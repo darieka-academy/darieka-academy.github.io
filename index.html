@@ -5,627 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Школа травниц Дариеки</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #2b3325;
-            --paper-color: #e8dcc4;
-            --paper-dark: #d4c5a9;
-            --text-dark: #2c241b;
-            --text-light: #f4ebd9;
-            --accent-green: #3d4d36;
-            --accent-gold: #b89b5e;
-            --border-color: #8c7a5d;
-            --danger-red: #8c3a3a;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
-            font-family: 'Merriweather', serif;
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 15px;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .screen {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .illustration-frame {
-            width: 100%;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: 3px solid var(--accent-green);
-            background-color: #1a1a1a;
-        }
-
-        .illustration-frame img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
-
-        .paper-card {
-            background-color: var(--paper-color);
-            background-image: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0  0 0.9 0 0 0  0 0.8 0 0 0  0 0 0 0.15 0"/></filter><rect width="200" height="200" filter="url(%23paper)"/></svg>');
-            color: var(--text-dark);
-            padding: 20px;
-            border-radius: 4px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-            position: relative;
-            margin-bottom: 15px;
-        }
-
-        .paper-card::before {
-            content: '';
-            position: absolute;
-            top: 5px; left: 5px; right: 5px; bottom: 5px;
-            border: 1px solid rgba(140, 122, 93, 0.4);
-            pointer-events: none;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
-            text-align: center;
-            color: var(--accent-green);
-            margin-bottom: 15px;
-        }
-
-        h1 { font-size: 26px; }
-        h2 { font-size: 22px; }
-        h3 { font-size: 20px; margin-bottom: 10px; }
-
-        p {
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .italic-text {
-            font-style: italic;
-            text-align: center;
-            color: #4a3b2c;
-            font-size: 16px;
-            margin: 15px 0;
-        }
-
-        .input-group {
-            margin: 15px 0;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            font-family: 'Merriweather', serif;
-            font-size: 16px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            color: var(--text-dark);
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        input[type="text"]:focus {
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 0 2px rgba(184, 155, 94, 0.4);
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background-color: var(--accent-green);
-            color: var(--text-light);
-            text-align: center;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
-            font-size: 18px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            transition: all 0.2s;
-            text-decoration: none;
-            margin-top: 10px;
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 3px rgba(0,0,0,0.4);
-        }
-
-        .btn-gold {
-            background-color: var(--accent-gold);
-            color: var(--text-dark);
-        }
-
-        .btn-disabled {
-            background-color: #7a7a7a;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .btn-back {
-            background-color: transparent;
-            color: var(--text-dark);
-            border: 1px solid var(--border-color);
-            box-shadow: none;
-            font-size: 15px;
-            margin-top: 15px;
-            padding: 10px;
-        }
-        .btn-back:active { background-color: rgba(0,0,0,0.05); }
-
-        .collectible-card {
-            background-color: var(--paper-dark);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            position: relative;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-        }
-
-        .card-image {
-            width: 100%;
-            max-width: 200px;
-            height: auto;
-            margin: 0 auto 10px auto;
-            display: block;
-            border-radius: 4px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            border: 2px solid var(--border-color);
-            background-color: #fff; 
-        }
-
-        .collectible-card .card-type {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #6d5c47;
-            margin-bottom: 10px;
-        }
-
-        .collectible-card h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .card-fact {
-            font-size: 13px;
-            background: rgba(255,255,255,0.3);
-            padding: 10px;
-            border-left: 3px solid var(--accent-green);
-            text-align: left;
-            margin-top: 15px;
-            font-style: italic;
-        }
-
-        .map-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        .location {
-            background-color: rgba(232, 220, 196, 0.2);
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 15px 10px;
-            text-align: center;
-            color: var(--text-light);
-            opacity: 0.6;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .location.unlocked {
-            background-color: var(--accent-green);
-            border: 1px solid var(--accent-gold);
-            opacity: 1;
-            color: var(--text-light);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        }
-
-        .location.researched {
-            background-color: #2c3d26;
-            border: 2px solid #8ba87f;
-            opacity: 1;
-            color: var(--text-light);
-            box-shadow: inset 0 0 10px rgba(139, 168, 127, 0.5);
-        }
-
-        .location-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .location-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .question-box {
-            background: rgba(255,255,255,0.3);
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 15px;
-        }
-
-        .answer-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 8px;
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: 'Merriweather', serif;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: left;
-            transition: background 0.2s;
-        }
-        
-        .answer-btn:hover { background-color: #f0e6d2; }
-
-        .feedback-text {
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        .text-center { text-align: center; }
-        .mt-20 { margin-top: 20px; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<div id="topBar" class="top-bar">
+    <div class="profile-info">
+        <div class="profile-name" id="ui-name">Ученица</div>
+        <div class="profile-rank">Новичок леса</div>
+    </div>
+    <div class="stats">
+        <div class="stat-box" id="ui-exp" onclick="alert('Опыт начисляется за уроки и квесты!')">⭐ 0</div>
+        <div class="stat-box" id="ui-items" onclick="openCollection()">🎒 0</div>
+    </div>
+</div>
+
 <div class="app-container">
-    
-    <!-- ЭКРАН 1: Ворота -->
+    <!-- ЭКРАН 1 -->
     <div id="screen-gates" class="screen active">
-        <div class="illustration-frame">
-            <img src="bg.png.PNG" alt="Академия Дариеки">
-        </div>
-        
+        <div class="illustration-frame"><img src="bg.png.PNG" alt="Академия"></div>
         <div class="paper-card">
             <h1>🚪 Ворота академии</h1>
             <p>Ты стоишь перед старыми коваными воротами. За ними — тропинка в лес и старый замок академии.</p>
-            <p>На воротах — табличка:</p>
             <p class="italic-text">«Входящий оставь здесь своё имя. Оно будет записано в Лесной архив».</p>
-            
-            <div class="input-group">
-                <input type="text" id="nameInput" placeholder="Твоё имя или прозвище" autocomplete="off">
-            </div>
-            
-            <button class="btn" onclick="saveName()">🖋️ Записать имя в архив</button>
+            <div class="input-group"><input type="text" id="nameInput" placeholder="Твоё имя" autocomplete="off"></div>
+            <button class="btn" onclick="saveName()">🖋️ Записать имя</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 2: Первая карточка -->
+    <!-- ЭКРАН 2 -->
     <div id="screen-card" class="screen">
         <div class="paper-card">
-            <p class="text-center italic-text">Перо скрипит по бумаге...</p>
             <h2 class="text-center">Имя записано в архив!</h2>
-            <p>Добро пожаловать в академию, <strong class="displayName"></strong>.</p>
-            <p>Ты — <strong>Новичок леса</strong>. Это твой первый ранг.</p>
+            <p>Добро пожаловать, <strong class="displayName"></strong>.</p>
             <p>В знак того, что ты теперь часть академии, прими свой первый предмет:</p>
-
             <div class="collectible-card">
-                <img src="IMG_9218.png" alt="Пропуск исследовательницы" class="card-image">
-                
-                <div class="card-type">Категория: Артефакт • Редкость: Обычная</div>
+                <img src="IMG_9218.png" alt="Пропуск" class="card-image">
+                <div class="card-type">Артефакт • Обычная</div>
                 <h3>Пропуск исследовательницы</h3>
-                <p>Старинный пропуск с гербом академии. На обратной стороне — место для имени. Говорят, он открывает не только двери, но и некоторые тайны.</p>
-                <div class="card-fact">
-                    <strong>Интересный факт:</strong> у первой хранительницы академии был точно такой же пропуск — только вместо герба на нём был отпечаток листа.
-                </div>
+                <p>Старинный пропуск с гербом академии.</p>
             </div>
-
-            <button class="btn btn-gold" onclick="addToCollection()">✨ Добавить в коллекцию</button>
+            <button class="btn btn-gold" onclick="addToCollection('pass')">✨ Добавить в коллекцию</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 3: Карта -->
+    <!-- ЭКРАН 3: КАРТА -->
     <div id="screen-map" class="screen">
         <div class="paper-card">
             <h1 class="text-center">Карта академии</h1>
-            <p class="text-center" id="mapGreeting">Твой первый шаг</p>
-            <p>🎉 <strong>Первая находка в коллекции!</strong></p>
-            <p>Ты можешь посещать открытые локации. Вот твоя академия:</p>
-            
+            <p class="text-center" id="mapGreeting">Твой путь начинается здесь</p>
             <div class="map-container">
-                <div class="location unlocked" onclick="alert('Ворота всегда открыты для тебя!')">
-                    <span class="location-icon" id="gateIcon">🚪</span>
-                    <span class="location-name">Ворота академии</span>
-                </div>
-                <!-- Оранжерея -->
-                <div id="locationGreenhouse" class="location" onclick="startGreenhouse()">
-                    <span class="location-icon" id="greenhouseIcon">🔒</span>
-                    <span class="location-name" id="greenhouseName">Старая оранжерея</span>
-                </div>
-                <div class="location">
-                    <span class="location-icon">🔒</span>
-                    <span class="location-name">Библиотека</span>
-                </div>
-                <div class="location">
-                    <span class="location-icon">🔒</span>
-                    <span class="location-name">Чердак</span>
-                </div>
+                <div class="location unlocked" onclick="alert('Ворота всегда открыты!')"><span class="location-icon">🚪</span><span class="location-name">Ворота</span></div>
+                <div id="loc-greenhouse" class="location" onclick="startGreenhouse()"><span class="location-icon" id="icon-greenhouse">🔒</span><span class="location-name" id="name-greenhouse">Оранжерея</span></div>
+                <div class="location"><span class="location-icon">🔒</span><span class="location-name">Библиотека</span></div>
+                <div class="location"><span class="location-icon">🔒</span><span class="location-name">Чердак</span></div>
             </div>
-
-            <button id="btnStartLesson" class="btn" onclick="openDariekaMeeting()">📖 Моя академия</button>
+            <button id="btn-start-lesson" class="btn" onclick="openDariekaMeeting()">📖 Продолжить обучение</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 4: Встреча с Дариекой -->
+    <!-- ЭКРАН 4 -->
     <div id="screen-meeting" class="screen">
         <div class="paper-card">
             <h2 class="text-center">Встреча с Дариекой</h2>
-            <p>🌿 <strong>Дариека:</strong> «Я видела, как ты записала своё имя в архив. Добро пожаловать, <span class="displayName"></span>!</p>
-            <p>Каждая травница начинает путь с простого умения — замечать детали. Я открываю тебе первую локацию — <strong>Старую оранжерею</strong>. Там тебя ждёт первый урок.</p>
-            <p>Но будь внимательна: в оранжерее всегда есть маленькие тайны».</p>
-            
+            <p>🌿 <strong>Дариека:</strong> «Добро пожаловать, <span class="displayName"></span>! Я открываю тебе Старую оранжерею».</p>
             <button class="btn" onclick="goToGreenhouseLesson()">🌿 Войти в Оранжерею</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 5: Урок в Оранжерее -->
+    <!-- ЭКРАН 5 -->
     <div id="screen-lesson2" class="screen">
-        <div class="illustration-frame">
-            <!-- Картинка оранжереи -->
-            <img src="IMG_9221.png.jfif" alt="Старая оранжерея">
-        </div>
-
+        <div class="illustration-frame"><img src="IMG_9221.png.jfif" alt="Оранжерея"></div>
         <div class="paper-card">
             <h2 class="text-center">Урок 1. Язык листьев</h2>
-            <p>Травницы знают: растения не умеют говорить, но могут многое рассказать внимательному исследователю.</p>
-            <p>Рассмотри любой опавший листик или комнатное растение, если взрослые разрешают. Обрати внимание на его форму, края, цвет и прожилки.</p>
-            <p>У каждого растения есть свои особенности. Даже два листочка с одного дерева могут немного отличаться друг от друга!</p>
-            <p><strong>Главное правило исследовательницы:</strong> мы не пробуем незнакомые растения на вкус, не срываем их и не трогаем без разрешения.</p>
-            
+            <p>Рассмотри любой опавший листик или комнатное растение. Обрати внимание на его форму, края и прожилки.</p>
+            <p><strong>Главное правило:</strong> мы не пробуем незнакомые растения на вкус и не трогаем без разрешения.</p>
             <button class="btn" onclick="showQuiz()">✅ Я изучила урок</button>
-            <button class="btn btn-back" onclick="switchScreen('screen-lesson2', 'screen-map')">← Вернуться на карту</button>
+            <button class="btn btn-back" onclick="switchScreen('screen-lesson2', 'screen-map')">← На карту</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 6: Проверка знаний -->
+    <!-- ЭКРАН 6 -->
     <div id="screen-quiz" class="screen">
         <div class="paper-card">
             <h2 class="text-center">Проверка знаний</h2>
-            <p><strong>Дариека:</strong> «Проверим, как ты усвоила первое правило. Как должна вести себя настоящая юная исследовательница?»</p>
-            
+            <p><strong>Дариека:</strong> «Как должна вести себя настоящая исследовательница?»</p>
             <div class="question-box">
-                <button class="answer-btn" onclick="checkAnswer(1)">А. Собирать незнакомые цветы и листья.</button>
-                <button class="answer-btn" onclick="checkAnswer(2)">Б. Рассматривать растения, не пробовать их на вкус и не трогать без разрешения.</button>
-                <button class="answer-btn" onclick="checkAnswer(3)">В. Уносить домой всё, что покажется интересным.</button>
+                <button class="answer-btn" onclick="checkAnswer(1)">А. Собирать незнакомые цветы.</button>
+                <button class="answer-btn" onclick="checkAnswer(2)">Б. Рассматривать, не пробовать и не трогать без разрешения.</button>
+                <button class="answer-btn" onclick="checkAnswer(3)">В. Уносить домой всё интересное.</button>
             </div>
-            
             <div id="quizFeedback" class="feedback-text"></div>
-            
-            <!-- Кнопка возврата к уроку -->
-            <button class="btn btn-back" onclick="switchScreen('screen-quiz', 'screen-lesson2')">← Вернуться к уроку</button>
+            <button class="btn btn-back" onclick="switchScreen('screen-quiz', 'screen-lesson2')">← К уроку</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 7: Награда (Карточка папоротника) -->
+    <!-- ЭКРАН 7 -->
     <div id="screen-reward2" class="screen">
         <div class="paper-card">
             <h2 class="text-center">Отличная работа!</h2>
-            <p>Дариека улыбается: «Прекрасно! Ты запомнила первое правило Академии. Внимательность и осторожность — лучшие качества исследовательницы!»</p>
-            <p>За твои старания я дарю тебе первую находку из оранжереи:</p>
-
+            <p>Дариека улыбается: «Ты запомнила первое правило!»</p>
             <div class="collectible-card">
-                <!-- Картинка папоротника -->
-                <img src="0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif" alt="Лист папоротника" class="card-image">
-                
-                <div class="card-type">РАСТЕНИЕ • ОБЫЧНАЯ РЕДКОСТЬ</div>
+                <img src="0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif" alt="Папоротник" class="card-image">
+                <div class="card-type">Растение • Обычная</div>
                 <h3>Лист папоротника</h3>
-                <p>Засушенный лист папоротника, найденный между страницами старого учебника.</p>
-                <p>У папоротников нет цветов, а их листья часто образуют красивые узоры.</p>
-                <div class="card-fact">
-                    <strong>Интересный факт:</strong> Папоротники появились задолго до динозавров. Их древние родственники росли на Земле сотни миллионов лет назад.
-                </div>
+                <p>Найден между страницами старого учебника.</p>
             </div>
-
             <button class="btn btn-gold" onclick="finishLesson()">✨ Добавить в коллекцию</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 8: СЕКРЕТ -->
+    <div id="screen-secret" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Тайна Оранжереи</h2>
+            <p>Из старой книги выпал листок. На нем цифры:</p>
+            <p class="text-center" style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #8c3a3a;">12 – 10 – 19 – 20</p>
+            <p><em>«Это не цифры. Это буквы. Посчитай от начала алфавита».</em></p>
+            <div class="input-group"><input type="text" id="secretInput" placeholder="Введи слово" style="text-transform: uppercase;"></div>
+            <button class="btn" onclick="checkSecret()">Разгадать</button>
+            <button class="btn btn-back" onclick="switchScreen('screen-secret', 'screen-map')">← На карту</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 9: КЛЮЧ -->
+    <div id="screen-secret-reward" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Тайна разгадана!</h2>
+            <p>«Слово "ЛИСТ" было ключом», — говорит Дариека.</p>
+            <div class="collectible-card">
+                <!-- Сюда потом вставим key.jfif -->
+                <img src="key.jfif" alt="Ключ" class="card-image" style="background:#d4c5a9;">
+                <div class="card-type">Артефакт • Необычная</div>
+                <h3>Старый ключ</h3>
+                <p>Тяжелый бронзовый ключ с биркой «Не для дверей».</p>
+            </div>
+            <button class="btn btn-gold" onclick="finishSecret()">✨ Забрать ключ</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 10: КОЛЛЕКЦИЯ -->
+    <div id="screen-collection" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">🎒 Моя коллекция</h2>
+            <div id="collection-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;"></div>
+            <button class="btn btn-back" onclick="switchScreen('screen-collection', 'screen-map')">← На карту</button>
         </div>
     </div>
 
 </div>
 
-<script>
-    // --- Состояние игры ---
-    let gameState = {
-        name: localStorage.getItem('darieka_student_name') || '',
-        hasPass: localStorage.getItem('darieka_has_pass') === 'true',
-        hasFern: localStorage.getItem('darieka_has_fern') === 'true',
-        exp: parseInt(localStorage.getItem('darieka_exp')) || 0,
-        greenhouseOpened: localStorage.getItem('darieka_greenhouse_opened') === 'true',
-        lesson1Completed: localStorage.getItem('darieka_lesson1_completed') === 'true'
-    };
-
-    // --- Сохранение состояния ---
-    function saveState() {
-        localStorage.setItem('darieka_student_name', gameState.name);
-        localStorage.setItem('darieka_has_pass', gameState.hasPass);
-        localStorage.setItem('darieka_has_fern', gameState.hasFern);
-        localStorage.setItem('darieka_exp', gameState.exp);
-        localStorage.setItem('darieka_greenhouse_opened', gameState.greenhouseOpened);
-        localStorage.setItem('darieka_lesson1_completed', gameState.lesson1Completed);
-    }
-
-    // --- Утилита переключения экранов ---
-    function switchScreen(hideId, showId) {
-        if (hideId) document.getElementById(hideId).classList.remove('active');
-        if (showId) document.getElementById(showId).classList.add('active');
-        window.scrollTo(0, 0);
-    }
-
-    // --- Логика инициализации ---
-    window.onload = function() {
-        const nameElements = document.querySelectorAll('.displayName');
-        nameElements.forEach(el => el.innerText = gameState.name);
-        
-        if (gameState.name && gameState.hasPass) {
-            updateMapUI();
-            switchScreen('screen-gates', 'screen-map');
-        } else if (gameState.name) {
-            switchScreen('screen-gates', 'screen-card');
-        }
-    };
-
-    // --- Шаг 1: Ворота и Пропуск ---
-    function saveName() {
-        const nameInput = document.getElementById('nameInput');
-        const name = nameInput.value.trim();
-        
-        if (name === "") {
-            alert("Пожалуйста, напиши своё имя или прозвище.");
-            return;
-        }
-
-        gameState.name = name;
-        saveState();
-        
-        const nameElements = document.querySelectorAll('.displayName');
-        nameElements.forEach(el => el.innerText = gameState.name);
-        
-        switchScreen('screen-gates', 'screen-card');
-    }
-
-    function addToCollection() {
-        gameState.hasPass = true;
-        saveState();
-        updateMapUI();
-        switchScreen('screen-card', 'screen-map');
-    }
-
-    // --- Шаг 2: Оранжерея ---
-    function startGreenhouse() {
-        if (gameState.greenhouseOpened) {
-            switchScreen('screen-map', 'screen-lesson2');
-        } else {
-            alert('Сначала поговори с Дариекой в разделе "Моя академия"!');
-        }
-    }
-
-    function openDariekaMeeting() {
-        if (gameState.lesson1Completed) {
-            alert('Ты уже прошла этот урок! Но можешь возвращаться в оранжерею, чтобы полюбоваться цветами.');
-            return;
-        }
-        if (gameState.greenhouseOpened) {
-            switchScreen('screen-map', 'screen-lesson2');
-            return;
-        }
-        
-        switchScreen('screen-map', 'screen-meeting');
-    }
-
-    function goToGreenhouseLesson() {
-        gameState.greenhouseOpened = true;
-        saveState();
-        updateMapUI();
-        switchScreen('screen-meeting', 'screen-lesson2');
-    }
-
-    function showQuiz() {
-        switchScreen('screen-lesson2', 'screen-quiz');
-    }
-
-    function checkAnswer(choice) {
-        const feedback = document.getElementById('quizFeedback');
-        
-        if (choice === 2) {
-            feedback.innerHTML = '<span style="color: green;">Прекрасно! Ты запомнила первое правило Академии.</span>';
-            if (!gameState.lesson1Completed) {
-                gameState.exp += 15;
-                saveState();
-            }
-            
-            setTimeout(() => {
-                switchScreen('screen-quiz', 'screen-reward2');
-            }, 1500);
-            
-        } else {
-            feedback.innerHTML = '<span style="color: #8c3a3a;">Не совсем! Исследовательница должна быть осторожной. Незнакомые растения могут быть опасны. Мы наблюдаем за ними глазами и не трогаем без разрешения.</span>';
-        }
-    }
-
-    function finishLesson() {
-        gameState.hasFern = true;
-        gameState.lesson1Completed = true;
-        saveState();
-        
-        updateMapUI();
-        switchScreen('screen-reward2', 'screen-map');
-        alert('Урок 1 пройден! Твой опыт: ' + gameState.exp + '. В коллекции: ' + (gameState.hasPass ? 1 : 0) + (gameState.hasFern ? 1 : 0) + ' предмета.');
-    }
-
-    // --- Обновление карты ---
-    function updateMapUI() {
-        const greenhouseLoc = document.getElementById('locationGreenhouse');
-        const greenhouseName = document.getElementById('greenhouseName');
-        const greenhouseIcon = document.getElementById('greenhouseIcon');
-        const btnStart = document.getElementById('btnStartLesson');
-
-        if (gameState.lesson1Completed) {
-            greenhouseLoc.classList.remove('locked');
-            greenhouseLoc.classList.add('researched');
-            greenhouseName.innerText = "Оранжерея (Изучена)";
-            greenhouseIcon.innerText = "🌿";
-            btnStart.innerText = "📖 Моя академия (Урок 1 пройден)";
-            btnStart.classList.add('btn-disabled');
-        } else if (gameState.greenhouseOpened) {
-            greenhouseLoc.classList.remove('locked');
-            greenhouseLoc.classList.add('unlocked');
-            greenhouseName.innerText = "Старая оранжерея";
-            greenhouseIcon.innerText = "🌿";
-        }
-    }
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
