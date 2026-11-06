@@ -25,7 +25,6 @@
 
         body {
             background-color: var(--bg-color);
-            /* Убрали картинку с фона, оставили красивый темно-зеленый */
             background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
             font-family: 'Merriweather', serif;
             color: var(--text-light);
@@ -57,7 +56,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Стиль для рамки с картинкой */
         .illustration-frame {
             width: 100%;
             border-radius: 4px;
@@ -182,6 +180,19 @@
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
         }
 
+        .card-image {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            margin: 0 auto 10px auto;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid var(--border-color);
+            /* Добавил белый фон картинке, чтобы если прозрачность не сработает, она смотрелась аккуратно на белом */
+            background-color: #fff; 
+        }
+
         .collectible-card .card-type {
             font-size: 12px;
             text-transform: uppercase;
@@ -252,9 +263,7 @@
 
 <div class="app-container">
     
-    <!-- ЭКРАН 1: Ворота -->
     <div id="screen-gates" class="screen active">
-        <!-- Вот наша картинка в красивой рамке -->
         <div class="illustration-frame">
             <img src="bg.png.PNG" alt="Академия Дариеки">
         </div>
@@ -273,7 +282,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2: Первая карточка -->
     <div id="screen-card" class="screen">
         <div class="paper-card">
             <p class="text-center italic-text" id="welcomeText">Перо скрипит по бумаге...</p>
@@ -283,6 +291,9 @@
             <p>В знак того, что ты теперь часть академии, прими свой первый предмет:</p>
 
             <div class="collectible-card">
+                <!-- Вот тут мы используем твое название IMG_9218.png -->
+                <img src="IMG_9218.png" alt="Пропуск исследовательницы" class="card-image">
+                
                 <div class="card-type">Категория: Артефакт • Редкость: Обычная</div>
                 <h3>Пропуск исследовательницы</h3>
                 <p>Старинный пропуск с гербом академии. На обратной стороне — место для имени. Говорят, он открывает не только двери, но и некоторые тайны.</p>
@@ -295,7 +306,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 3: Карта -->
     <div id="screen-map" class="screen">
         <div class="paper-card">
             <h1 class="text-center">Твой первый шаг</h1>
