@@ -178,6 +178,17 @@
             opacity: 0.7;
         }
 
+        .btn-back {
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            font-size: 15px;
+            margin-top: 15px;
+            padding: 10px;
+        }
+        .btn-back:active { background-color: rgba(0,0,0,0.05); }
+
         .collectible-card {
             background-color: var(--paper-dark);
             border: 2px solid var(--border-color);
@@ -403,7 +414,8 @@
     <!-- ЭКРАН 5: Урок в Оранжерее -->
     <div id="screen-lesson2" class="screen">
         <div class="illustration-frame">
-            <img src="ИЗОБРАЖЕНИЕ_9221.png.jfif" alt="Старая оранжерея">
+            <!-- Картинка оранжереи -->
+            <img src="orangereya.jfif" alt="Старая оранжерея">
         </div>
 
         <div class="paper-card">
@@ -414,6 +426,7 @@
             <p><strong>Главное правило исследовательницы:</strong> мы не пробуем незнакомые растения на вкус, не срываем их и не трогаем без разрешения.</p>
             
             <button class="btn" onclick="showQuiz()">✅ Я изучила урок</button>
+            <button class="btn btn-back" onclick="switchScreen('screen-lesson2', 'screen-map')">← Вернуться на карту</button>
         </div>
     </div>
 
@@ -430,6 +443,9 @@
             </div>
             
             <div id="quizFeedback" class="feedback-text"></div>
+            
+            <!-- Кнопка возврата к уроку -->
+            <button class="btn btn-back" onclick="switchScreen('screen-quiz', 'screen-lesson2')">← Вернуться к уроку</button>
         </div>
     </div>
 
@@ -441,6 +457,9 @@
             <p>За твои старания я дарю тебе первую находку из оранжереи:</p>
 
             <div class="collectible-card">
+                <!-- Картинка папоротника -->
+                <img src="0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif" alt="Лист папоротника" class="card-image">
+                
                 <div class="card-type">РАСТЕНИЕ • ОБЫЧНАЯ РЕДКОСТЬ</div>
                 <h3>Лист папоротника</h3>
                 <p>Засушенный лист папоротника, найденный между страницами старого учебника.</p>
@@ -486,11 +505,9 @@
 
     // --- Логика инициализации ---
     window.onload = function() {
-        // Подставляем имя везде, где нужно
         const nameElements = document.querySelectorAll('.displayName');
         nameElements.forEach(el => el.innerText = gameState.name);
         
-        // Определяем, с какого экрана начать
         if (gameState.name && gameState.hasPass) {
             updateMapUI();
             switchScreen('screen-gates', 'screen-map');
@@ -540,12 +557,10 @@
             return;
         }
         if (gameState.greenhouseOpened) {
-            // Если урок открыт, но не пройден
             switchScreen('screen-map', 'screen-lesson2');
             return;
         }
         
-        // Первое открытие
         switchScreen('screen-map', 'screen-meeting');
     }
 
@@ -565,15 +580,14 @@
         
         if (choice === 2) {
             feedback.innerHTML = '<span style="color: green;">Прекрасно! Ты запомнила первое правило Академии.</span>';
-            // Начисляем опыт только если урок еще не пройден
             if (!gameState.lesson1Completed) {
-                gameState.exp += 15; // 10 за урок + 5 за ответ
+                gameState.exp += 15;
                 saveState();
             }
             
             setTimeout(() => {
                 switchScreen('screen-quiz', 'screen-reward2');
-            }, 1500); // Задержка 1.5 секунды
+            }, 1500);
             
         } else {
             feedback.innerHTML = '<span style="color: #8c3a3a;">Не совсем! Исследовательница должна быть осторожной. Незнакомые растения могут быть опасны. Мы наблюдаем за ними глазами и не трогаем без разрешения.</span>';
@@ -598,7 +612,6 @@
         const btnStart = document.getElementById('btnStartLesson');
 
         if (gameState.lesson1Completed) {
-            // Локация исследована
             greenhouseLoc.classList.remove('locked');
             greenhouseLoc.classList.add('researched');
             greenhouseName.innerText = "Оранжерея (Изучена)";
@@ -606,7 +619,6 @@
             btnStart.innerText = "📖 Моя академия (Урок 1 пройден)";
             btnStart.classList.add('btn-disabled');
         } else if (gameState.greenhouseOpened) {
-            // Локация открыта, но не пройдена
             greenhouseLoc.classList.remove('locked');
             greenhouseLoc.classList.add('unlocked');
             greenhouseName.innerText = "Старая оранжерея";
