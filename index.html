@@ -25,17 +25,14 @@
 
         body {
             background-color: var(--bg-color);
-            /* ЗДЕСЬ МЫ УКАЗАЛИ ТОЧНОЕ ИМЯ ФАЙЛА */
-            background-image: linear-gradient(rgba(43, 51, 37, 0.6), rgba(43, 51, 37, 0.8)), url('bg.png.PNG');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            /* Убрали картинку с фона, оставили красивый темно-зеленый */
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
             font-family: 'Merriweather', serif;
             color: var(--text-light);
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
         .app-container {
@@ -43,12 +40,12 @@
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .screen {
             display: none;
-            animation: fadeIn 1s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         .screen.active {
@@ -60,16 +57,33 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Стиль для рамки с картинкой */
+        .illustration-frame {
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 3px solid var(--accent-green);
+            background-color: #1a1a1a;
+        }
+
+        .illustration-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
         .paper-card {
             background-color: var(--paper-color);
             background-image: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0  0 0.9 0 0 0  0 0.8 0 0 0  0 0 0 0.15 0"/></filter><rect width="200" height="200" filter="url(%23paper)"/></svg>');
             color: var(--text-dark);
-            padding: 30px 20px;
+            padding: 20px;
             border-radius: 4px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
             border: 1px solid var(--border-color);
             position: relative;
-            opacity: 0.95; 
         }
 
         .paper-card::before {
@@ -88,8 +102,8 @@
             margin-bottom: 15px;
         }
 
-        h1 { font-size: 28px; }
-        h2 { font-size: 24px; }
+        h1 { font-size: 26px; }
+        h2 { font-size: 22px; }
         h3 { font-size: 20px; margin-bottom: 10px; }
 
         p {
@@ -104,11 +118,11 @@
             text-align: center;
             color: #4a3b2c;
             font-size: 16px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .input-group {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         input[type="text"] {
@@ -161,8 +175,8 @@
             background-color: var(--paper-dark);
             border: 2px solid var(--border-color);
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 15px;
+            margin: 15px 0;
             text-align: center;
             position: relative;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
@@ -177,8 +191,8 @@
         }
 
         .collectible-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -196,24 +210,25 @@
         .map-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         .location {
             background-color: rgba(232, 220, 196, 0.2);
             border: 1px dashed var(--border-color);
             border-radius: 8px;
-            padding: 15px;
+            padding: 15px 10px;
             text-align: center;
-            color: var(--text-light);
-            opacity: 0.5;
+            color: var(--text-dark);
+            opacity: 0.6;
         }
 
         .location.unlocked {
             background-color: var(--accent-green);
             border: 1px solid var(--accent-gold);
             opacity: 1;
+            color: var(--text-light);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
@@ -225,7 +240,7 @@
 
         .location-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
         }
         
@@ -237,10 +252,16 @@
 
 <div class="app-container">
     
+    <!-- ЭКРАН 1: Ворота -->
     <div id="screen-gates" class="screen active">
+        <!-- Вот наша картинка в красивой рамке -->
+        <div class="illustration-frame">
+            <img src="bg.png.PNG" alt="Академия Дариеки">
+        </div>
+        
         <div class="paper-card">
             <h1>🚪 Ворота академии</h1>
-            <p>Ты стоишь перед старыми коваными воротами, увитыми плющом. За ними — тропинка в лес.</p>
+            <p>Ты стоишь перед старыми коваными воротами. За ними — тропинка в лес и старый замок академии.</p>
             <p>На воротах — табличка:</p>
             <p class="italic-text">«Входящий оставь здесь своё имя. Оно будет записано в Лесной архив».</p>
             
@@ -252,6 +273,7 @@
         </div>
     </div>
 
+    <!-- ЭКРАН 2: Первая карточка -->
     <div id="screen-card" class="screen">
         <div class="paper-card">
             <p class="text-center italic-text" id="welcomeText">Перо скрипит по бумаге...</p>
@@ -273,6 +295,7 @@
         </div>
     </div>
 
+    <!-- ЭКРАН 3: Карта -->
     <div id="screen-map" class="screen">
         <div class="paper-card">
             <h1 class="text-center">Твой первый шаг</h1>
