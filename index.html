@@ -15,6 +15,7 @@
             --accent-green: #3d4d36;
             --accent-gold: #b89b5e;
             --border-color: #8c7a5d;
+            --danger-red: #8c3a3a;
         }
 
         * {
@@ -82,6 +83,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
             border: 1px solid var(--border-color);
             position: relative;
+            margin-bottom: 15px;
         }
 
         .paper-card::before {
@@ -157,6 +159,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             transition: all 0.2s;
             text-decoration: none;
+            margin-top: 10px;
         }
 
         .btn:active {
@@ -167,6 +170,12 @@
         .btn-gold {
             background-color: var(--accent-gold);
             color: var(--text-dark);
+        }
+
+        .btn-disabled {
+            background-color: #7a7a7a;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .collectible-card {
@@ -189,7 +198,6 @@
             border-radius: 4px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             border: 2px solid var(--border-color);
-            /* Добавил белый фон картинке, чтобы если прозрачность не сработает, она смотрелась аккуратно на белом */
             background-color: #fff; 
         }
 
@@ -223,6 +231,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 15px;
+            margin-bottom: 15px;
         }
 
         .location {
@@ -231,8 +240,10 @@
             border-radius: 8px;
             padding: 15px 10px;
             text-align: center;
-            color: var(--text-dark);
+            color: var(--text-light);
             opacity: 0.6;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
         .location.unlocked {
@@ -241,6 +252,14 @@
             opacity: 1;
             color: var(--text-light);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .location.researched {
+            background-color: #2c3d26;
+            border: 2px solid #8ba87f;
+            opacity: 1;
+            color: var(--text-light);
+            box-shadow: inset 0 0 10px rgba(139, 168, 127, 0.5);
         }
 
         .location-icon {
@@ -254,7 +273,37 @@
             font-size: 15px;
             font-weight: 700;
         }
+
+        .question-box {
+            background: rgba(255,255,255,0.3);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .answer-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: 'Merriweather', serif;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s;
+        }
         
+        .answer-btn:hover { background-color: #f0e6d2; }
+
+        .feedback-text {
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
         .text-center { text-align: center; }
         .mt-20 { margin-top: 20px; }
     </style>
@@ -263,6 +312,7 @@
 
 <div class="app-container">
     
+    <!-- ЭКРАН 1: Ворота -->
     <div id="screen-gates" class="screen active">
         <div class="illustration-frame">
             <img src="bg.png.PNG" alt="Академия Дариеки">
@@ -282,16 +332,16 @@
         </div>
     </div>
 
+    <!-- ЭКРАН 2: Первая карточка -->
     <div id="screen-card" class="screen">
         <div class="paper-card">
-            <p class="text-center italic-text" id="welcomeText">Перо скрипит по бумаге...</p>
+            <p class="text-center italic-text">Перо скрипит по бумаге...</p>
             <h2 class="text-center">Имя записано в архив!</h2>
-            <p>Добро пожаловать в академию, <strong id="displayName"></strong>.</p>
+            <p>Добро пожаловать в академию, <strong class="displayName"></strong>.</p>
             <p>Ты — <strong>Новичок леса</strong>. Это твой первый ранг.</p>
             <p>В знак того, что ты теперь часть академии, прими свой первый предмет:</p>
 
             <div class="collectible-card">
-                <!-- Вот тут мы используем твое название IMG_9218.png -->
                 <img src="IMG_9218.png" alt="Пропуск исследовательницы" class="card-image">
                 
                 <div class="card-type">Категория: Артефакт • Редкость: Обычная</div>
@@ -306,20 +356,23 @@
         </div>
     </div>
 
+    <!-- ЭКРАН 3: Карта -->
     <div id="screen-map" class="screen">
         <div class="paper-card">
-            <h1 class="text-center">Твой первый шаг</h1>
-            <p class="text-center">🎉 <strong>Первая находка в коллекции!</strong></p>
-            <p>Теперь у тебя есть <strong>1 предмет</strong> в архиве. Но сначала — осмотрись. Вот твоя академия:</p>
+            <h1 class="text-center">Карта академии</h1>
+            <p class="text-center" id="mapGreeting">Твой первый шаг</p>
+            <p>🎉 <strong>Первая находка в коллекции!</strong></p>
+            <p>Ты можешь посещать открытые локации. Вот твоя академия:</p>
             
             <div class="map-container">
-                <div class="location unlocked">
-                    <span class="location-icon">🚪</span>
+                <div class="location unlocked" onclick="alert('Ворота всегда открыты для тебя!')">
+                    <span class="location-icon" id="gateIcon">🚪</span>
                     <span class="location-name">Ворота академии</span>
                 </div>
-                <div class="location">
-                    <span class="location-icon">🔒</span>
-                    <span class="location-name">Старая оранжерея</span>
+                <!-- Оранжерея -->
+                <div id="locationGreenhouse" class="location" onclick="startGreenhouse()">
+                    <span class="location-icon" id="greenhouseIcon">🔒</span>
+                    <span class="location-name" id="greenhouseName">Старая оранжерея</span>
                 </div>
                 <div class="location">
                     <span class="location-icon">🔒</span>
@@ -331,15 +384,122 @@
                 </div>
             </div>
 
-            <div class="mt-20">
-                <button class="btn" onclick="alert('Скоро здесь появятся уроки! Жди весточку от Дариеки.')">📖 Моя академия</button>
+            <button id="btnStartLesson" class="btn" onclick="openDariekaMeeting()">📖 Моя академия</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: Встреча с Дариекой -->
+    <div id="screen-meeting" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Встреча с Дариекой</h2>
+            <p>🌿 <strong>Дариека:</strong> «Я видела, как ты записала своё имя в архив. Добро пожаловать, <span class="displayName"></span>!</p>
+            <p>Каждая травница начинает путь с простого умения — замечать детали. Я открываю тебе первую локацию — <strong>Старую оранжерею</strong>. Там тебя ждёт первый урок.</p>
+            <p>Но будь внимательна: в оранжерее всегда есть маленькие тайны».</p>
+            
+            <button class="btn" onclick="goToGreenhouseLesson()">🌿 Войти в Оранжерею</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 5: Урок в Оранжерее -->
+    <div id="screen-lesson2" class="screen">
+        <div class="illustration-frame">
+            <img src="IMG_9221.png" alt="Старая оранжерея">
+        </div>
+
+        <div class="paper-card">
+            <h2 class="text-center">Урок 1. Язык листьев</h2>
+            <p>Травницы знают: растения не умеют говорить, но могут многое рассказать внимательному исследователю.</p>
+            <p>Рассмотри любой опавший листик или комнатное растение, если взрослые разрешают. Обрати внимание на его форму, края, цвет и прожилки.</p>
+            <p>У каждого растения есть свои особенности. Даже два листочка с одного дерева могут немного отличаться друг от друга!</p>
+            <p><strong>Главное правило исследовательницы:</strong> мы не пробуем незнакомые растения на вкус, не срываем их и не трогаем без разрешения.</p>
+            
+            <button class="btn" onclick="showQuiz()">✅ Я изучила урок</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 6: Проверка знаний -->
+    <div id="screen-quiz" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Проверка знаний</h2>
+            <p><strong>Дариека:</strong> «Проверим, как ты усвоила первое правило. Как должна вести себя настоящая юная исследовательница?»</p>
+            
+            <div class="question-box">
+                <button class="answer-btn" onclick="checkAnswer(1)">А. Собирать незнакомые цветы и листья.</button>
+                <button class="answer-btn" onclick="checkAnswer(2)">Б. Рассматривать растения, не пробовать их на вкус и не трогать без разрешения.</button>
+                <button class="answer-btn" onclick="checkAnswer(3)">В. Уносить домой всё, что покажется интересным.</button>
             </div>
+            
+            <div id="quizFeedback" class="feedback-text"></div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 7: Награда (Карточка папоротника) -->
+    <div id="screen-reward2" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Отличная работа!</h2>
+            <p>Дариека улыбается: «Прекрасно! Ты запомнила первое правило Академии. Внимательность и осторожность — лучшие качества исследовательницы!»</p>
+            <p>За твои старания я дарю тебе первую находку из оранжереи:</p>
+
+            <div class="collectible-card">
+                <div class="card-type">РАСТЕНИЕ • ОБЫЧНАЯ РЕДКОСТЬ</div>
+                <h3>Лист папоротника</h3>
+                <p>Засушенный лист папоротника, найденный между страницами старого учебника.</p>
+                <p>У папоротников нет цветов, а их листья часто образуют красивые узоры.</p>
+                <div class="card-fact">
+                    <strong>Интересный факт:</strong> Папоротники появились задолго до динозавров. Их древние родственники росли на Земле сотни миллионов лет назад.
+                </div>
+            </div>
+
+            <button class="btn btn-gold" onclick="finishLesson()">✨ Добавить в коллекцию</button>
         </div>
     </div>
 
 </div>
 
 <script>
+    // --- Состояние игры ---
+    let gameState = {
+        name: localStorage.getItem('darieka_student_name') || '',
+        hasPass: localStorage.getItem('darieka_has_pass') === 'true',
+        hasFern: localStorage.getItem('darieka_has_fern') === 'true',
+        exp: parseInt(localStorage.getItem('darieka_exp')) || 0,
+        greenhouseOpened: localStorage.getItem('darieka_greenhouse_opened') === 'true',
+        lesson1Completed: localStorage.getItem('darieka_lesson1_completed') === 'true'
+    };
+
+    // --- Сохранение состояния ---
+    function saveState() {
+        localStorage.setItem('darieka_student_name', gameState.name);
+        localStorage.setItem('darieka_has_pass', gameState.hasPass);
+        localStorage.setItem('darieka_has_fern', gameState.hasFern);
+        localStorage.setItem('darieka_exp', gameState.exp);
+        localStorage.setItem('darieka_greenhouse_opened', gameState.greenhouseOpened);
+        localStorage.setItem('darieka_lesson1_completed', gameState.lesson1Completed);
+    }
+
+    // --- Утилита переключения экранов ---
+    function switchScreen(hideId, showId) {
+        if (hideId) document.getElementById(hideId).classList.remove('active');
+        if (showId) document.getElementById(showId).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    // --- Логика инициализации ---
+    window.onload = function() {
+        // Подставляем имя везде, где нужно
+        const nameElements = document.querySelectorAll('.displayName');
+        nameElements.forEach(el => el.innerText = gameState.name);
+        
+        // Определяем, с какого экрана начать
+        if (gameState.name && gameState.hasPass) {
+            updateMapUI();
+            switchScreen('screen-gates', 'screen-map');
+        } else if (gameState.name) {
+            switchScreen('screen-gates', 'screen-card');
+        }
+    };
+
+    // --- Шаг 1: Ворота и Пропуск ---
     function saveName() {
         const nameInput = document.getElementById('nameInput');
         const name = nameInput.value.trim();
@@ -349,34 +509,110 @@
             return;
         }
 
-        localStorage.setItem('darieka_student_name', name);
-        document.getElementById('displayName').innerText = name;
+        gameState.name = name;
+        saveState();
+        
+        const nameElements = document.querySelectorAll('.displayName');
+        nameElements.forEach(el => el.innerText = gameState.name);
+        
         switchScreen('screen-gates', 'screen-card');
     }
 
     function addToCollection() {
-        localStorage.setItem('darieka_has_pass', 'true');
+        gameState.hasPass = true;
+        saveState();
+        updateMapUI();
         switchScreen('screen-card', 'screen-map');
     }
 
-    function switchScreen(hideId, showId) {
-        document.getElementById(hideId).classList.remove('active');
-        document.getElementById(showId).classList.add('active');
-        window.scrollTo(0, 0);
+    // --- Шаг 2: Оранжерея ---
+    function startGreenhouse() {
+        if (gameState.greenhouseOpened) {
+            switchScreen('screen-map', 'screen-lesson2');
+        } else {
+            alert('Сначала поговори с Дариекой в разделе "Моя академия"!');
+        }
     }
 
-    window.onload = function() {
-        const savedName = localStorage.getItem('darieka_student_name');
-        const hasPass = localStorage.getItem('darieka_has_pass');
-        
-        if (savedName && hasPass) {
-            document.getElementById('displayName').innerText = savedName;
-            switchScreen('screen-gates', 'screen-map');
-        } else if (savedName) {
-            document.getElementById('displayName').innerText = savedName;
-            switchScreen('screen-gates', 'screen-card');
+    function openDariekaMeeting() {
+        if (gameState.lesson1Completed) {
+            alert('Ты уже прошла этот урок! Но можешь возвращаться в оранжерею, чтобы полюбоваться цветами.');
+            return;
         }
-    };
+        if (gameState.greenhouseOpened) {
+            // Если урок открыт, но не пройден
+            switchScreen('screen-map', 'screen-lesson2');
+            return;
+        }
+        
+        // Первое открытие
+        switchScreen('screen-map', 'screen-meeting');
+    }
+
+    function goToGreenhouseLesson() {
+        gameState.greenhouseOpened = true;
+        saveState();
+        updateMapUI();
+        switchScreen('screen-meeting', 'screen-lesson2');
+    }
+
+    function showQuiz() {
+        switchScreen('screen-lesson2', 'screen-quiz');
+    }
+
+    function checkAnswer(choice) {
+        const feedback = document.getElementById('quizFeedback');
+        
+        if (choice === 2) {
+            feedback.innerHTML = '<span style="color: green;">Прекрасно! Ты запомнила первое правило Академии.</span>';
+            // Начисляем опыт только если урок еще не пройден
+            if (!gameState.lesson1Completed) {
+                gameState.exp += 15; // 10 за урок + 5 за ответ
+                saveState();
+            }
+            
+            setTimeout(() => {
+                switchScreen('screen-quiz', 'screen-reward2');
+            }, 1500); // Задержка 1.5 секунды
+            
+        } else {
+            feedback.innerHTML = '<span style="color: #8c3a3a;">Не совсем! Исследовательница должна быть осторожной. Незнакомые растения могут быть опасны. Мы наблюдаем за ними глазами и не трогаем без разрешения.</span>';
+        }
+    }
+
+    function finishLesson() {
+        gameState.hasFern = true;
+        gameState.lesson1Completed = true;
+        saveState();
+        
+        updateMapUI();
+        switchScreen('screen-reward2', 'screen-map');
+        alert('Урок 1 пройден! Твой опыт: ' + gameState.exp + '. В коллекции: ' + (gameState.hasPass ? 1 : 0) + (gameState.hasFern ? 1 : 0) + ' предмета.');
+    }
+
+    // --- Обновление карты ---
+    function updateMapUI() {
+        const greenhouseLoc = document.getElementById('locationGreenhouse');
+        const greenhouseName = document.getElementById('greenhouseName');
+        const greenhouseIcon = document.getElementById('greenhouseIcon');
+        const btnStart = document.getElementById('btnStartLesson');
+
+        if (gameState.lesson1Completed) {
+            // Локация исследована
+            greenhouseLoc.classList.remove('locked');
+            greenhouseLoc.classList.add('researched');
+            greenhouseName.innerText = "Оранжерея (Изучена)";
+            greenhouseIcon.innerText = "🌿";
+            btnStart.innerText = "📖 Моя академия (Урок 1 пройден)";
+            btnStart.classList.add('btn-disabled');
+        } else if (gameState.greenhouseOpened) {
+            // Локация открыта, но не пройдена
+            greenhouseLoc.classList.remove('locked');
+            greenhouseLoc.classList.add('unlocked');
+            greenhouseName.innerText = "Старая оранжерея";
+            greenhouseIcon.innerText = "🌿";
+        }
+    }
 </script>
 
 </body>
