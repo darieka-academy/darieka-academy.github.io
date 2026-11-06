@@ -57,7 +57,7 @@
             <div class="map-container">
                 <div class="location unlocked" onclick="alert('Ворота всегда открыты!')"><span class="location-icon">🚪</span><span class="location-name">Ворота</span></div>
                 <div id="loc-greenhouse" class="location" onclick="startGreenhouse()"><span class="location-icon" id="icon-greenhouse">🔒</span><span class="location-name" id="name-greenhouse">Оранжерея</span></div>
-                <div class="location"><span class="location-icon">🔒</span><span class="location-name">Библиотека</span></div>
+                <div id="loc-library" class="location" onclick="if(gameState.libraryOpened) switchScreen('screen-map', 'screen-library'); else alert('Сначала найди ключ!')"><span class="location-icon" id="icon-library">🔒</span><span class="location-name" id="name-library">Библиотека</span></div>
                 <div class="location"><span class="location-icon">🔒</span><span class="location-name">Чердак</span></div>
             </div>
             <button id="btn-start-lesson" class="btn" onclick="openDariekaMeeting()">📖 Продолжить обучение</button>
@@ -73,13 +73,15 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 5 -->
+    <!-- ЭКРАН 5: УРОК (ВОЗВРАЩЕН ПОЛНЫЙ ТЕКСТ) -->
     <div id="screen-lesson2" class="screen">
         <div class="illustration-frame"><img src="IMG_9221.png.jfif" alt="Оранжерея"></div>
         <div class="paper-card">
             <h2 class="text-center">Урок 1. Язык листьев</h2>
-            <p>Рассмотри любой опавший листик или комнатное растение. Обрати внимание на его форму, края и прожилки.</p>
-            <p><strong>Главное правило:</strong> мы не пробуем незнакомые растения на вкус и не трогаем без разрешения.</p>
+            <p>Травницы знают: растения не умеют говорить, но могут многое рассказать внимательному исследователю.</p>
+            <p>Рассмотри любой опавший листик или комнатное растение, если взрослые разрешают. Обрати внимание на его форму, края, цвет и прожилки.</p>
+            <p>У каждого растения есть свои особенности. Даже два листочка с одного дерева могут немного отличаться друг от друга!</p>
+            <p><strong>Главное правило исследовательницы:</strong> мы не пробуем незнакомые растения на вкус, не срываем их и не трогаем без разрешения.</p>
             <button class="btn" onclick="showQuiz()">✅ Я изучила урок</button>
             <button class="btn btn-back" onclick="switchScreen('screen-lesson2', 'screen-map')">← На карту</button>
         </div>
@@ -134,7 +136,6 @@
             <h2 class="text-center">Тайна разгадана!</h2>
             <p>«Слово "ЛИСТ" было ключом», — говорит Дариека.</p>
             <div class="collectible-card">
-                <!-- Сюда потом вставим key.jfif -->
                 <img src="key.jfif" alt="Ключ" class="card-image" style="background:#d4c5a9;">
                 <div class="card-type">Артефакт • Необычная</div>
                 <h3>Старый ключ</h3>
@@ -144,7 +145,57 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 10: КОЛЛЕКЦИЯ -->
+    <!-- ЭКРАН 10: ВХОД В БИБЛИОТЕКУ -->
+    <div id="screen-library-intro" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Библиотека Забытых Знаний</h2>
+            <p>🌿 <strong>Дариека:</strong> «Раз ты разгадала шифр, пришло время открыть следующую локацию. Этот ключ с биркой "Не для дверей" явно ведет в Библиотеку. Там стоят старые сундуки. Иди и посмотри, что внутри».</p>
+            <button class="btn" onclick="openLibraryIntro()">📚 Войти в Библиотеку</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 11: ВНУТРИ БИБЛИОТЕКИ -->
+    <div id="screen-library" class="screen">
+        <div class="illustration-frame"><img src="library.jfif" alt="Библиотека"></div>
+        <div class="paper-card">
+            <h2 class="text-center">В глубине залов</h2>
+            <p>Ты проходишь мимо высоких стеллажей. В самом углу стоит старый сундук, весь покрытый пылью. На его замке — точно такое же отверстие, как на твоем ключе.</p>
+            <p>Ты вставляешь ключ... Раздается тихий щелчок!</p>
+            <button class="btn" onclick="openChest()">🔑 Открыть сундук</button>
+            <button class="btn btn-back" onclick="switchScreen('screen-library', 'screen-map')">← На карту</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 12: НАХОДКА ПИСЬМА -->
+    <div id="screen-letter-found" class="screen">
+        <div class="paper-card">
+            <h2 class="text-center">Находка в сундуке</h2>
+            <p>Внутри сундука лежит странное письмо, перевязанное выцветшей лентой.</p>
+            <div class="collectible-card">
+                <img src="letter.jfif" alt="Письмо" class="card-image">
+                <div class="card-type">Секрет • Редкая</div>
+                <h3>Письмо из архива</h3>
+                <p>Пожелтевший лист с непонятными символами. Кажется, оно написано очень давно.</p>
+                <div class="card-fact"><strong>Интересно:</strong> Это письмо явно адресовано не тебе. Или... кому-то из прошлого?</div>
+            </div>
+            <button class="btn btn-gold" onclick="continueToPet()">✨ Забрать письмо</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 13: ВСТРЕЧА С ПИТОМЦЕМ -->
+    <div id="screen-pet-meeting" class="screen">
+        <div class="illustration-frame"><img src="moss.jfif" alt="Моховичок"></div>
+        <div class="paper-card">
+            <h2 class="text-center">Кто это тут шуршит?</h2>
+            <p>Когда ты убрала письмо, из-за полки выкатился маленький круглый комочек мха. У него блестящие глазки-бусинки.</p>
+            <p>🌿 <strong>Дариека:</strong> «Ох, это же Моховичок! Он живет здесь очень давно и любит прятаться среди старых книг. Кажется, ты ему понравилась. Он хочет пойти с тобой».</p>
+            <p>Придумай имя для своего нового лесного спутника:</p>
+            <div class="input-group"><input type="text" id="petNameInput" placeholder="Имя питомца (например, Моховичок)"></div>
+            <button class="btn" onclick="adoptPet()">🌱 Взять питомца с собой</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 14: КОЛЛЕКЦИЯ -->
     <div id="screen-collection" class="screen">
         <div class="paper-card">
             <h2 class="text-center">🎒 Моя коллекция</h2>
