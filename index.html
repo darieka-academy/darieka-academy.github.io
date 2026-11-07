@@ -4,9 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Школа травниц Дариеки</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* Иллюстрации локаций на карте */
+
+        .map-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 18px;
+            margin-bottom: 18px;
+        }
+
+        .map-container .location {
+            padding: 9px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.3s, border-color 0.3s;
+            overflow: hidden;
+        }
+
+        .location-image {
+            width: 100%;
+            height: 125px;
+            overflow: hidden;
+            border-radius: 5px;
+            margin-bottom: 9px;
+            border: 1px solid #a58b58;
+            background: #e8dcc4;
+        }
+
+        .location-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-container .location-name {
+            display: block;
+            min-height: 34px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Старые значки оставляем для совместимости с app.js,
+           но больше не показываем */
+
+        .map-container .location-icon {
+            display: none;
+        }
+
+        .map-container .location:not(.unlocked):not(.researched) {
+            opacity: 0.65;
+        }
+
+        .map-container .location.unlocked,
+        .map-container .location.researched {
+            opacity: 1;
+        }
+
+        @media (max-width: 390px) {
+            .location-image {
+                height: 105px;
+            }
+
+            .map-container .location-name {
+                font-size: 15px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <div id="topBar" class="top-bar">
@@ -18,9 +93,11 @@
     <div class="stats">
         <div class="stat-box experience-box">
             <img src="potion.jfif" alt="Колбочка опыта" class="header-icon">
+
             <div class="stat-info">
                 <span class="stat-label">Опыт</span>
                 <span id="ui-exp">0</span>
+
                 <div class="exp-progress">
                     <div class="exp-progress-fill" id="expFill"></div>
                 </div>
@@ -29,6 +106,7 @@
 
         <div class="stat-box basket-box" onclick="openCollection()" title="Моя коллекция">
             <img src="basket.jfif" alt="Корзинка находок" class="header-icon">
+
             <div class="stat-info">
                 <span class="stat-label">Находки</span>
                 <span id="ui-items">0</span>
@@ -37,288 +115,685 @@
     </div>
 </div>
 
+
 <div class="app-container">
 
     <!-- ВОРОТА АКАДЕМИИ -->
+
     <div id="screen-gates" class="screen active">
+
         <div class="illustration-frame">
             <img src="bg.png.PNG" alt="Академия">
         </div>
+
         <div class="paper-card">
             <h1>Ворота академии</h1>
+
             <p>Ты стоишь перед старыми коваными воротами. За ними — тропинка в лес и старый замок академии.</p>
+
             <p class="italic-text">«Входящий оставь здесь своё имя. Оно будет записано в Лесной архив».</p>
+
             <div class="input-group">
                 <input type="text" id="nameInput" placeholder="Твоё имя" autocomplete="off">
             </div>
+
             <button class="btn" onclick="saveName()">Записать имя</button>
         </div>
+
     </div>
+
 
     <!-- ПЕРВЫЙ ПРОПУСК -->
+
     <div id="screen-card" class="screen">
+
         <div class="paper-card">
+
             <h2>Имя записано в архив!</h2>
+
             <p>Добро пожаловать, <strong class="displayName"></strong>.</p>
+
             <p>В знак того, что ты теперь часть академии, прими свой первый предмет:</p>
+
             <div class="collectible-card">
                 <img src="IMG_9218.png" alt="Пропуск" class="card-image">
+
                 <div class="card-type">Артефакт • Обычная</div>
+
                 <h3>Пропуск исследовательницы</h3>
+
                 <p>Старинный пропуск с гербом академии.</p>
             </div>
-            <button class="btn btn-gold" onclick="addToCollection('pass')">Добавить в коллекцию</button>
+
+            <button class="btn btn-gold" onclick="addToCollection('pass')">
+                Добавить в коллекцию
+            </button>
+
         </div>
+
     </div>
 
-    <!-- КАРТА -->
+
+    <!-- КАРТА АКАДЕМИИ -->
+
     <div id="screen-map" class="screen">
+
         <div class="paper-card">
+
             <h1>Карта академии</h1>
-            <p class="text-center" id="mapGreeting">Твой путь начинается здесь</p>
+
+            <p class="text-center" id="mapGreeting">
+                Твой путь начинается здесь
+            </p>
 
             <div class="map-container">
-                <div class="location unlocked" onclick="alert('Ворота всегда открыты!')">
+
+                <!-- ВРАТА -->
+
+                <div class="location unlocked"
+                     onclick="alert('Ворота всегда открыты!')">
+
+                    <div class="location-image">
+                        <img src="door.jfif" alt="Врата академии">
+                    </div>
+
                     <span class="location-icon">В</span>
-                    <span class="location-name">Ворота</span>
+
+                    <span class="location-name">
+                        Врата академии
+                    </span>
+
                 </div>
 
-                <div id="loc-greenhouse" class="location" onclick="startGreenhouse()">
+
+                <!-- ОРАНЖЕРЕЯ -->
+
+                <div id="loc-greenhouse"
+                     class="location"
+                     onclick="startGreenhouse()">
+
+                    <div class="location-image">
+                        <img src="greenhouse1.jfif" alt="Старая оранжерея">
+                    </div>
+
                     <span class="location-icon" id="icon-greenhouse">🔒</span>
-                    <span class="location-name" id="name-greenhouse">Оранжерея</span>
+
+                    <span class="location-name" id="name-greenhouse">
+                        Оранжерея
+                    </span>
+
                 </div>
 
-                <div id="loc-library" class="location" onclick="openLibraryFromMap()">
+
+                <!-- БИБЛИОТЕКА -->
+
+                <div id="loc-library"
+                     class="location"
+                     onclick="openLibraryFromMap()">
+
+                    <div class="location-image">
+                        <img src="library1.jfif" alt="Библиотека забытых знаний">
+                    </div>
+
                     <span class="location-icon" id="icon-library">🔒</span>
-                    <span class="location-name" id="name-library">Библиотека</span>
+
+                    <span class="location-name" id="name-library">
+                        Библиотека
+                    </span>
+
                 </div>
 
-                <div id="loc-attic" class="location" onclick="openAttic()">
+
+                <!-- ЧЕРДАК -->
+
+                <div id="loc-attic"
+                     class="location"
+                     onclick="openAttic()">
+
+                    <div class="location-image">
+                        <img src="attic1.jfif" alt="Чердак хранительницы">
+                    </div>
+
                     <span class="location-icon" id="icon-attic">🔒</span>
-                    <span class="location-name" id="name-attic">Чердак хранительницы</span>
+
+                    <span class="location-name" id="name-attic">
+                        Чердак хранительницы
+                    </span>
+
                 </div>
+
             </div>
 
-            <button id="btn-start-lesson" class="btn" onclick="openDariekaMeeting()">Продолжить обучение</button>
-            <button id="btn-pets-map" class="btn btn-secondary" onclick="openPets()">Мои питомцы</button>
-            <button id="btn-diploma-map" class="btn btn-secondary" onclick="openDiploma()">Мой диплом</button>
+
+            <button id="btn-start-lesson"
+                    class="btn"
+                    onclick="openDariekaMeeting()">
+                Продолжить обучение
+            </button>
+
+            <button id="btn-pets-map"
+                    class="btn btn-secondary"
+                    onclick="openPets()">
+                Мои питомцы
+            </button>
+
+            <button id="btn-diploma-map"
+                    class="btn btn-secondary"
+                    onclick="openDiploma()">
+                Мой диплом
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ВСТРЕЧА С ДАРИЕКА -->
+
     <div id="screen-meeting" class="screen">
+
         <div class="paper-card">
+
             <h2>Встреча с Дариекой</h2>
-            <p><strong>Дариека:</strong> «Добро пожаловать, <span class="displayName"></span>! Я открываю тебе Старую оранжерею».</p>
-            <button class="btn" onclick="goToGreenhouseLesson()">Войти в Оранжерею</button>
+
+            <p>
+                <strong>Дариека:</strong>
+                «Добро пожаловать, <span class="displayName"></span>!
+                Я открываю тебе Старую оранжерею».
+            </p>
+
+            <button class="btn" onclick="goToGreenhouseLesson()">
+                Войти в Оранжерею
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- УРОК -->
+
     <div id="screen-lesson2" class="screen">
+
         <div class="illustration-frame">
             <img src="IMG_9221.png.jfif" alt="Оранжерея">
         </div>
+
         <div class="paper-card">
+
             <h2>Урок 1. Язык листьев</h2>
+
             <p>Травницы знают: растения не умеют говорить, но могут многое рассказать внимательному исследователю.</p>
+
             <p>Рассмотри любой опавший листик или комнатное растение, если взрослые разрешают. Обрати внимание на его форму, края, цвет и прожилки.</p>
+
             <p>У каждого растения есть свои особенности. Даже два листочка с одного дерева могут немного отличаться друг от друга!</p>
+
             <p><strong>Главное правило исследовательницы:</strong> мы не пробуем незнакомые растения на вкус, не срываем их и не трогаем без разрешения.</p>
-            <button class="btn" onclick="showQuiz()">Я изучила урок</button>
-            <button class="btn btn-back" onclick="switchScreen('screen-lesson2', 'screen-map')">На карту</button>
+
+            <button class="btn" onclick="showQuiz()">
+                Я изучила урок
+            </button>
+
+            <button class="btn btn-back"
+                    onclick="switchScreen('screen-lesson2', 'screen-map')">
+                На карту
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ПРОВЕРКА ЗНАНИЙ -->
+
     <div id="screen-quiz" class="screen">
+
         <div class="paper-card">
+
             <h2>Проверка знаний</h2>
-            <p><strong>Дариека:</strong> «Как должна вести себя настоящая исследовательница?»</p>
+
+            <p>
+                <strong>Дариека:</strong>
+                «Как должна вести себя настоящая исследовательница?»
+            </p>
+
             <div class="question-box">
-                <button class="answer-btn" onclick="checkAnswer(1)">А. Собирать незнакомые цветы.</button>
-                <button class="answer-btn" onclick="checkAnswer(2)">Б. Рассматривать, не пробовать и не трогать без разрешения.</button>
-                <button class="answer-btn" onclick="checkAnswer(3)">В. Уносить домой всё интересное.</button>
+
+                <button class="answer-btn" onclick="checkAnswer(1)">
+                    А. Собирать незнакомые цветы.
+                </button>
+
+                <button class="answer-btn" onclick="checkAnswer(2)">
+                    Б. Рассматривать, не пробовать и не трогать без разрешения.
+                </button>
+
+                <button class="answer-btn" onclick="checkAnswer(3)">
+                    В. Уносить домой всё интересное.
+                </button>
+
             </div>
+
             <div id="quizFeedback" class="feedback-text"></div>
-            <button class="btn btn-back" onclick="switchScreen('screen-quiz', 'screen-lesson2')">К уроку</button>
+
+            <button class="btn btn-back"
+                    onclick="switchScreen('screen-quiz', 'screen-lesson2')">
+                К уроку
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- НАГРАДА ЗА УРОК -->
+
     <div id="screen-reward2" class="screen">
+
         <div class="paper-card">
+
             <h2>Отличная работа!</h2>
+
             <p>Дариека улыбается: «Ты запомнила первое правило!»</p>
+
             <div class="collectible-card">
-                <img src="0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif" alt="Папоротник" class="card-image">
+
+                <img src="0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif"
+                     alt="Папоротник"
+                     class="card-image">
+
                 <div class="card-type">Растение • Обычная</div>
+
                 <h3>Лист папоротника</h3>
+
                 <p>Найден между страницами старого учебника.</p>
+
             </div>
-            <button class="btn btn-gold" onclick="finishLesson()">Добавить в коллекцию</button>
+
+            <button class="btn btn-gold" onclick="finishLesson()">
+                Добавить в коллекцию
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- ТАЙНА ОРАНЖЕРЕИ -->
+
     <div id="screen-secret" class="screen">
+
         <div class="paper-card">
+
             <h2>Тайна Оранжереи</h2>
+
             <p>Из старой книги выпал листок. На нем цифры:</p>
-            <p class="text-center secret-code">12 – 10 – 19 – 20</p>
+
+            <p class="text-center secret-code">
+                12 – 10 – 19 – 20
+            </p>
+
             <p><em>«Это не цифры. Это буквы. Посчитай от начала алфавита».</em></p>
+
             <div class="input-group">
                 <input type="text" id="secretInput" placeholder="Введи слово">
             </div>
-            <button class="btn" onclick="checkSecret()">Разгадать</button>
-            <button class="btn btn-back" onclick="switchScreen('screen-secret', 'screen-map')">На карту</button>
+
+            <button class="btn" onclick="checkSecret()">
+                Разгадать
+            </button>
+
+            <button class="btn btn-back"
+                    onclick="switchScreen('screen-secret', 'screen-map')">
+                На карту
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- НАХОДКА КЛЮЧА -->
+
     <div id="screen-secret-reward" class="screen">
+
         <div class="paper-card">
+
             <h2>Тайна разгадана!</h2>
+
             <p>«Слово "ЛИСТ" было ключом», — говорит Дариека.</p>
+
             <div class="collectible-card">
+
                 <img src="key.jfif" alt="Ключ" class="card-image">
+
                 <div class="card-type">Артефакт • Необычная</div>
+
                 <h3>Старый ключ</h3>
+
                 <p>Тяжелый бронзовый ключ с биркой «Не для дверей».</p>
+
             </div>
-            <button class="btn btn-gold" onclick="finishSecret()">Забрать ключ</button>
+
+            <button class="btn btn-gold" onclick="finishSecret()">
+                Забрать ключ
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ВХОД В БИБЛИОТЕКУ -->
+
     <div id="screen-library-intro" class="screen">
+
         <div class="paper-card">
+
             <h2>Библиотека забытых знаний</h2>
-            <p><strong>Дариека:</strong> «Раз ты разгадала шифр, пришло время открыть следующую локацию. Этот ключ с биркой "Не для дверей" явно ведет в Библиотеку. Там стоят старые сундуки. Иди и посмотри, что внутри».</p>
-            <button class="btn" onclick="openLibraryIntro()">Войти в Библиотеку</button>
+
+            <p>
+                <strong>Дариека:</strong>
+                «Раз ты разгадала шифр, пришло время открыть следующую локацию.
+                Этот ключ с биркой "Не для дверей" явно ведет в Библиотеку.
+                Там стоят старые сундуки. Иди и посмотри, что внутри».
+            </p>
+
+            <button class="btn" onclick="openLibraryIntro()">
+                Войти в Библиотеку
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- БИБЛИОТЕКА -->
+
     <div id="screen-library" class="screen">
+
         <div class="illustration-frame">
             <img src="library.jfif" alt="Библиотека">
         </div>
+
         <div class="paper-card">
+
             <h2>В глубине залов</h2>
+
             <p>Ты проходишь мимо высоких стеллажей. В самом углу стоит старый сундук, весь покрытый пылью. На его замке — точно такое же отверстие, как на твоем ключе.</p>
+
             <p>Ты вставляешь ключ... Раздается тихий щелчок!</p>
-            <button class="btn" onclick="openChest()">Открыть сундук</button>
-            <button class="btn btn-back" onclick="switchScreen('screen-library', 'screen-map')">На карту</button>
+
+            <button class="btn" onclick="openChest()">
+                Открыть сундук
+            </button>
+
+            <button class="btn btn-back"
+                    onclick="switchScreen('screen-library', 'screen-map')">
+                На карту
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ПИСЬМО -->
+
     <div id="screen-letter-found" class="screen">
+
         <div class="paper-card">
+
             <h2>Находка в сундуке</h2>
+
             <p>Внутри сундука лежит странное письмо, перевязанное выцветшей лентой.</p>
+
             <div class="collectible-card">
+
                 <img src="letter.jfif" alt="Письмо" class="card-image">
+
                 <div class="card-type">Секрет • Редкая</div>
+
                 <h3>Письмо из архива</h3>
+
                 <p>Пожелтевший лист с непонятными символами. Кажется, оно написано очень давно.</p>
-                <div class="card-fact"><strong>Интересно:</strong> Это письмо явно адресовано не тебе. Или... кому-то из прошлого?</div>
+
+                <div class="card-fact">
+                    <strong>Интересно:</strong>
+                    Это письмо явно адресовано не тебе. Или... кому-то из прошлого?
+                </div>
+
             </div>
-            <button class="btn btn-gold" onclick="continueToPet()">Забрать письмо</button>
+
+            <button class="btn btn-gold" onclick="continueToPet()">
+                Забрать письмо
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- ВСТРЕЧА С МОХОВИЧКОМ -->
+
     <div id="screen-pet-meeting" class="screen">
+
         <div class="illustration-frame">
             <img src="moss.jfif" alt="Моховичок">
         </div>
+
         <div class="paper-card">
+
             <h2>Кто это тут шуршит?</h2>
+
             <p>Когда ты убрала письмо, из-за полки выкатился маленький круглый комочек мха. У него блестящие глазки-бусинки.</p>
-            <p><strong>Дариека:</strong> «Ох, это же Моховичок! Он живет здесь очень давно и любит прятаться среди старых книг. Кажется, ты ему понравилась. Он хочет пойти с тобой».</p>
+
+            <p>
+                <strong>Дариека:</strong>
+                «Ох, это же Моховичок! Он живет здесь очень давно
+                и любит прятаться среди старых книг.
+                Кажется, ты ему понравилась. Он хочет пойти с тобой».
+            </p>
+
             <p>Придумай имя для своего нового лесного спутника:</p>
+
             <div class="input-group">
-                <input type="text" id="petNameInput" placeholder="Имя питомца (например, Моховичок)">
+                <input type="text"
+                       id="petNameInput"
+                       placeholder="Имя питомца (например, Моховичок)">
             </div>
-            <button class="btn" onclick="adoptPet()">Взять питомца с собой</button>
+
+            <button class="btn" onclick="adoptPet()">
+                Взять питомца с собой
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ФИНАЛ ГЛАВЫ I -->
+
     <div id="screen-chapter1-finale" class="screen">
+
         <div class="paper-card diploma-scene">
+
             <h1>Глава I завершена!</h1>
-            <p class="text-center">Дариека бережно раскрывает старинную папку.</p>
-            <p><strong>Дариека:</strong> «Ты прошла первые тропы, разгадала тайны архива и нашла верного лесного спутника. Я с радостью вручаю тебе этот диплом. Это только начало твоего пути!»</p>
 
-            <img src="diploma.jpg" alt="Диплом Первые следы" class="diploma-image">
+            <p class="text-center">
+                Дариека бережно раскрывает старинную папку.
+            </p>
 
-            <p class="text-center"><strong>Награда за завершение главы: +50 опыта</strong></p>
-            <button class="btn btn-gold" onclick="openChapterTwo()">Перейти к Главе II</button>
-            <button class="btn btn-secondary" onclick="openPets()">Посмотреть питомца</button>
+            <p>
+                <strong>Дариека:</strong>
+                «Ты прошла первые тропы, разгадала тайны архива
+                и нашла верного лесного спутника.
+                Я с радостью вручаю тебе этот диплом.
+                Это только начало твоего пути!»
+            </p>
+
+            <img src="diploma.jpg"
+                 alt="Диплом Первые следы"
+                 class="diploma-image">
+
+            <p class="text-center">
+                <strong>Награда за завершение главы: +50 опыта</strong>
+            </p>
+
+            <button class="btn btn-gold" onclick="openChapterTwo()">
+                Перейти к Главе II
+            </button>
+
+            <button class="btn btn-secondary" onclick="openPets()">
+                Посмотреть питомца
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- МОИ ПИТОМЦЫ -->
+
     <div id="screen-pets" class="screen">
+
         <div class="paper-card">
+
             <h2>Мои питомцы</h2>
+
             <div id="pet-card" class="pet-card">
-                <img src="moss.jfif" alt="Моховичок" class="pet-image">
+
+                <img src="moss.jfif"
+                     alt="Моховичок"
+                     class="pet-image">
+
                 <div class="card-type">Лесной спутник</div>
+
                 <h3 id="pet-display-name">Моховичок</h3>
+
                 <p>Маленький хранитель тихих уголков библиотеки. Любит мягкий мох, старые книги и спокойные прогулки по лесу.</p>
-                <p class="card-fact">Моховичок всегда рядом. Ему не нужен ежедневный уход, и он никогда не исчезнет из твоей коллекции.</p>
+
+                <p class="card-fact">
+                    Моховичок всегда рядом.
+                    Ему не нужен ежедневный уход,
+                    и он никогда не исчезнет из твоей коллекции.
+                </p>
+
             </div>
-            <p id="no-pets-message" class="text-center">Пока у тебя нет питомцев. Возможно, один из лесных жителей скоро захочет с тобой познакомиться.</p>
-            <button class="btn btn-back" onclick="backToMap()">На карту</button>
+
+            <p id="no-pets-message" class="text-center">
+                Пока у тебя нет питомцев. Возможно, один из лесных жителей скоро захочет с тобой познакомиться.
+            </p>
+
+            <button class="btn btn-back" onclick="backToMap()">
+                На карту
+            </button>
+
         </div>
+
     </div>
+
 
     <!-- ДИПЛОМ -->
+
     <div id="screen-diploma" class="screen">
+
         <div class="paper-card">
+
             <h2>Мой диплом</h2>
-            <img src="diploma.jpg" alt="Диплом Первые следы" class="diploma-image">
-            <p class="text-center">Диплом за завершение Главы I «Первые следы».</p>
-            <button class="btn btn-back" onclick="backToMap()">На карту</button>
+
+            <img src="diploma.jpg"
+                 alt="Диплом Первые следы"
+                 class="diploma-image">
+
+            <p class="text-center">
+                Диплом за завершение Главы I «Первые следы».
+            </p>
+
+            <button class="btn btn-back" onclick="backToMap()">
+                На карту
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- ГЛАВА II: ЧЕРДАК -->
+
     <div id="screen-attic" class="screen">
+
         <div class="illustration-frame">
             <img src="attic.jfif" alt="Чердак хранительницы">
         </div>
+
         <div class="paper-card">
+
             <h2>Глава II. Чердак хранительницы</h2>
+
             <p>За узкой дверью лестница ведёт под самую крышу академии. Здесь пахнет деревом, сухими травами и старыми книгами.</p>
+
             <p>Вдоль стен стоят сундуки и коробки. Сквозь пыльное окно льётся мягкий свет. Кажется, это место давно ждало новую хранительницу.</p>
-            <p><strong>Дариека:</strong> «Добро пожаловать на чердак. Здесь хранятся вещи прежних исследовательниц. Осмотрись внимательно — возможно, ты найдёшь первую реликвию этого места».</p>
-            <button id="btn-attic-find" class="btn btn-gold" onclick="findAtticCard()">Осмотреть старую полку</button>
+
+            <p>
+                <strong>Дариека:</strong>
+                «Добро пожаловать на чердак.
+                Здесь хранятся вещи прежних исследовательниц.
+                Осмотрись внимательно — возможно, ты найдёшь первую реликвию этого места».
+            </p>
+
+            <button id="btn-attic-find"
+                    class="btn btn-gold"
+                    onclick="findAtticCard()">
+                Осмотреть старую полку
+            </button>
+
             <div id="attic-card-result" class="collectible-card hidden">
+
                 <div class="card-type">Артефакт • Необычная</div>
+
                 <h3>Медный колокольчик</h3>
+
                 <p>Небольшой колокольчик с потемневшей поверхностью. На его боку выгравирован лист папоротника.</p>
-                <div class="card-fact">Говорят, прежние хранительницы звонили в него, когда находили что-то важное для Лесного архива.</div>
+
+                <div class="card-fact">
+                    Говорят, прежние хранительницы звонили в него,
+                    когда находили что-то важное для Лесного архива.
+                </div>
+
             </div>
-            <button class="btn btn-back" onclick="backToMap()">На карту</button>
+
+            <button class="btn btn-back" onclick="backToMap()">
+                На карту
+            </button>
+
         </div>
+
     </div>
 
+
     <!-- КОЛЛЕКЦИЯ -->
+
     <div id="screen-collection" class="screen">
+
         <div class="paper-card">
+
             <h2>Моя коллекция</h2>
+
             <div id="collection-grid" class="collection-grid"></div>
-            <button class="btn btn-back" onclick="backToMap()">На карту</button>
+
+            <button class="btn btn-back" onclick="backToMap()">
+                На карту
+            </button>
+
         </div>
+
     </div>
 
 </div>
 
+
 <script src="app.js"></script>
+
 </body>
 </html>
