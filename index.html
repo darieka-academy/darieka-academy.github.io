@@ -111,9 +111,11 @@
                     <span class="location-name" id="name-attic">Чердак хранительницы</span>
                 </div>
             </div>
+            
+            <!-- КНОПКИ НА КАРТЕ -->
             <button id="btn-start-lesson" class="btn" onclick="openDariekaMeeting()">Продолжить обучение</button>
-            <button id="btn-pets-map" class="btn btn-secondary" onclick="openPets()">Мои питомцы</button>
-            <button id="btn-diploma-map" class="btn btn-secondary" onclick="openDiploma()">Мой диплом</button>
+            <button id="btn-pets-map" class="btn btn-secondary" onclick="openPets()" style="display:none;">Мои питомцы</button>
+            <button id="btn-diploma-map" class="btn btn-secondary" onclick="openDiploma()" style="display:none;">Мой диплом</button>
         </div>
     </div>
 
@@ -308,9 +310,7 @@
     </div>
 
     <!-- ГРИМУАР (Скрытый контейнер, управляется через JS) -->
-    <div id="screen-grimoire" class="screen">
-        <!-- Контент генерируется скриптом -->
-    </div>
+    <div id="screen-grimoire" class="screen"></div>
 
     <!-- КОЛЛЕКЦИЯ -->
     <div id="screen-collection" class="screen">
