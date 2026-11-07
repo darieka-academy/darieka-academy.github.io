@@ -460,7 +460,22 @@ function updateGrimoireInterface() {
     if (progressText) progressText.innerText = 'Страниц открыто: ' + completed + ' из ' + total;
 
     if (!gameState.grimoireStarted) {
-                    <div class="grimoire-page">
+                         content.innerHTML = `
+            <div class="grimoire-page">
+                <h3>Старая книга</h3>
+                <p>На чердаке ты находишь книгу прежней хранительницы. Её страницы почти пусты.</p>
+                <p>Возможно, именно тебе предстоит наполнить её знаниями.</p>
+                <label for="grimoire-name">Название твоего гримуара:</label>
+                <input id="grimoire-name" class="grimoire-note" type="text" value="${escapeHTML(gameState.grimoireName)}" maxlength="60">
+                <button class="btn btn-gold" onclick="beginGrimoire()">Открыть первую страницу</button>
+            </div>
+        `;
+        return;
+    }
+
+    if (gameState.grimoireStep >= total) {
+        content.innerHTML = `
+            <div class="grimoire-page">
                 <h3>${escapeHTML(gameState.grimoireName)}</h3>
                 <h2>Первый том завершён!</h2>
                 <p>Ты собрала первые страницы своего гримуара, изучила строение растений и создала собственные записи.</p>
