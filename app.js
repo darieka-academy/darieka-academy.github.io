@@ -1,3 +1,18 @@
+/* =========================================================
+   Школа травниц Дариеки — app.js
+   ========================================================= */
+
+function safeParse(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (raw === null || raw === '') return fallback;
+        const value = JSON.parse(raw);
+        return value === null || value === undefined ? fallback : value;
+    } catch (error) {
+        return fallback;
+    }
+}
+
 let gameState = {
     name: localStorage.getItem('darieka_student_name') || '',
     hasPass: localStorage.getItem('darieka_has_pass') === 'true',
@@ -18,9 +33,11 @@ let gameState = {
     secretRewardClaimed: localStorage.getItem('darieka_secret_reward_claimed') === 'true',
     grimoireStarted: localStorage.getItem('darieka_grimoire_started') === 'true',
     grimoireStep: parseInt(localStorage.getItem('darieka_grimoire_step'), 10) || 0,
-    grimoirePages: JSON.parse(localStorage.getItem('darieka_grimoire_pages') || '[]'),
+    grimoirePages: safeParse('darieka_grimoire_pages', []),
     grimoireName: localStorage.getItem('darieka_grimoire_name') || 'Гримуар травницы'
 };
+
+if (!Array.isArray(gameState.grimoirePages)) gameState.grimoirePages = [];
 
 function saveState() {
     localStorage.setItem('darieka_student_name', gameState.name);
@@ -38,13 +55,22 @@ function saveState() {
     localStorage.setItem('darieka_chapter1_bonus_claimed', gameState.chapter1BonusClaimed);
     localStorage.setItem('darieka_attic_opened', gameState.atticOpened);
     localStorage.setItem('darieka_has_attic_card', gameState.hasAtticCard);
-    localStorage.setItem("darieka_quiz_reward_claimed", gameState.quizRewardClaimed);
+    localStorage.setItem('darieka_quiz_reward_claimed', gameState.quizRewardClaimed);
     localStorage.setItem('darieka_secret_reward_claimed', gameState.secretRewardClaimed);
     localStorage.setItem('darieka_grimoire_started', gameState.grimoireStarted);
     localStorage.setItem('darieka_grimoire_step', gameState.grimoireStep);
     localStorage.setItem('darieka_grimoire_pages', JSON.stringify(gameState.grimoirePages));
     localStorage.setItem('darieka_grimoire_name', gameState.grimoireName);
     updateUI();
+}
+
+function escapeHTML(value) {
+    return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 function updateUI() {
@@ -62,7 +88,7 @@ function updateUI() {
         el.innerText = gameState.name;
     });
 
-    const itemsCount = (gameState.hasPass?1:0) + (gameState.hasFern?1:0) + (gameState.hasKey?1:0) + (gameState.hasLetter?1:0) + (gameState.hasAtticCard?1:0);
+    const itemsCount = (gameState.hasPass ? 1 : 0) + (gameState.hasFern ? 1 : 0) + (gameState.hasKey ? 1 : 0) + (gameState.hasLetter ? 1 : 0) + (gameState.hasAtticCard ? 1 : 0);
     if (uiItems) uiItems.innerText = itemsCount;
 
     const expFill = document.getElementById('expFill');
@@ -90,7 +116,7 @@ function updateUI() {
     const btnStart = document.getElementById('btn-start-lesson');
     if (btnStart) {
         if (gameState.hasPet) btnStart.innerText = 'Открыть чердак хранительницы';
-        else if (gameState.hasLetter) btnStart.innerText = 'Найти Моховичку';
+        else if (gameState.hasLetter) btnStart.innerText = 'Найти Моховичка';
         else if (gameState.secretFound) btnStart.innerText = 'Открыть Библиотеку';
         else if (gameState.lesson1Completed) btnStart.innerText = 'Найти следующую тайну';
         else btnStart.innerText = 'Продолжить обучение';
@@ -126,7 +152,7 @@ function switchScreen(hideId, showId) {
         const showScreen = document.getElementById(showId);
         if (showScreen) showScreen.classList.add('active');
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo(0, 0);
 }
 
 function backToMap() {
@@ -136,7 +162,8 @@ function backToMap() {
     window.scrollTo(0, 0);
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
+    // Старые сохранения: если питомец уже есть, а бонус главы I не выдан — выдать один раз.
     if (gameState.hasPet && !gameState.chapter1BonusClaimed) {
         gameState.chapter1BonusClaimed = true;
         gameState.exp += 50;
@@ -150,6 +177,8 @@ window.addEventListener('load', function() {
         switchScreen('screen-gates', 'screen-card');
     }
 });
+
+/* ---------- Глава I ---------- */
 
 function saveName() {
     const input = document.getElementById('nameInput');
@@ -237,7 +266,39 @@ function finishChapterOne() {
 }
 
 function openDiploma() { switchScreen('screen-map', 'screen-diploma'); }
-function openPets() { switchScreen(null, 'screen-pets'); }function playChapterDoorAnimation(callback) {
+function openPets() { switchScreen(null, 'screen-pets'); }
+
+/* ---------- Коллекция ---------- */
+
+function openCollection() {
+    const grid = document.getElementById('collection-grid');
+    if (grid) {
+        const items = [];
+        if (gameState.hasPass) items.push({ img: 'IMG_9218.png', type: 'Артефакт • Обычный', title: 'Пропуск исследовательницы', text: 'Старинный пропуск с гербом академии.' });
+        if (gameState.hasFern) items.push({ img: '0a801e11-cddf-46d4-9e53-6ff907729cc8.jfif', type: 'Растение • Обычная', title: 'Лист папоротника', text: 'Найден между страницами старого учебника.' });
+        if (gameState.hasKey) items.push({ img: 'key.jfif', type: 'Артефакт • Необычный', title: 'Старый ключ', text: 'Тяжелый бронзовый ключ с биркой «Не для дверей».' });
+        if (gameState.hasLetter) items.push({ img: 'letter.jfif', type: 'Секрет • Редкая', title: 'Письмо из архива', text: 'Пожелтевший лист с непонятными символами.' });
+        if (gameState.hasAtticCard) items.push({ img: '', type: 'Артефакт • Необычный', title: 'Медный колокольчик', text: 'С выгравированным листом папоротника.' });
+
+        if (!items.length) {
+            grid.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Пока в коллекции пусто. Находки появятся по мере твоих исследований.</p>';
+        } else {
+            grid.innerHTML = items.map(item => `
+                <div class="collectible-card">
+                    ${item.img ? `<img src="${escapeHTML(item.img)}" alt="${escapeHTML(item.title)}" class="card-image">` : ''}
+                    <div class="card-type">${escapeHTML(item.type)}</div>
+                    <h3>${escapeHTML(item.title)}</h3>
+                    <p>${escapeHTML(item.text)}</p>
+                </div>
+            `).join('');
+        }
+    }
+    switchScreen(null, 'screen-collection');
+}
+
+/* ---------- Глава II: анимация двери ---------- */
+
+function playChapterDoorAnimation(callback) {
     const overlay = document.createElement('div');
     overlay.id = 'chapter-door-overlay';
     overlay.innerHTML = `
@@ -252,6 +313,7 @@ function openPets() { switchScreen(null, 'screen-pets'); }function playChapterDo
                 <h1>Глава II</h1>
                 <h2>Чердак хранительницы</h2>
             </div>
+            <button type="button" id="chapter-door-sound" class="sound-toggle" style="position:absolute;bottom:24px;z-index:5;">Включить скрип двери</button>
         </div>
     `;
     const style = document.createElement('style');
@@ -264,9 +326,9 @@ function openPets() { switchScreen(null, 'screen-pets'); }function playChapterDo
         .chapter-door-panel { position: absolute; inset: 20px; border: 3px solid #b18b54; box-shadow: inset 0 0 20px #17120c; }
         .chapter-door-handle { position: absolute; right: 22px; top: 48%; width: 13px; height: 13px; background: #d4ac60; border-radius: 50%; }
         .chapter-door-title { position: absolute; z-index: 3; text-align: center; color: #f2dfb7; opacity: 0; width: 90%; text-shadow: 0 2px 10px #000; animation: chapterTitle 2s ease forwards; animation-delay: 3.5s; }
-        .chapter-door-title p { letter-spacing: 3px; text-transform: uppercase; font-size: 12px; }
-        .chapter-door-title h1 { font-family: Georgia, serif; font-size: 42px; margin: 12px 0; }
-        .chapter-door-title h2 { font-family: Georgia, serif; font-size: 24px; font-weight: normal; }
+        .chapter-door-title p { letter-spacing: 3px; text-transform: uppercase; font-size: 12px; text-align: center; }
+        .chapter-door-title h1 { font-family: Georgia, serif; font-size: 42px; margin: 12px 0; color: #f2dfb7; }
+        .chapter-door-title h2 { font-family: Georgia, serif; font-size: 24px; font-weight: normal; color: #f2dfb7; }
         @keyframes doorOpen { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(-105deg); } }
         @keyframes doorLight { 0% { opacity: 0; transform: scale(.5); } 70% { opacity: .75; transform: scale(1.3); } 100% { opacity: .45; transform: scale(1.5); } }
         @keyframes chapterTitle { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -274,40 +336,70 @@ function openPets() { switchScreen(null, 'screen-pets'); }function playChapterDo
     `;
     document.head.appendChild(style);
     document.body.appendChild(overlay);
+
     const audio = new Audio('door_creak_slow.mp3');
     audio.volume = 0.65;
-    audio.play().catch(() => {});
-    setTimeout(() => { overlay.remove(); style.remove(); if (callback) callback(); }, 6500);
+    const soundButton = document.getElementById('chapter-door-sound');
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.then(() => { if (soundButton) soundButton.style.display = 'none'; })
+            .catch(() => { /* браузер заблокировал звук — кнопка остаётся */ });
+    }
+    if (soundButton) {
+        soundButton.addEventListener('click', () => {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+            soundButton.style.display = 'none';
+        });
+    }
+
+    setTimeout(() => {
+        try { audio.pause(); } catch (error) {}
+        overlay.remove();
+        style.remove();
+        if (callback) callback();
+    }, 6500);
 }
 
 function openChapterTwo() {
-    gameState.atticOpened = true; saveState();
-    playChapterDoorAnimation(() => { switchScreen('screen-chapter1-finale', 'screen-attic'); createGrimoireInterface(); });
+    gameState.atticOpened = true;
+    saveState();
+    playChapterDoorAnimation(() => {
+        switchScreen('screen-chapter1-finale', 'screen-attic');
+        createGrimoireInterface();
+    });
 }
 
 function openAttic() {
     if (!gameState.hasPet) { alert('Эта локация откроется после завершения Главы I.'); return; }
-    gameState.atticOpened = true; saveState(); switchScreen(null, 'screen-attic'); createGrimoireInterface();
+    gameState.atticOpened = true;
+    saveState();
+    switchScreen(null, 'screen-attic');
+    createGrimoireInterface();
 }
 
 function findAtticCard() {
     if (gameState.hasAtticCard) return;
-    gameState.hasAtticCard = true; gameState.exp += 10; saveState();
+    gameState.hasAtticCard = true;
+    gameState.exp += 10;
+    saveState();
     const result = document.getElementById('attic-card-result');
     const button = document.getElementById('btn-attic-find');
     if (result) result.classList.remove('hidden');
     if (button) button.style.display = 'none';
 }
 
+/* ---------- Глава II: уроки гримуара ---------- */
+
 const grimoireLessons = [
-    { title: 'Пустая книга хранительницы', subtitle: 'Начало твоего гримуара', text: `<p>На старом чердаке ты находишь большую книгу в темно-зеленом переплете.</p><p>Ее страницы пожелтели от времени. На первой странице виден едва заметный отпечаток листа.</p><p><strong>Дариэка:</strong> «Каждая хранительница вела свою книгу. В неё записывали открытия, наблюдения, рисунки и истории. Теперь у тебя будет своя».</p><p>Гримуар — это не просто книга заклинаний. Это личная энциклопедия исследовательницы.</p>`, task: 'Придумай название для своей книги.', question: 'Для чего хранительница ведет гримуар?', answers: ['Чтобы записывать наблюдения, знания и открытия', 'Чтобы хранить только красивые картинки', 'Чтобы забыть изученные растения'], correct: 0, reward: 'Первая страница гримуара', fact: 'Настоящие исследователи тоже ведут полевые дневники.' },
+    { title: 'Пустая книга хранительницы', subtitle: 'Начало твоего гримуара', text: `<p>На старом чердаке ты находишь большую книгу в темно-зеленом переплете.</p><p>Ее страницы пожелтели от времени. На первой странице виден едва заметный отпечаток листа.</p><p><strong>Дариека:</strong> «Каждая хранительница вела свою книгу. В неё записывали открытия, наблюдения, рисунки и истории. Теперь у тебя будет своя».</p><p>Гримуар — это не просто книга заклинаний. Это личная энциклопедия исследовательницы.</p>`, task: 'Придумай название для своей книги.', question: 'Для чего хранительница ведет гримуар?', answers: ['Чтобы записывать наблюдения, знания и открытия', 'Чтобы хранить только красивые картинки', 'Чтобы забыть изученные растения'], correct: 0, reward: 'Первая страница гримуара', fact: 'Настоящие исследователи тоже ведут полевые дневники.' },
     { title: 'Тайный язык растений', subtitle: 'Из чего состоит растение', text: `<p>На следующей странице изображено незнакомое растение. От корней до верхушки оно разделено на несколько частей.</p><p>У большинства знакомых нам растений есть корень, стебель и листья. У многих также есть цветы, плоды и семена.</p><p><strong>Корень</strong> помогает растению закрепляться в почве и получать воду.</p><p><strong>Стебель</strong> поддерживает растение и проводит воду и питательные вещества.</p><p><strong>Листья</strong> участвуют в фотосинтезе.</p>`, task: 'Нарисуй растение и подпиши корень, стебель и листья.', question: 'Какая часть растения обычно поглощает воду из почвы?', answers: ['Цветок', 'Корень', 'Лист'], correct: 1, reward: 'Знание строения растения', fact: 'У мхов нет настоящих корней.' },
-    { title: 'Тайна листа', subtitle: 'Форма, края и прожилки', text: `<p>Дариэка кладёт перед тобой несколько изображений листьев.</p><p>Листья различаются по форме, краям, размеру и расположению прожилок.</p><p>Прожилки помогают распределять воду и вещества внутри листа.</p>`, task: 'Посмотри на комнатное растение с разрешения взрослого. Опиши его листья.', question: 'Что можно рассмотреть, сравнивая листья?', answers: ['Только их запах', 'Форму, края и прожилки', 'Только высоту дерева'], correct: 1, reward: 'Страница наблюдений за листьями', fact: 'У некоторых растений листья имеют необычную форму.' },
+    { title: 'Тайна листа', subtitle: 'Форма, края и прожилки', text: `<p>Дариека кладёт перед тобой несколько изображений листьев.</p><p>Листья различаются по форме, краям, размеру и расположению прожилок.</p><p>Прожилки помогают распределять воду и вещества внутри листа.</p>`, task: 'Посмотри на комнатное растение с разрешения взрослого. Опиши его листья.', question: 'Что можно рассмотреть, сравнивая листья?', answers: ['Только их запах', 'Форму, края и прожилки', 'Только высоту дерева'], correct: 1, reward: 'Страница наблюдений за листьями', fact: 'У некоторых растений листья имеют необычную форму.' },
     { title: 'Подземные тайны', subtitle: 'Корни растений', text: `<p>На старой иллюстрации изображено растение, а под землей — целый мир тонких корешков.</p><p>Корни удерживают растение в почве и поглощают воду с растворёнными минеральными веществами.</p>`, task: 'Нарисуй подземную часть растения.', question: 'Какая одна из главных задач корней?', answers: ['Поглощать воду и удерживать растение', 'Привлекать бабочек ярким цветом', 'Создавать семена'], correct: 0, reward: 'Страница «Подземный мир»', fact: 'Корни некоторых деревьев могут распространяться далеко за пределы кроны.' },
     { title: 'Секрет зеленого стебля', subtitle: 'Опора и движение воды', text: `<p>Стебель кажется простой частью растения, но внутри него происходит постоянное движение.</p><p>По специальным проводящим тканям вода поднимается от корней к листьям.</p>`, task: 'Нарисуй два растения: одно с мягким стеблем, другое — с одревесневшим.', question: 'Какую функцию выполняет стебель?', answers: ['Только украшает растение', 'Поддерживает части растения и участвует в переносе воды', 'Заменяет корни у всех растений'], correct: 1, reward: 'Страница «Страж стебля»', fact: 'Ствол дерева — это тоже стебель.' },
     { title: 'Цветочная мастерская', subtitle: 'Как устроен цветок', text: `<p>На этой странице гримуара нарисован цветок с раскрытыми лепестками.</p><p>Цветок — орган размножения многих растений.</p>`, task: 'Нарисуй цветок и попробуй обозначить лепестки, тычинки и пестик.', question: 'Какую важную роль выполняет цветок?', answers: ['Участвует в размножении растения', 'Всегда защищает корни от холода', 'Поглощает воду из почвы'], correct: 0, reward: 'Страница «Цветочная мастерская»', fact: 'Некоторые цветы опыляются не насекомыми, а ветром.' },
     { title: 'Тайна семени', subtitle: 'Начало новой жизни', text: `<p>В маленьком семени скрыта будущая жизнь растения.</p><p>Внутри семени находится зародыш — зачаток будущего растения.</p>`, task: 'Придумай и нарисуй путешествие одного семечка.', question: 'Что находится внутри семени?', answers: ['Готовый взрослый цветок', 'Зародыш будущего растения', 'Только воздух'], correct: 1, reward: 'Страница «Путешествие семени»', fact: 'Семена одуванчика могут переноситься ветром на большие расстояния.' },
-    { title: 'Гербарная мастерская', subtitle: 'Искусство наблюдения', text: `<p>Дариэка открывает ящик с рисунками растений.</p><p>В нашей академии можно вести безопасный бумажный гербарий.</p>`, task: 'Создай свою первую ботаническую страницу.', question: 'Что можно использовать для безопасной страницы гербария?', answers: ['Только неизвестные растения, собранные в лесу', 'Рисунок, фотографию и собственные наблюдения', 'Попробовать растение на вкус'], correct: 1, reward: 'Первая ботаническая страница', fact: 'В музеях хранятся гербарии, которым сотни лет.' },
+    { title: 'Гербарная мастерская', subtitle: 'Искусство наблюдения', text: `<p>Дариека открывает ящик с рисунками растений.</p><p>В нашей академии можно вести безопасный бумажный гербарий.</p>`, task: 'Создай свою первую ботаническую страницу.', question: 'Что можно использовать для безопасной страницы гербария?', answers: ['Только неизвестные растения, собранные в лесу', 'Рисунок, фотографию и собственные наблюдения', 'Попробовать растение на вкус'], correct: 1, reward: 'Первая ботаническая страница', fact: 'В музеях хранятся гербарии, которым сотни лет.' },
     { title: 'Легенды зеленого леса', subtitle: 'Реальные растения и вымышленные истории', text: `<p>На чердаке ты находишь книгу старых преданий.</p><p>В нашей академии существуют и собственные вымышленные легенды о волшебных травах.</p>`, task: 'Придумай легенду о вымышленном лесном растении.', question: 'Что важно помнить о магических свойствах растений из сказок?', answers: ['Любая легенда является научным фактом', 'Сказочные свойства — часть вымышленной истории', 'Любое растение можно использовать как зелье'], correct: 1, reward: 'Страница лесных преданий', fact: 'У многих реальных растений есть народные названия.' },
     { title: 'Испытание травницы', subtitle: 'Собери знания воедино', text: `<p>Дариека раскладывает перед тобой карточки с изображениями корня, стебля, листа, цветка и семени.</p>`, task: 'Создай схему растения целиком. Подпиши его части.', question: 'Почему части растения нельзя рассматривать совершенно отдельно друг от друга?', answers: ['Потому что они работают вместе и связаны между собой', 'Потому что все части выполняют одну и ту же функцию', 'Потому что у растения нет отдельных частей'], correct: 0, reward: 'Знак начинающей травницы', fact: 'Даже небольшой лист зависит от воды, которую получают корни.' },
     { title: 'Послание Дариеки', subtitle: 'Твои первые открытия', text: `<p>На последней странице первого раздела появляется золотистая печать.</p><p><strong>Дариека:</strong> «Ты научилась замечать то, мимо чего многие проходят».</p>`, task: 'Напиши короткое письмо самой себе: что тебе больше всего понравилось изучать?', question: 'Что делает личный гримуар ценным?', answers: ['Он хранит только награды', 'Он собирает знания, наблюдения и личные открытия ученицы', 'Его нельзя дополнять после первого урока'], correct: 1, reward: 'Завершение первого тома', fact: 'Настоящие научные дневники помогают сохранять наблюдения.' }
@@ -315,41 +407,71 @@ const grimoireLessons = [
 
 const grimoirePageImages = ['gr.jfif', 'gr1.jfif', 'gr2.jfif', 'gr3.jfif', 'gr4.jfif', 'gr5.jfif', 'gr6.jfif', 'gr7.jfif', 'gr8.jfif', 'gr9.jfif', 'gr10.jfif'];
 
+const GRIMOIRE_PAGE_EXP = 10;
+
 function getGrimoireNotes() {
-    try { return JSON.parse(localStorage.getItem('darieka_grimoire_notes') || '{}'); } catch (error) { return {}; }
+    try {
+        const notes = JSON.parse(localStorage.getItem('darieka_grimoire_notes') || '{}');
+        return notes && typeof notes === 'object' ? notes : {};
+    } catch (error) {
+        return {};
+    }
 }
+
 function saveGrimoireNote(index, value) {
     const notes = getGrimoireNotes();
     notes[index] = value;
     localStorage.setItem('darieka_grimoire_notes', JSON.stringify(notes));
-}function createGrimoireInterface() {
+}
+
+/* ---------- Глава II: интерфейс гримуара ---------- */
+
+let grimoireView = 'list';      // 'list' | 'lesson'
+let grimoireQuizPassed = false; // пройден ли вопрос в открытом уроке
+
+function createGrimoireInterface() {
     const atticScreen = document.getElementById('screen-attic');
     if (!atticScreen) return;
     if (document.getElementById('grimoire-interface')) { updateGrimoireInterface(); return; }
 
-    const style = document.createElement('style');
-    style.id = 'grimoire-style';
-    style.textContent = `
-        .grimoire-panel { margin-top: 24px; padding: 18px; border: 1px solid #a58b58; border-radius: 10px; background: rgba(44, 53, 37, .96); color: #f1e5c9; }
-        .grimoire-panel h2, .grimoire-panel h3 { font-family: Georgia, serif; color: #e6cb91; }
-        .grimoire-progress { height: 9px; background: #1c251b; border-radius: 20px; overflow: hidden; margin: 12px 0; }
-        .grimoire-progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #71875b, #d0ad65); transition: width .4s ease; }
-        .grimoire-page { background: #eee2c5; color: #443726; border: 2px solid #b49a66; border-radius: 7px; padding: 18px; margin-top: 16px; line-height: 1.7; }
-        .grimoire-page h3 { color: #4a5639; }
-        .grimoire-task { background: #dcd0ae; padding: 14px; border-left: 4px solid #8b774b; margin-top: 16px; border-radius: 4px; }
-        .grimoire-question { margin-top: 18px; padding: 14px; background: #e4d7b8; color: #443726; border-radius: 6px; }
-        .grimoire-answer { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #8e805e; border-radius: 5px; background: #f2e8d2; color: #403626; text-align: left; cursor: pointer; font-size: 15px; }
-        .grimoire-answer:hover { background: #d8c9a6; }
-        .grimoire-note { width: 100%; min-height: 100px; padding: 12px; margin-top: 12px; border: 1px solid #a58b58; border-radius: 5px; background: #f5ebd6; color: #403626; font-family: Georgia, serif; font-size: 15px; box-sizing: border-box; }
-        .grimoire-small { color: #d7c49c; font-size: 13px; }
-        .grimoire-success { color: #42643b; font-weight: bold; margin-top: 12px; }
-        .grimoire-reward { border: 1px solid #c4a35e; background: #eee0b9; color: #493b28; padding: 15px; border-radius: 6px; margin-top: 14px; }
-        .grimoire-illustration-frame { width: 100%; margin: 0 auto 18px; padding: 7px; background: #d9c9a8; border: 2px solid #a58b58; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
-        .grimoire-illustration { display: block; width: 100%; height: auto; max-height: 520px; object-fit: contain; border-radius: 3px; }
-        .grimoire-page-counter { text-align: center; color: #766448; font-size: 11px; letter-spacing: 1px; margin-bottom: 10px; }
-        .grimoire-page .grimoire-note { display: block; width: 100%; min-height: 115px; box-sizing: border-box; resize: vertical; }
-    `;
-    document.head.appendChild(style);
+    if (!document.getElementById('grimoire-style')) {
+        const style = document.createElement('style');
+        style.id = 'grimoire-style';
+        style.textContent = `
+            .grimoire-panel { margin-top: 24px; padding: 18px; border: 1px solid #a58b58; border-radius: 10px; background: rgba(44, 53, 37, .96); color: #f1e5c9; }
+            .grimoire-panel h2, .grimoire-panel h3 { font-family: Georgia, serif; color: #e6cb91; }
+            .grimoire-panel .grimoire-bar { height: 9px; background: #1c251b; border-radius: 20px; overflow: hidden; margin: 12px 0; }
+            .grimoire-panel .grimoire-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #71875b, #d0ad65); transition: width .4s ease; }
+            .grimoire-panel p { color: #f1e5c9; }
+            .grimoire-page { background: #eee2c5; color: #443726; border: 2px solid #b49a66; border-radius: 7px; padding: 18px; margin-top: 16px; line-height: 1.7; }
+            .grimoire-page h3 { color: #4a5639; }
+            .grimoire-page p { color: #443726; text-align: left; }
+            .grimoire-task { background: #dcd0ae; padding: 14px; border-left: 4px solid #8b774b; margin-top: 16px; border-radius: 4px; }
+            .grimoire-question { margin-top: 18px; padding: 14px; background: #e4d7b8; color: #443726; border-radius: 6px; }
+            .grimoire-answer { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #8e805e; border-radius: 5px; background: #f2e8d2; color: #403626; text-align: left; cursor: pointer; font-size: 15px; font-family: inherit; }
+            .grimoire-answer:hover { background: #d8c9a6; }
+            .grimoire-answer.correct { background: #dce8cf; border: 2px solid #4e7447; }
+            .grimoire-answer.incorrect { background: #f0d8cf; border: 2px solid #9a4b43; }
+            .grimoire-input, .grimoire-textarea { display: block; width: 100%; padding: 12px; margin-top: 12px; border: 1px solid #a58b58; border-radius: 5px; background: #f5ebd6; color: #403626; font-family: Georgia, serif; font-size: 15px; box-sizing: border-box; font-style: normal; border-left: 1px solid #a58b58; }
+            .grimoire-textarea { min-height: 115px; resize: vertical; }
+            .grimoire-small { color: #d7c49c; font-size: 13px; }
+            .grimoire-success { color: #42643b; font-weight: bold; margin-top: 12px; }
+            .grimoire-error { color: #8c3a3a; font-weight: bold; margin-top: 12px; }
+            .grimoire-reward { border: 1px solid #c4a35e; background: #eee0b9; color: #493b28; padding: 15px; border-radius: 6px; margin-top: 14px; }
+            .grimoire-illustration-frame { width: 100%; margin: 0 auto 18px; padding: 7px; background: #d9c9a8; border: 2px solid #a58b58; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
+            .grimoire-illustration { display: block; width: 100%; height: auto; max-height: 520px; object-fit: contain; border-radius: 3px; }
+            .grimoire-page-counter { text-align: center; color: #766448; font-size: 11px; letter-spacing: 1px; margin-bottom: 10px; }
+            .grimoire-lesson-row { display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px; margin-top: 9px; border: 1px solid #a18a61; border-radius: 6px; background: rgba(238,226,197,.14); color: #f1e5c9; text-align: left; cursor: pointer; font-family: inherit; }
+            .grimoire-lesson-row.done { background: rgba(126,145,91,.28); }
+            .grimoire-lesson-row.locked { opacity: .5; cursor: not-allowed; }
+            .grimoire-lesson-num { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #d0ad65; color: #e6cb91; font-weight: bold; }
+            .grimoire-lesson-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+            .grimoire-lesson-info strong { color: #e6cb91; font-family: Georgia, serif; }
+            .grimoire-lesson-info span { font-size: 12px; color: #d7c49c; }
+            .grimoire-lesson-state { font-size: 11px; color: #bcd09a; }
+        `;
+        document.head.appendChild(style);
+    }
 
     const panel = document.createElement('div');
     panel.id = 'grimoire-interface';
@@ -357,12 +479,26 @@ function saveGrimoireNote(index, value) {
     panel.innerHTML = `
         <h2>Книга хранительницы</h2>
         <p>Здесь будут храниться твои знания, рисунки, наблюдения и открытия.</p>
-        <div class="grimoire-progress"><div id="grimoire-progress-fill" class="grimoire-progress-fill"></div></div>
+        <div class="grimoire-bar"><div id="grimoire-progress-fill" class="grimoire-bar-fill"></div></div>
         <p id="grimoire-progress-text" class="grimoire-small"></p>
         <div id="grimoire-content"></div>
     `;
-    atticScreen.querySelector('.paper-card').appendChild(panel);
+    const card = atticScreen.querySelector('.paper-card');
+    if (!card) return;
+    card.appendChild(panel);
     updateGrimoireInterface();
+}
+
+function openGrimoire() {
+    createGrimoireInterface();
+    grimoireView = 'list';
+    updateGrimoireInterface();
+    const panel = document.getElementById('grimoire-interface');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function isGrimoirePageDone(index) {
+    return gameState.grimoirePages.indexOf(index) !== -1;
 }
 
 function updateGrimoireInterface() {
@@ -384,4 +520,174 @@ function updateGrimoireInterface() {
                 <p>На чердаке ты находишь книгу прежней хранительницы. Её страницы почти пусты.</p>
                 <p>Возможно, именно тебе предстоит наполнить её знаниями.</p>
                 <label for="grimoire-name">Название твоего гримуара:</label>
-                <input id="grimoire-name" class="grimoire-note" type="text" value="${escapeHTML(gameState.grimoireName
+                <input id="grimoire-name" class="grimoire-input" type="text" value="${escapeHTML(gameState.grimoireName)}" maxlength="60">
+                <button class="btn btn-gold" onclick="startGrimoire()">Начать гримуар</button>
+            </div>
+        `;
+        return;
+    }
+
+    if (grimoireView === 'lesson') {
+        renderGrimoireLesson(content);
+    } else {
+        renderGrimoireList(content);
+    }
+}
+
+function renderGrimoireList(content) {
+    const total = grimoireLessons.length;
+    const completed = gameState.grimoirePages.length;
+    // Следующий доступный урок — первый невыполненный
+    let nextIndex = 0;
+    while (nextIndex < total && isGrimoirePageDone(nextIndex)) nextIndex++;
+
+    let rows = '';
+    grimoireLessons.forEach((lesson, i) => {
+        const done = isGrimoirePageDone(i);
+        const available = done || i === nextIndex;
+        const state = done ? 'Открыта ✓' : (available ? 'Можно начать' : 'Закрыта');
+        rows += `
+            <button type="button" class="grimoire-lesson-row ${done ? 'done' : ''} ${available ? '' : 'locked'}" onclick="openGrimoireLesson(${i})">
+                <span class="grimoire-lesson-num">${i + 1}</span>
+                <span class="grimoire-lesson-info"><strong>${escapeHTML(lesson.title)}</strong><span>${escapeHTML(lesson.subtitle)}</span></span>
+                <span class="grimoire-lesson-state">${state}</span>
+            </button>
+        `;
+    });
+
+    let finale = '';
+    if (completed === total) {
+        finale = `<div class="grimoire-reward"><strong>Первый том завершён!</strong><br>Ты открыла все страницы гримуара. Дариека гордится тобой.</div>`;
+    }
+
+    content.innerHTML = `
+        <h3>${escapeHTML(gameState.grimoireName)}</h3>
+        <p class="grimoire-small">Страницы открываются по порядку. Спешить некуда — возвращайся когда захочешь.</p>
+        ${rows}
+        ${finale}
+    `;
+}
+
+function openGrimoireLesson(index) {
+    if (index < 0 || index >= grimoireLessons.length) return;
+    let nextIndex = 0;
+    while (nextIndex < grimoireLessons.length && isGrimoirePageDone(nextIndex)) nextIndex++;
+    if (!isGrimoirePageDone(index) && index !== nextIndex) {
+        alert('Эта страница откроется после предыдущей.');
+        return;
+    }
+    gameState.grimoireStep = index;
+    saveState();
+    grimoireView = 'lesson';
+    grimoireQuizPassed = isGrimoirePageDone(index);
+    updateGrimoireInterface();
+    const panel = document.getElementById('grimoire-interface');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderGrimoireLesson(content) {
+    const index = gameState.grimoireStep;
+    const lesson = grimoireLessons[index];
+    if (!lesson) { grimoireView = 'list'; renderGrimoireList(content); return; }
+
+    const done = isGrimoirePageDone(index);
+    const notes = getGrimoireNotes();
+    const noteValue = notes[index] || '';
+    const image = grimoirePageImages[index];
+
+    const answers = lesson.answers.map((answer, j) =>
+        `<button type="button" class="grimoire-answer ${done && j === lesson.correct ? 'correct' : ''}" id="grimoire-answer-${j}" onclick="answerGrimoireQuestion(${j})">${escapeHTML(answer)}</button>`
+    ).join('');
+
+    content.innerHTML = `
+        <div class="grimoire-page">
+            <div class="grimoire-page-counter">СТРАНИЦА ${index + 1} ИЗ ${grimoireLessons.length}</div>
+            ${image ? `<div class="grimoire-illustration-frame"><img class="grimoire-illustration" src="${escapeHTML(image)}" alt="${escapeHTML(lesson.title)}" onerror="this.parentNode.style.display='none'"></div>` : ''}
+            <h3>${escapeHTML(lesson.title)}</h3>
+            <p class="grimoire-small" style="color:#766448;text-align:center;">${escapeHTML(lesson.subtitle)}</p>
+            ${lesson.text}
+            <div class="grimoire-task">
+                <strong>Задание:</strong> ${escapeHTML(lesson.task)}
+                <textarea id="grimoire-note-field" class="grimoire-textarea" placeholder="Здесь можно записать свои наблюдения (необязательно)" oninput="saveGrimoireNote(${index}, this.value)">${escapeHTML(noteValue)}</textarea>
+                <p class="grimoire-small" style="color:#76684f;margin-top:6px;">Твои записи сохраняются автоматически.</p>
+            </div>
+            <div class="grimoire-question">
+                <strong>${escapeHTML(lesson.question)}</strong>
+                ${answers}
+                <div id="grimoire-feedback">${done ? '<p class="grimoire-success">Эта страница уже открыта.</p>' : ''}</div>
+            </div>
+            <div class="grimoire-reward" id="grimoire-fact"><strong>Интересный факт:</strong> ${escapeHTML(lesson.fact)}</div>
+            <button type="button" class="btn btn-gold" id="grimoire-complete-button" onclick="completeGrimoireLesson()" ${grimoireQuizPassed ? '' : 'disabled'} style="${grimoireQuizPassed ? '' : 'opacity:.48;'}">${done ? 'Вернуться к страницам' : 'Открыть страницу гримуара'}</button>
+            <button type="button" class="btn btn-back" onclick="backToGrimoireList()">К списку страниц</button>
+        </div>
+    `;
+}
+
+function answerGrimoireQuestion(choice) {
+    const lesson = grimoireLessons[gameState.grimoireStep];
+    if (!lesson) return;
+    const button = document.getElementById('grimoire-answer-' + choice);
+    const feedback = document.getElementById('grimoire-feedback');
+
+    if (choice === lesson.correct) {
+        grimoireQuizPassed = true;
+        if (button) { button.classList.remove('incorrect'); button.classList.add('correct'); }
+        if (feedback) feedback.innerHTML = '<p class="grimoire-success">Верно! Страница гримуара готова открыться.</p>';
+        const complete = document.getElementById('grimoire-complete-button');
+        if (complete) { complete.disabled = false; complete.style.opacity = ''; }
+    } else {
+        if (button) button.classList.add('incorrect');
+        if (feedback) feedback.innerHTML = '<p class="grimoire-error">Пока не то. Перечитай страницу и попробуй ещё раз — опыт за ошибки не отнимается.</p>';
+    }
+}
+
+function completeGrimoireLesson() {
+    const index = gameState.grimoireStep;
+    const lesson = grimoireLessons[index];
+    if (!lesson) return;
+
+    if (isGrimoirePageDone(index)) { backToGrimoireList(); return; }
+    if (!grimoireQuizPassed) return;
+
+    gameState.grimoirePages.push(index);
+    gameState.exp += GRIMOIRE_PAGE_EXP; // награда за страницу выдаётся один раз
+    saveState();
+
+    const content = document.getElementById('grimoire-content');
+    if (content) {
+        content.innerHTML = `
+            <div class="grimoire-page">
+                <h3>Страница открыта!</h3>
+                <div class="grimoire-reward"><strong>Награда:</strong> ${escapeHTML(lesson.reward)}<br>+${GRIMOIRE_PAGE_EXP} опыта</div>
+                <button type="button" class="btn btn-gold" onclick="backToGrimoireList()">К списку страниц</button>
+            </div>
+        `;
+    }
+    updateGrimoireInterface_progressOnly();
+}
+
+function updateGrimoireInterface_progressOnly() {
+    const total = grimoireLessons.length;
+    const completed = gameState.grimoirePages.length;
+    const progress = document.getElementById('grimoire-progress-fill');
+    const progressText = document.getElementById('grimoire-progress-text');
+    if (progress) progress.style.width = (completed / total * 100) + '%';
+    if (progressText) progressText.innerText = 'Страниц открыто: ' + completed + ' из ' + total;
+}
+
+function backToGrimoireList() {
+    grimoireView = 'list';
+    updateGrimoireInterface();
+    const panel = document.getElementById('grimoire-interface');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function startGrimoire() {
+    const input = document.getElementById('grimoire-name');
+    const name = input && input.value.trim() ? input.value.trim() : 'Гримуар травницы';
+    gameState.grimoireName = name;
+    gameState.grimoireStarted = true;
+    saveState();
+    grimoireView = 'list';
+    updateGrimoireInterface();
+}
