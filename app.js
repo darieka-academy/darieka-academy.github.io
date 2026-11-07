@@ -1,5 +1,5 @@
 // ======================================================
-// ШКОЛА ТРАВНИЦ ДАРИЕKИ
+// ШКОЛА ТРАВНИЦ ДАРИЕКИ
 // ГЛАВА I + ГЛАВА II
 // ======================================================
 
@@ -9,54 +9,54 @@
 // ======================================================
 
 let gameState = {
-    name: localStorage.getItem('darieka_student_name') || '',
+ name: localStorage.getItem('darieka_student_name') || '',
 
-    hasPass: localStorage.getItem('darieka_has_pass') === 'true',
-    hasFern: localStorage.getItem('darieka_has_fern') === 'true',
-    hasKey: localStorage.getItem('darieka_has_key') === 'true',
+ hasPass: localStorage.getItem('darieka_has_pass') === 'true',
+ hasFern: localStorage.getItem('darieka_has_fern') === 'true',
+ hasKey: localStorage.getItem('darieka_has_key') === 'true',
 
-    exp: parseInt(localStorage.getItem('darieka_exp'), 10) || 0,
+ exp: parseInt(localStorage.getItem('darieka_exp'), 10) || 0,
 
-    greenhouseOpened: localStorage.getItem('darieka_greenhouse_opened') === 'true',
-    lesson1Completed: localStorage.getItem('darieka_lesson1_completed') === 'true',
-    secretFound: localStorage.getItem('darieka_secret_found') === 'true',
+ greenhouseOpened: localStorage.getItem('darieka_greenhouse_opened') === 'true',
+ lesson1Completed: localStorage.getItem('darieka_lesson1_completed') === 'true',
+ secretFound: localStorage.getItem('darieka_secret_found') === 'true',
 
-    libraryOpened: localStorage.getItem('darieka_library_opened') === 'true',
-    hasLetter: localStorage.getItem('darieka_has_letter') === 'true',
+ libraryOpened: localStorage.getItem('darieka_library_opened') === 'true',
+ hasLetter: localStorage.getItem('darieka_has_letter') === 'true',
 
-    hasPet: localStorage.getItem('darieka_has_pet') === 'true',
-    petName: localStorage.getItem('darieka_pet_name') || '',
+ hasPet: localStorage.getItem('darieka_has_pet') === 'true',
+ petName: localStorage.getItem('darieka_pet_name') || '',
 
-    chapter1BonusClaimed:
-        localStorage.getItem('darieka_chapter1_bonus_claimed') === 'true',
+ глава1Бонус получен:
+ localStorage.getItem('darieka_chapter1_bonus_claimed') === 'true',
 
-    atticOpened: localStorage.getItem('darieka_attic_opened') === 'true',
-    hasAtticCard: localStorage.getItem('darieka_has_attic_card') === 'true',
+ atticOpened: localStorage.getItem('darieka_attic_opened') === 'true',
+ hasAtticCard: localStorage.getItem('darieka_has_attic_card') === 'true',
 
-    quizRewardClaimed:
-        localStorage.getItem('darieka_quiz_reward_claimed') === 'true',
+ quizRewardClaimed:
+ localStorage.getItem('darieka_quiz_reward_claimed') === 'true',
 
-    secretRewardClaimed:
-        localStorage.getItem('darieka_secret_reward_claimed') === 'true',
+ secretRewardClaimed:
+ localStorage.getItem('darieka_secret_reward_claimed') === 'true',
 
-    // Глава II: прогресс гримуара
-    grimoireStarted:
-        localStorage.getItem('darieka_grimoire_started') === 'true',
+ // Глава II: прогресс гримуара
+ grimoireStarted:
+ localStorage.getItem('darieka_grimoire_started') === 'true',
 
-    grimoireStep:
-        parseInt(localStorage.getItem('darieka_grimoire_step'), 10) || 0,
+ grimoireStep:
+ parseInt(localStorage.getItem('darieka_grimoire_step'), 10) || 0,
 
-    grimoirePages:
-        JSON.parse(localStorage.getItem('darieka_grimoire_pages') || '[]'),
+ grimoirePages:
+ JSON.parse(localStorage.getItem('darieka_grimoire_pages') || '[]'),
 
-    grimoireName:
-        localStorage.getItem('darieka_grimoire_name') || 'Гримуар травницы',
+ grimoireName:
+ localStorage.getItem('darieka_grimoire_name') || 'Гримуар травницы',
 
-    atticQuizCompleted:
-        localStorage.getItem('darieka_attic_quiz_completed') === 'true',
+ atticQuizCompleted:
+ localStorage.getItem('darieka_attic_quiz_completed') === 'true',
 
-    atticCardClaimed:
-        localStorage.getItem('darieka_attic_card_claimed') === 'true'
+ atticCardClaimed:
+ localStorage.getItem('darieka_attic_card_claimed') === 'true'
 };
 
 
@@ -65,56 +65,56 @@ let gameState = {
 // ======================================================
 
 function saveState() {
-    localStorage.setItem('darieka_student_name', gameState.name);
+ localStorage.setItem('darieka_student_name', gameState.name);
 
-    localStorage.setItem('darieka_has_pass', gameState.hasPass);
-    localStorage.setItem('darieka_has_fern', gameState.hasFern);
-    localStorage.setItem('darieka_has_key', gameState.hasKey);
+ localStorage.setItem('darieka_has_pass', gameState.hasPass);
+ localStorage.setItem('darieka_has_fern', gameState.hasFern);
+ localStorage.setItem('darieka_has_key', gameState.hasKey);
 
-    localStorage.setItem('darieka_exp', gameState.exp);
+ localStorage.setItem('darieka_exp', gameState.exp);
 
-    localStorage.setItem('darieka_greenhouse_opened', gameState.greenhouseOpened);
-    localStorage.setItem('darieka_lesson1_completed', gameState.lesson1Completed);
-    localStorage.setItem('darieka_secret_found', gameState.secretFound);
+ localStorage.setItem('darieka_greenhouse_opened', gameState.greenhouseOpened);
+ localStorage.setItem('darieka_lesson1_completed', gameState.lesson1Completed);
+ localStorage.setItem('darieka_secret_found', gameState.secretFound);
 
-    localStorage.setItem('darieka_library_opened', gameState.libraryOpened);
-    localStorage.setItem('darieka_has_letter', gameState.hasLetter);
+ localStorage.setItem('darieka_library_opened', gameState.libraryOpened);
+ localStorage.setItem('darieka_has_letter', gameState.hasLetter);
 
-    localStorage.setItem('darieka_has_pet', gameState.hasPet);
-    localStorage.setItem('darieka_pet_name', gameState.petName);
+ localStorage.setItem('darieka_has_pet', gameState.hasPet);
+ localStorage.setItem('darieka_pet_name', gameState.petName);
 
-    localStorage.setItem(
-        'darieka_chapter1_bonus_claimed',
-        gameState.chapter1BonusClaimed
-    );
+ localStorage.setItem(
+ 'darieka_chapter1_bonus_claimed',
+ gameState.chapter1BonusClaimed
+ );
 
-    localStorage.setItem('darieka_attic_opened', gameState.atticOpened);
-    localStorage.setItem('darieka_has_attic_card', gameState.hasAtticCard);
+ localStorage.setItem('darieka_attic_opened', gameState.atticOpened);
+ localStorage.setItem('darieka_has_attic_card', gameState.hasAtticCard);
 
-    localStorage.setItem('darieka_quiz_reward_claimed', gameState.quizRewardClaimed);
-    localStorage.setItem('darieka_secret_reward_claimed', gameState.secretRewardClaimed);
+ localStorage.setItem("darieka_quiz_reward_claimed", gameState.quizRewardClaimed);
+ localStorage.setItem('darieka_secret_reward_claimed', gameState.secretRewardClaimed);
 
-    localStorage.setItem('darieka_grimoire_started', gameState.grimoireStarted);
-    localStorage.setItem('darieka_grimoire_step', gameState.grimoireStep);
+ localStorage.setItem('darieka_grimoire_started', gameState.grimoireStarted);
+ localStorage.setItem('darieka_grimoire_step', gameState.grimoireStep);
 
-    localStorage.setItem(
-        'darieka_grimoire_pages',
-        JSON.stringify(gameState.grimoirePages)
-    );
+ localStorage.setItem(
+ 'darieka_grimoire_pages',
+ JSON.stringify(gameState.grimoirePages)
+ );
 
-    localStorage.setItem('darieka_grimoire_name', gameState.grimoireName);
+ localStorage.setItem('darieka_grimoire_name', gameState.grimoireName);
 
-    localStorage.setItem(
-        'darieka_attic_quiz_completed',
-        gameState.atticQuizCompleted
-    );
+ localStorage.setItem(
+ 'darieka_attic_quiz_completed',
+ gameState.atticQuizCompleted
+ );
 
-    localStorage.setItem(
-        'darieka_attic_card_claimed',
-        gameState.atticCardClaimed
-    );
+ localStorage.setItem(
+ 'darieka_attic_card_claimed',
+ gameState.atticCardClaimed
+ );
 
-    updateUI();
+ updateUI();
 }
 
 
@@ -123,132 +123,132 @@ function saveState() {
 // ======================================================
 
 function updateUI() {
-    const topBar = document.getElementById('topBar');
+ const topBar = document.getElementById('topBar');
 
-    if (topBar && gameState.name) {
-        topBar.classList.add('active');
-    }
+ if (topBar && gameState.name) {
+ topBar.classList.add('active');
+ }
 
-    const uiName = document.getElementById('ui-name');
-    const uiExp = document.getElementById('ui-exp');
-    const uiItems = document.getElementById('ui-items');
+ const uiName = document.getElementById('ui-name');
+ const uiExp = document.getElementById('ui-exp');
+ const uiItems = document.getElementById('ui-items');
 
-    if (uiName) uiName.innerText = gameState.name;
-    if (uiExp) uiExp.innerText = gameState.exp;
+ if (uiName) uiName.innerText = gameState.name;
+ если (uiExp) то uiExp.innerText = gameState.exp;
 
-    document.querySelectorAll('.displayName').forEach(element => {
-        element.innerText = gameState.name;
-    });
+ документ.querySelectorAll('.displayName').forEach(element => {
+ element.innerText = gameState.name;
+ });
 
-    const itemsCount =
-        (gameState.hasPass ? 1 : 0) +
-        (gameState.hasFern ? 1 : 0) +
-        (gameState.hasKey ? 1 : 0) +
-        (gameState.hasLetter ? 1 : 0) +
-        (gameState.hasAtticCard ? 1 : 0);
+ const itemsCount =
+ (gameState.hasPass ? 1 : 0) +
+ (gameState.hasFern ? 1 : 0) +
+ (gameState.hasKey ? 1 : 0) +
+ (gameState.hasLetter ? 1 : 0) +
+ (gameState.hasAtticCard ? 1 : 0);
 
-    if (uiItems) uiItems.innerText = itemsCount;
+ if (uiItems) uiItems.innerText = itemsCount;
 
-    const expFill = document.getElementById('expFill');
+ const expFill = document.getElementById('expFill');
 
-    if (expFill) {
-        expFill.style.width = (gameState.exp % 100) + '%';
-    }
+ if (expFill) {
+ expFill.style.width = (gameState.exp % 100) + '%';
+ }
 
-    // Оранжерея
+ // Оранжерея
 
-    const greenhouse = document.getElementById('loc-greenhouse');
+ const greenhouse = document.getElementById('loc-greenhouse');
 
-    if (greenhouse) {
-        if (gameState.lesson1Completed) {
-            greenhouse.classList.remove('locked');
-            greenhouse.classList.add('researched');
-        } else if (gameState.greenhouseOpened) {
-            greenhouse.classList.remove('locked');
-            greenhouse.classList.add('unlocked');
-        }
-    }
+ if (greenhouse) {
+ if (gameState.lesson1Completed) {
+ greenhouse.classList.remove('locked');
+ greenhouse.classList.add('researched');
+ } else if (gameState.greenhouseOpened) {
+ greenhouse.classList.remove('locked');
+ greenhouse.classList.add('unlocked');
+ }
+ }
 
-    // Библиотека
+ // Библиотека
 
-    const library = document.getElementById('loc-library');
+ const library = document.getElementById('loc-library');
 
-    if (library && gameState.libraryOpened) {
-        library.classList.remove('locked');
-        library.classList.add('unlocked');
-    }
+ if (library && gameState.libraryOpened) {
+ library.classList.remove('locked');
+ library.classList.add('unlocked');
+ }
 
-    // Чердак
+ // Чердак
 
-    const attic = document.getElementById('loc-attic');
+ const attic = document.getElementById('loc-attic');
 
-    if (attic && gameState.hasPet) {
-        attic.classList.remove('locked');
-        attic.classList.add('unlocked');
+ if (attic && gameState.hasPet) {
+ attic.classList.remove('locked');
+ attic.classList.add('unlocked');
 
-        if (gameState.grimoireStep >= 12) {
-            attic.classList.add('researched');
-        }
-    }
+ if (gameState.grimoireStep >= 12) {
+ attic.classList.add('researched');
+ }
+ }
 
-    // Кнопка продолжения
+ // Кнопка продолжения
 
-    const btnStart = document.getElementById('btn-start-lesson');
+ const btnStart = document.getElementById('btn-start-lesson');
 
-    if (btnStart) {
-        if (gameState.hasPet) {
-            btnStart.innerText = 'Открыть Чердак хранительницы';
-        } else if (gameState.hasLetter) {
-            btnStart.innerText = 'Найти Моховичка';
-        } else if (gameState.secretFound) {
-            btnStart.innerText = 'Открыть Библиотеку';
-        } else if (gameState.lesson1Completed) {
-            btnStart.innerText = 'Найти следующую тайну';
-        } else {
-            btnStart.innerText = 'Продолжить обучение';
-        }
-    }
+ if (btnStart) {
+ if (gameState.hasPet) {
+ btnStart.innerText = 'Открыть чердак хранительницы';
+ } else if (gameState.hasLetter) {
+ btnStart.innerText = 'Найти Моховичку';
+ } else if (gameState.secretFound) {
+ btnStart.innerText = 'Открыть Библиотеку';
+ } else if (gameState.lesson1Completed) {
+ btnStart.innerText = 'Найти следующую тайну';
+ } else {
+ btnStart.innerText = 'Продолжить обучение';
+ }
+ }
 
-    // Питомцы
+ // Питомцы
 
-    const petsButton = document.getElementById('btn-pets-map');
+ const petsButton = document.getElementById('btn-pets-map');
 
-    if (petsButton) {
-        petsButton.style.display = gameState.hasPet ? 'block' : 'none';
-    }
+ if (petsButton) {
+ petsButton.style.display = gameState.hasPet ? 'block' : 'none';
+ }
 
-    const petDisplayName = document.getElementById('pet-display-name');
+ const petDisplayName = document.getElementById('pet-display-name');
 
-    if (petDisplayName) {
-        petDisplayName.innerText = gameState.petName || 'Моховичок';
-    }
+ if (petDisplayName) {
+ petDisplayName.innerText = gameState.petName || 'Моховичок';
+ }
 
-    const petCard = document.getElementById('pet-card');
-    const noPetsMessage = document.getElementById('no-pets-message');
+ const petCard = document.getElementById('pet-card');
+ const noPetsMessage = document.getElementById('no-pets-message');
 
-    if (petCard && noPetsMessage) {
-        petCard.style.display = gameState.hasPet ? 'block' : 'none';
-        noPetsMessage.style.display = gameState.hasPet ? 'none' : 'block';
-    }
+ if (petCard && noPetsMessage) {
+ petCard.style.display = gameState.hasPet ? 'block' : 'none';
+ noPetsMessage.style.display = gameState.hasPet ? 'none' : 'block';
+ }
 
-    // Диплом
+ // Диплом
 
-    const diplomaButton = document.getElementById('btn-diploma-map');
+ const diplomaButton = document.getElementById('btn-diploma-map');
 
-    if (diplomaButton) {
-        diplomaButton.style.display =
-            gameState.chapter1BonusClaimed ? 'block' : 'none';
-    }
+ if (diplomaButton) {
+ diplomaButton.style.display =
+ gameState.chapter1BonusClaimed ? 'block' : 'none';
+ }
 
-    // Находка на чердаке
+ // Находка на чердаке
 
-    const atticResult = document.getElementById('attic-card-result');
-    const atticButton = document.getElementById('btn-attic-find');
+ const atticResult = document.getElementById('attic-card-result');
+ const atticButton = document.getElementById('btn-attic-find');
 
-    if (atticResult && atticButton) {
-        atticResult.classList.toggle('hidden', !gameState.hasAtticCard);
-        atticButton.style.display = gameState.hasAtticCard ? 'none' : 'block';
-    }
+ if (atticResult && atticButton) {
+ atticResult.classList.toggle('hidden', !gameState.hasAtticCard);
+ atticButton.style.display = gameState.hasAtticCard ? 'none' : 'block';
+ }
 }
 
 
@@ -257,31 +257,31 @@ function updateUI() {
 // ======================================================
 
 function switchScreen(hideId, showId) {
-    // На экране всегда остаётся только один активный раздел.
-    // Это предотвращает накопление предыдущих уроков сверху.
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
+ // На экране всегда остается только один активный раздел.
+ // Это предотвращает наложение предыдущих уроков друг на друга.
+ документ.querySelectorAll('.screen').forEach(screen => {
+ screen.classList.remove('active');
+ });
 
-    if (showId) {
-        const showScreen = document.getElementById(showId);
-        if (showScreen) showScreen.classList.add('active');
-    }
+ if (showId) {
+ const showScreen = document.getElementById(showId);
+ if (showScreen) showScreen.classList.add('active');
+ }
 
-    window.scrollTo({ top: 0, behavior: 'instant' });
+ window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 
 function backToMap() {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
+ document.querySelectorAll('.screen').forEach(screen => {
+ screen.classList.remove('active');
+ });
 
-    const map = document.getElementById('screen-map');
+ const map = document.getElementById('screen-map');
 
-    if (map) map.classList.add('active');
+ if (map) map.classList.add('active');
 
-    window.scrollTo(0, 0);
+ window.scrollTo(0, 0);
 }
 
 
@@ -291,22 +291,22 @@ function backToMap() {
 
 window.addEventListener('load', function() {
 
-    // Если ученица получила питомца до обновления,
-    // выдаём бонус Главы I только один раз.
+ // Если ученица получила питомца до обновления,
+ // выдаём бонус за главу I только один раз.
 
-    if (gameState.hasPet && !gameState.chapter1BonusClaimed) {
-        gameState.chapter1BonusClaimed = true;
-        gameState.exp += 50;
-        saveState();
-    }
+ if (gameState.hasPet && !gameState.chapter1BonusClaimed) {
+ gameState.chapter1BonusClaimed = true;
+ gameState.exp += 50;
+ saveState();
+ }
 
-    updateUI();
+ updateUI();
 
-    if (gameState.name && gameState.hasPass) {
-        switchScreen('screen-gates', 'screen-map');
-    } else if (gameState.name) {
-        switchScreen('screen-gates', 'screen-card');
-    }
+ if (gameState.name && gameState.hasPass) {
+ switchScreen('screen-gates', 'screen-map');
+ } else if (gameState.name) {
+ switchScreen('screen-gates', 'screen-card');
+ }
 
 });
 
@@ -316,33 +316,33 @@ window.addEventListener('load', function() {
 // ======================================================
 
 function saveName() {
-    const input = document.getElementById('nameInput');
+ const input = document.getElementById('nameInput');
 
-    if (!input) return;
+ if (!input) return;
 
-    const name = input.value.trim();
+ const name = input.value.trim();
 
-    if (!name) {
-        alert('Пожалуйста, напиши имя!');
-        return;
-    }
+ if (!name) {
+ alert('Пожалуйста, напишите имя!');
+ return;
+ }
 
-    gameState.name = name;
+ gameState.name = name;
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-gates', 'screen-card');
+ switchScreen('screen-gates', 'screen-card');
 }
 
 
 function addToCollection(item) {
-    if (item === 'pass') {
-        gameState.hasPass = true;
-    }
+ if (item === 'pass') {
+ gameState.hasPass = true;
+ }
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-card', 'screen-map');
+ switchScreen('screen-card', 'screen-map');
 }
 
 
@@ -351,129 +351,129 @@ function addToCollection(item) {
 // ======================================================
 
 function startGreenhouse() {
-    if (gameState.lesson1Completed) {
-        alert('Ты уже прошла этот урок! Можешь полюбоваться находками.');
-    } else if (gameState.greenhouseOpened) {
-        switchScreen('screen-map', 'screen-lesson2');
-    } else {
-        alert('Сначала поговори с Дариекой!');
-    }
+ if (gameState.lesson1Completed) {
+ alert('Ты уже прошла этот урок! Можешь полюбоваться находками.');
+ } else if (gameState.greenhouseOpened) {
+ switchScreen('screen-map', 'screen-lesson2');
+ } else {
+ alert('Сначала поговори с Дариекой!');
+ }
 }
 
 
 function openDariekaMeeting() {
-    if (gameState.hasPet) {
-        openAttic();
-        return;
-    }
+ if (gameState.hasPet) {
+ openAttic();
+ return;
+ }
 
-    if (gameState.hasLetter) {
-        switchScreen('screen-map', 'screen-pet-meeting');
-        return;
-    }
+ if (gameState.hasLetter) {
+ switchScreen('screen-map', 'screen-pet-meeting');
+ return;
+ }
 
-    if (gameState.secretFound) {
-        switchScreen('screen-map', 'screen-library-intro');
-        return;
-    }
+ if (gameState.secretFound) {
+ switchScreen('screen-map', 'screen-library-intro');
+ return;
+ }
 
-    if (gameState.lesson1Completed) {
-        switchScreen('screen-map', 'screen-secret');
-        return;
-    }
+ if (gameState.lesson1Completed) {
+ switchScreen('screen-map', 'screen-secret');
+ return;
+ }
 
-    if (gameState.greenhouseOpened) {
-        switchScreen('screen-map', 'screen-lesson2');
-    } else {
-        switchScreen('screen-map', 'screen-meeting');
-    }
+ if (gameState.greenhouseOpened) {
+ switchScreen('screen-map', 'screen-lesson2');
+ } else {
+ switchScreen('screen-map', 'screen-meeting');
+ }
 }
 
 
 function goToGreenhouseLesson() {
-    gameState.greenhouseOpened = true;
+ gameState.greenhouseOpened = true;
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-meeting', 'screen-lesson2');
+ switchScreen('screen-meeting', 'screen-lesson2');
 }
 
 
 function showQuiz() {
-    switchScreen('screen-lesson2', 'screen-quiz');
+ switchScreen('screen-lesson2', 'screen-quiz');
 }
 
 
 function checkAnswer(choice) {
-    const feedback = document.getElementById('quizFeedback');
+ const feedback = document.getElementById('quizFeedback');
 
-    if (!feedback) return;
+ if (!feedback) return;
 
-    if (choice === 2) {
-        feedback.innerHTML =
-            '<span style="color:green;">Прекрасно! Ты запомнила правило.</span>';
+ if (choice === 2) {
+ feedback.innerHTML =
+ '<span style="color:green;">Прекрасно! Ты запомнила правило.</span>';
 
-        if (!gameState.quizRewardClaimed) {
-            gameState.exp += 15;
-            gameState.quizRewardClaimed = true;
-            saveState();
-        }
+ if (!gameState.quizRewardClaimed) {
+ gameState.exp += 15;
+ gameState.quizRewardClaimed = true;
+ saveState();
+ }
 
-        setTimeout(() => {
-            switchScreen('screen-quiz', 'screen-reward2');
-        }, 900);
+ setTimeout(() => {
+ switchScreen('screen-quiz', 'screen-reward2');
+ }, 900);
 
-    } else {
-        feedback.innerHTML =
-            '<span style="color:#8c3a3a;">Не совсем! Незнакомые растения могут быть опасны.</span>';
-    }
+ } else {
+ feedback.innerHTML =
+ '<span style="color:#8c3a3a;">Не совсем! Незнакомые растения могут быть опасны.</span>';
+ }
 }
 
 
 function finishLesson() {
-    gameState.hasFern = true;
-    gameState.lesson1Completed = true;
+ gameState.hasFern = true;
+ gameState.lesson1Completed = true;
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-reward2', 'screen-map');
+ switchScreen('screen-reward2', 'screen-map');
 }
 
 
 // ======================================================
-// 8. ТАЙНА ОРАНЖЕРЕИ
+// 8. ТАЙНА ОРНАЖЕРИИ
 // ======================================================
 
 function checkSecret() {
-    const input = document.getElementById('secretInput');
+ const input = document.getElementById('secretInput');
 
-    if (!input) return;
+ if (!input) return;
 
-    const value = input.value.trim().toUpperCase();
+ const value = input.value.trim().toUpperCase();
 
-    if (value === 'ЛИСТ') {
+ if (value === 'ЛИСТ') {
 
-        if (!gameState.secretRewardClaimed) {
-            gameState.exp += 10;
-            gameState.secretRewardClaimed = true;
-            saveState();
-        }
+ if (!gameState.secretRewardClaimed) {
+ gameState.exp += 10;
+ gameState.secretRewardClaimed = true;
+ saveState();
+ }
 
-        switchScreen('screen-secret', 'screen-secret-reward');
+ switchScreen('screen-secret', 'screen-secret-reward');
 
-    } else {
-        alert('Пока не сходится. Подсказка: 12 — это двенадцатая буква алфавита.');
-    }
+ } else {
+ alert('Пока не сходится. Подсказка: 12 — это двенадцатая буква алфавита.');
+ }
 }
 
 
 function finishSecret() {
-    gameState.hasKey = true;
-    gameState.secretFound = true;
+ gameState.hasKey = true;
+ gameState.secretFound = true;
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-secret-reward', 'screen-map');
+ switchScreen('screen-secret-reward', 'screen-map');
 }
 
 
@@ -482,37 +482,37 @@ function finishSecret() {
 // ======================================================
 
 function openLibraryIntro() {
-    switchScreen('screen-library-intro', 'screen-library');
+ switchScreen('screen-library-intro', 'screen-library');
 }
 
 
 function openLibraryFromMap() {
-    if (gameState.libraryOpened) {
-        switchScreen('screen-map', 'screen-library');
-    } else {
-        alert('Сначала найди ключ и открой Библиотеку!');
-    }
+ if (gameState.libraryOpened) {
+ switchScreen('screen-map', 'screen-library');
+ } else {
+ alert('Сначала найди ключ и открой Библиотеку!');
+ }
 }
 
 
 function openChest() {
-    if (gameState.hasLetter) {
-        switchScreen('screen-library', 'screen-letter-found');
-        return;
-    }
+ if (gameState.hasLetter) {
+ switchScreen('screen-library', 'screen-letter-found');
+ return;
+ }
 
-    gameState.hasLetter = true;
-    gameState.libraryOpened = true;
-    gameState.exp += 10;
+ gameState.hasLetter = true;
+ gameState.libraryOpened = true;
+ gameState.exp += 10;
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-library', 'screen-letter-found');
+ switchScreen('screen-library', 'screen-letter-found');
 }
 
 
 function continueToPet() {
-    switchScreen('screen-letter-found', 'screen-pet-meeting');
+ switchScreen('screen-letter-found', 'screen-pet-meeting');
 }
 
 
@@ -521,19 +521,19 @@ function continueToPet() {
 // ======================================================
 
 function adoptPet() {
-    const input = document.getElementById('petNameInput');
+ const input = document.getElementById('petNameInput');
 
-    const petName = input && input.value.trim()
-        ? input.value.trim()
-        : 'Моховичок';
+ const petName = input && input.value.trim()
+ ? input.value.trim()
+ : 'Моховичок';
 
-    if (!gameState.hasPet) {
-        gameState.hasPet = true;
-        gameState.petName = petName;
-        gameState.exp += 20;
-    }
+ if (!gameState.hasPet) {
+ gameState.hasPet = true;
+ gameState.petName = petName;
+ gameState.exp += 20;
+ }
 
-    finishChapterOne();
+ finishChapterOne();
 }
 
 
@@ -543,24 +543,24 @@ function adoptPet() {
 
 function finishChapterOne() {
 
-    if (!gameState.chapter1BonusClaimed) {
-        gameState.exp += 50;
-        gameState.chapter1BonusClaimed = true;
-    }
+ if (!gameState.chapter1BonusClaimed) {
+ gameState.exp += 50;
+ gameState.chapter1BonusClaimed = true;
+ }
 
-    saveState();
+ saveState();
 
-    switchScreen('screen-pet-meeting', 'screen-chapter1-finale');
+ switchScreen('screen-pet-meeting', 'screen-chapter1-finale');
 }
 
 
 function openDiploma() {
-    switchScreen('screen-map', 'screen-diploma');
+ switchScreen('screen-map', 'screen-diploma');
 }
 
 
 function openPets() {
-    switchScreen(null, 'screen-pets');
+ switchScreen(null, 'screen-pets');
 }
 
 
@@ -570,168 +570,168 @@ function openPets() {
 
 function playChapterDoorAnimation(callback) {
 
-    const overlay = document.createElement('div');
+ const overlay = document.createElement('div');
 
-    overlay.id = 'chapter-door-overlay';
+ overlay.id = 'chapter-door-overlay';
 
-    overlay.innerHTML = `
-        <div class="chapter-door-scene">
-            <div class="chapter-door-light"></div>
+ overlay.innerHTML = `
+ <div class="chapter-door-scene">
+ <div class="chapter-door-light"></div>
 
-            <div class="chapter-door">
-                <div class="chapter-door-panel"></div>
-                <div class="chapter-door-handle"></div>
-            </div>
+ <div class="chapter-door">
+ <div class="chapter-door-panel"></div>
+ <div class="chapter-door-handle"></div>
+ </div>
 
-            <div class="chapter-door-title">
-                <p>Школа травниц Дариеки</p>
-                <h1>Глава II</h1>
-                <h2>Чердак хранительницы</h2>
-            </div>
-        </div>
-    `;
+ <div class="chapter-door-title">
+ <p>Школа травниц Дариеки</p>
+ <h1>Глава II</h1>
+ <h2>Чердак хранительницы</h2>
+ </div>
+ </div>
+ `;
 
-    const style = document.createElement('style');
+ const style = document.createElement('style');
 
-    style.id = 'chapter-door-style';
+ style.id = 'chapter-door-style';
 
-    style.textContent = `
-        #chapter-door-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background: #171b13;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            animation: doorFadeIn 1s ease;
-        }
+ style.textContent = `
+ #chapter-door-overlay {
+ position: fixed;
+ inset: 0;
+ z-index: 99999;
+ background: #171b13;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ overflow: hidden;
+ animation: doorFadeIn 1s ease;
+ }
 
-        .chapter-door-scene {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            perspective: 1000px;
-            background:
-                radial-gradient(ellipse at center, #57452b 0%, #22271c 65%, #11150f 100%);
-        }
+ .chapter-door-scene {
+ position: relative;
+ width: 100%;
+ height: 100%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ perspective: 1000px;
+ фон:
+ radial-gradient(ellipse at center, #57452b 0%, #22271c 65%, #11150f 100%);
+ }
 
-        .chapter-door-light {
-            position: absolute;
-            width: 260px;
-            height: 400px;
-            background: #e6b65c;
-            opacity: 0;
-            filter: blur(65px);
-            animation: doorLight 4s ease forwards;
-        }
+ .chapter-door-light {
+ position: absolute;
+ width: 260px;
+ height: 400px;
+ background: #e6b65c;
+ opacity: 0;
+ filter: blur(65px);
+ animation: doorLight 4s ease forwards;
+ }
 
-        .chapter-door {
-            position: absolute;
-            width: 230px;
-            height: 390px;
-            background: linear-gradient(90deg, #35251a, #68482b, #302016);
-            border: 9px solid #92734a;
-            border-radius: 5px;
-            box-shadow: 0 0 35px #090b08;
-            transform-origin: left center;
-            animation: doorOpen 3.5s ease-in-out forwards;
-            animation-delay: 1.2s;
-        }
+ .chapter-door {
+ position: absolute;
+ width: 230px;
+ height: 390px;
+ background: linear-gradient(90deg, #35251a, #68482b, #302016);
+ border: 9px solid #92734a;
+ border-radius: 5px;
+ box-shadow: 0 0 35px #090b08;
+ transform-origin: left center;
+ animation: doorOpen 3.5s ease-in-out forwards;
+ animation-delay: 1.2s;
+ }
 
-        .chapter-door-panel {
-            position: absolute;
-            inset: 20px;
-            border: 3px solid #b18b54;
-            box-shadow: inset 0 0 20px #17120c;
-        }
+ .chapter-door-panel {
+ position: absolute;
+ inset: 20px;
+ border: 3px solid #b18b54;
+ box-shadow: inset 0 0 20px #17120c;
+ }
 
-        .chapter-door-handle {
-            position: absolute;
-            right: 22px;
-            top: 48%;
-            width: 13px;
-            height: 13px;
-            background: #d4ac60;
-            border-radius: 50%;
-        }
+ .chapter-door-handle {
+ position: absolute;
+ right: 22px;
+ top: 48%;
+ width: 13px;
+ height: 13px;
+ background: #d4ac60;
+ border-radius: 50%;
+ }
 
-        .chapter-door-title {
-            position: absolute;
-            z-index: 3;
-            text-align: center;
-            color: #f2dfb7;
-            opacity: 0;
-            width: 90%;
-            text-shadow: 0 2px 10px #000;
-            animation: chapterTitle 2s ease forwards;
-            animation-delay: 3.5s;
-        }
+ .chapter-door-title {
+ position: absolute;
+ z-index: 3;
+ text-align: center;
+ color: #f2dfb7;
+ opacity: 0;
+ width: 90%;
+ text-shadow: 0 2px 10px #000;
+ animation: chapterTitle 2s ease forwards;
+ animation-delay: 3.5s;
+ }
 
-        .chapter-door-title p {
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
+ .chapter-door-title p {
+ letter-spacing: 3px;
+ text-transform: uppercase;
+ font-size: 12px;
+ }
 
-        .chapter-door-title h1 {
-            font-family: Georgia, serif;
-            font-size: 42px;
-            margin: 12px 0;
-        }
+ .chapter-door-title h1 {
+ font-family: Georgia, serif;
+ font-size: 42px;
+ margin: 12px 0;
+ }
 
-        .chapter-door-title h2 {
-            font-family: Georgia, serif;
-            font-size: 24px;
-            font-weight: normal;
-        }
+ .chapter-door-title h2 {
+ font-family: Georgia, serif;
+ font-size: 24px;
+ font-weight: normal;
+ }
 
-        @keyframes doorOpen {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(-105deg); }
-        }
+ @keyframes doorOpen {
+ 0% { transform: rotateY(0deg); }
+ 100% { transform: rotateY(-105deg); }
+ }
 
-        @keyframes doorLight {
-            0% { opacity: 0; transform: scale(.5); }
-            70% { opacity: .75; transform: scale(1.3); }
-            100% { opacity: .45; transform: scale(1.5); }
-        }
+ @keyframes doorLight {
+ 0% { opacity: 0; transform: scale(.5); }
+ 70% { opacity: .75; transform: scale(1.3); }
+ 100% { opacity: .45; transform: scale(1.5); }
+ }
 
-        @keyframes chapterTitle {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+ @keyframes chapterTitle {
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
 
-        @keyframes doorFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    `;
+ @keyframes doorFadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
+ `;
 
-    document.head.appendChild(style);
-    document.body.appendChild(overlay);
+ document.head.appendChild(style);
+ document.body.appendChild(overlay);
 
-    // Звук двери
+ // Звук двери
 
-    const audio = new Audio('door_creak_slow.mp3');
-    audio.volume = 0.65;
+ const audio = new Audio('door_creak_slow.mp3');
+ audio.volume = 0.65;
 
-    audio.play().catch(() => {
-        // Если браузер запретил звук,
-        // анимация всё равно продолжится.
-    });
+ audio.play().catch(() => {
+ // Если браузер запретил звук,
+ // анимация все равно продолжится.
+ });
 
-    setTimeout(() => {
-        overlay.remove();
-        style.remove();
+ setTimeout(() => {
+ overlay.remove();
+ style.remove();
 
-        if (callback) callback();
+ if (callback) callback();
 
-    }, 6500);
+ }, 6500);
 }
 
 
@@ -741,50 +741,50 @@ function playChapterDoorAnimation(callback) {
 
 function openChapterTwo() {
 
-    gameState.atticOpened = true;
+ gameState.atticOpened = true;
 
-    saveState();
+ saveState();
 
-    playChapterDoorAnimation(() => {
-        switchScreen('screen-chapter1-finale', 'screen-attic');
-        createGrimoireInterface();
-    });
+ playChapterDoorAnimation(() => {
+ switchScreen('screen-chapter1-finale', 'screen-attic');
+ createGrimoireInterface();
+ });
 }
 
 
 function openAttic() {
 
-    if (!gameState.hasPet) {
-        alert('Эта локация откроется после завершения Главы I.');
-        return;
-    }
+ if (!gameState.hasPet) {
+ alert('Эта локация откроется после завершения Главы I.');
+ return;
+ }
 
-    gameState.atticOpened = true;
+ gameState.atticOpened = true;
 
-    saveState();
+ saveState();
 
-    switchScreen(null, 'screen-attic');
+ switchScreen(null, 'screen-attic');
 
-    createGrimoireInterface();
+ createGrimoireInterface();
 }
 
 
 function findAtticCard() {
 
-    if (gameState.hasAtticCard) {
-        return;
-    }
+ if (gameState.hasAtticCard) {
+ return;
+ }
 
-    gameState.hasAtticCard = true;
-    gameState.exp += 10;
+ gameState.hasAtticCard = true;
+ gameState.exp += 10;
 
-    saveState();
+ saveState();
 
-    const result = document.getElementById('attic-card-result');
-    const button = document.getElementById('btn-attic-find');
+ const result = document.getElementById('attic-card-result');
+ const button = document.getElementById('btn-attic-find');
 
-    if (result) result.classList.remove('hidden');
-    if (button) button.style.display = 'none';
+ if (result) result.classList.remove('hidden');
+ if (button) button.style.display = 'none';
 }
 
 
@@ -794,210 +794,210 @@ function findAtticCard() {
 
 const grimoireLessons = [
 
-    {
-        title: 'Пустая книга хранительницы',
-        subtitle: 'Начало твоего гримуара',
-        text: `
-            <p>На старом чердаке ты находишь большую книгу в тёмно-зелёном переплёте.</p>
+ {
+ title: 'Пустая книга хранительницы',
+ subtitle: 'Начало твоего гримуара',
+ text: `
+ <p>На старом чердаке ты находишь большую книгу в темно-зеленом переплете.</p>
 
-            <p>Её страницы пожелтели от времени. На первой странице виден едва заметный отпечаток листа.</p>
+ <p>Ее страницы пожелтели от времени. На первой странице виден едва заметный отпечаток листа.</p>
 
-            <p><strong>Дариека:</strong> «Каждая хранительница вела собственную книгу. В неё записывали открытия, наблюдения, рисунки и истории. Теперь у тебя будет своя».</p>
+ <p><strong>Дариэка:</strong> «Каждая хранительница вела свою книгу. В неё записывали открытия, наблюдения, рисунки и истории. Теперь у тебя будет своя».</p>
 
-            <p>Гримуар — это не просто книга заклинаний. Это личная энциклопедия исследовательницы.</p>
-        `,
-        task: 'Придумай название своей книги. Это может быть, например, «Тайны зелёного леса», «Книга травницы» или твоё собственное название.',
-        question: 'Для чего хранительница ведёт гримуар?',
-        answers: [
-            'Чтобы записывать наблюдения, знания и открытия',
-            'Чтобы хранить только красивые картинки',
-            'Чтобы забывать изученные растения'
-        ],
-        correct: 0,
-        reward: 'Первая страница гримуара',
-        fact: 'Настоящие исследователи тоже ведут полевые дневники и записывают наблюдения.'
-    },
+ <p>Гримуар — это не просто книга заклинаний. Это личная энциклопедия исследовательницы.</p>
+ `,
+ task: 'Придумай название для своей книги. Это может быть, например, «Тайны зеленого леса», «Книга травницы» или ваше собственное название».
+ question: 'Для чего хранительница ведет гримуар?',
+ answers: [
+ 'Чтобы записывать наблюдения, знания и открытия',
+ 'Чтобы хранить только красивые картинки',
+ 'Чтобы забыть изученные растения'
+ ],
+ correct: 0,
+ reward: 'Первая страница гримуара',
+ fact: 'Настоящие исследователи тоже ведут полевые дневники и записывают наблюдения.'
+ },
 
-    {
-        title: 'Тайный язык растений',
-        subtitle: 'Из чего состоит растение',
-        text: `
-            <p>На следующей странице изображено незнакомое растение. От корней до верхушки оно разделено на несколько частей.</p>
+ {
+ title: 'Тайный язык растений',
+ subtitle: 'Из чего состоит растение',
+ text: `
+ <p>На следующей странице изображено незнакомое растение. От корней до верхушки оно разделено на несколько частей.</p>
 
-            <p>У большинства знакомых нам растений есть корень, стебель и листья. У многих также есть цветы, плоды и семена.</p>
+ <p>У большинства знакомых нам растений есть корень, стебель и листья. У многих также есть цветы, плоды и семена.</p>
 
-            <p><strong>Корень</strong> помогает растению закрепляться в почве и получать воду.</p>
+ <p><strong>Корень</strong> помогает растению закрепляться в почве и получать воду.</p>
 
-            <p><strong>Стебель</strong> поддерживает растение и проводит воду и питательные вещества.</p>
+ <p><strong>Стебель</strong> поддерживает растение и проводит воду и питательные вещества.</p>
 
-            <p><strong>Листья</strong> участвуют в фотосинтезе — процессе, при котором растение использует свет для образования питательных веществ.</p>
-        `,
-        task: 'Нарисуй любое знакомое растение и подпиши на рисунке корень, стебель и листья. Можно нарисовать растение по памяти.',
-        question: 'Какая часть растения обычно поглощает воду из почвы?',
-        answers: [
-            'Цветок',
-            'Корень',
-            'Лист'
-        ],
-        correct: 1,
-        reward: 'Знание строения растения',
-        fact: 'Не у всех растений строение одинаковое: например, у мхов нет настоящих корней.'
-    },
+ <p><strong>Листья</strong> участвуют в фотосинтезе — процессе, при котором растение использует свет для образования питательных веществ.</p>
+ `,
+ задание: 'Нарисуй любое знакомое тебе растение и подпиши на рисунке корень, стебель и листья. Можно нарисовать растение по памяти.',
+ question: 'Какая часть растения обычно поглощает воду из почвы?',
+ answers: [
+ 'Цветок',
+ 'Корень',
+ 'Лист'
+ ],
+ correct: 1,
+ reward: 'Знание строения растения',
+ fact: 'Не у всех растений строение одинаковое: например, у мхов нет настоящих корней.'
+ },
 
-    {
-        title: 'Тайна листа',
-        subtitle: 'Форма, края и прожилки',
-        text: `
-            <p>Дариека кладёт перед тобой несколько изображений листьев.</p>
+ {
+ title: 'Тайна листа',
+ subtitle: 'Форма, края и прожилки',
+ text: `
+ <p>Дариэка кладёт перед тобой несколько изображений листьев.</p>
 
-            <p>Один лист округлый, другой вытянутый, третий похож на маленькую ладонь.</p>
+ <p>Один лист округлый, другой вытянутый, третий похож на маленькую ладонь.</p>
 
-            <p>Листья различаются по форме, краям, размеру и расположению прожилок.</p>
+ <p>Листья различаются по форме, краям, размеру и расположению прожилок.</p>
 
-            <p>Прожилки помогают распределять воду и вещества внутри листа, а также поддерживают его форму.</p>
+ <p>Прожилки помогают распределять воду и вещества внутри листа, а также поддерживают его форму.</p>
 
-            <p>Ботаники используют особенности листьев, чтобы определять и сравнивать растения.</p>
-        `,
-        task: 'Найди изображение листа или посмотри на комнатное растение с разрешения взрослого. Опиши его форму, край и прожилки. Не срывай листья ради задания.',
-        question: 'Что можно рассмотреть, сравнивая листья?',
-        answers: [
-            'Только их запах',
-            'Форму, края и прожилки',
-            'Только высоту дерева'
-        ],
-        correct: 1,
-        reward: 'Страница наблюдений за листьями',
-        fact: 'У некоторых растений листья имеют необычную форму, которая помогает узнавать вид.'
-    },
+ <p>Ботаники используют особенности листьев для определения и сравнения растений.</p>
+ `,
+ задание: 'Найди изображение листа или посмотри на комнатное растение с разрешения взрослого. Опиши его форму, края и прожилки. Не срывай листья ради задания.',
+ question: 'Что можно рассмотреть, сравнивая листья?',
+ answers: [
+ 'Только их запах',
+ 'Форму, края и прожилки',
+ 'Только высоту дерева'
+ ],
+ correct: 1,
+ reward: 'Страница наблюдений за листьями',
+ fact: 'У некоторых растений листья имеют необычную форму, которая помогает определить вид.'
+ },
 
-    {
-        title: 'Подземные тайны',
-        subtitle: 'Корни растений',
-        text: `
-            <p>На старой иллюстрации изображено растение, а под землёй — целый мир тонких корешков.</p>
+ {
+ title: 'Подземные тайны',
+ subtitle: 'Корни растений',
+ text: `
+ <p>На старой иллюстрации изображено растение, а под землей — целый мир тонких корешков.</p>
 
-            <p>Корни удерживают растение в почве и поглощают воду с растворёнными минеральными веществами.</p>
+ <p>Корни удерживают растение в почве и поглощают воду с растворёнными минеральными веществами.</p>
 
-            <p>У разных растений корни устроены по-разному. У одних есть заметный главный корень, у других — множество похожих тонких корней.</p>
+ <p>У разных растений корни устроены по-разному. У одних есть заметный главный корень, у других — множество похожих тонких корней.</p>
 
-            <p>Иногда корни могут запасать питательные вещества. Например, у моркови утолщённый корень.</p>
-        `,
-        task: 'Нарисуй подземную часть растения. Покажи, как от основного корня отходят более тонкие корешки.',
-        question: 'Какая одна из главных задач корней?',
-        answers: [
-            'Поглощать воду и удерживать растение',
-            'Привлекать бабочек ярким цветом',
-            'Создавать семена'
-        ],
-        correct: 0,
-        reward: 'Страница «Подземный мир»',
-        fact: 'Корни некоторых деревьев могут распространяться далеко за пределы кроны.'
-    },
+ <p>Иногда корни могут запасать питательные вещества. Например, у моркови утолщённый корень.</p>
+ `,
+ задание: 'Нарисуй подземную часть растения. Покажи, как от основного корня отходят более тонкие корешки.',
+ вопрос: 'Какая одна из главных задач корней?',
+ ответы: [
+ 'Поглощать воду и удерживать растение',
+ 'Привлекать бабочек ярким цветом',
+ 'Создавать семена'
+ ],
+ correct: 0,
+ reward: 'Страница «Подземный мир»',
+ fact: 'Корни некоторых деревьев могут распространяться далеко за пределы кроны.'
+ },
 
-    {
-        title: 'Секрет зелёного стебля',
-        subtitle: 'Опора и движение воды',
-        text: `
-            <p>Стебель кажется простой частью растения, но внутри него происходит постоянное движение.</p>
+ {
+ title: 'Секрет зеленого стебля',
+ subtitle: 'Опора и движение воды',
+ text: `
+ <p>Стебель кажется простой частью растения, но внутри него происходит постоянное движение.</p>
 
-            <p>По специальным проводящим тканям вода поднимается от корней к листьям.</p>
+ <p>По специальным проводящим тканям вода поднимается от корней к листьям.</p>
 
-            <p>Стебель также поддерживает листья и цветы, помогая им получать свет.</p>
+ <p>Стебель также поддерживает листья и цветы, помогая им получать свет.</p>
 
-            <p>У некоторых растений стебли мягкие и гибкие, у других — твёрдые и древесные.</p>
-        `,
-        task: 'Нарисуй два растения: одно с мягким стеблем, другое с древесным. Подпиши, чем они отличаются.',
-        question: 'Какую функцию выполняет стебель?',
-        answers: [
-            'Только украшает растение',
-            'Поддерживает части растения и участвует в переносе воды',
-            'Заменяет корни у всех растений'
-        ],
-        correct: 1,
-        reward: 'Страница «Страж стебля»',
-        fact: 'Ствол дерева — это тоже стебель, только сильно утолщённый и одревесневший.'
-    },
+ <p>У некоторых растений стебли мягкие и гибкие, у других — твёрдые и одревесневшие.</p>
+ `,
+ задание: 'Нарисуй два растения: одно с мягким стеблем, другое — с одревесневшим. Подпиши, чем они отличаются.',
+ question: 'Какую функцию выполняет стебель?',
+ answers: [
+ 'Только украшает растение',
+ 'Поддерживает части растения и участвует в переносе воды',
+ 'Заменяет корни у всех растений'
+ ],
+ correct: 1,
+ reward: 'Страница «Страж стебля»',
+ fact: 'Ствол дерева — это тоже стебель, только сильно утолщённый и одревесневший.'
+ },
 
-    {
-        title: 'Цветочная мастерская',
-        subtitle: 'Как устроен цветок',
-        text: `
-            <p>На этой странице гримуара нарисован цветок с раскрытыми лепестками.</p>
+ {
+ title: 'Цветочная мастерская',
+ subtitle: 'Как устроен цветок',
+ text: `
+ <p>На этой странице гримуара нарисован цветок с раскрытыми лепестками.</p>
 
-            <p>Цветок — орган размножения многих растений.</p>
+ <p>Цветок — орган размножения многих растений.</p>
 
-            <p>Его части могут включать лепестки, чашелистики, тычинки и пестик.</p>
+ <p>Его части могут включать лепестки, чашелистики, тычинки и пестик.</p>
 
-            <p>Яркие лепестки и запах у некоторых растений помогают привлекать опылителей — например, насекомых.</p>
+ <p>Яркие лепестки и запах некоторых растений помогают привлекать опылителей, например насекомых.</p>
 
-            <p>Но не все растения опыляются насекомыми: некоторые используют ветер.</p>
-        `,
-        task: 'Нарисуй цветок и попробуй обозначить лепестки, тычинки и пестик. Можно использовать схему из учебника или энциклопедии.',
-        question: 'Какую важную роль выполняет цветок?',
-        answers: [
-            'Участвует в размножении растения',
-            'Всегда защищает корни от холода',
-            'Поглощает воду из почвы'
-        ],
-        correct: 0,
-        reward: 'Страница «Цветочная мастерская»',
-        fact: 'Некоторые цветы опыляются не насекомыми, а ветром.'
-    },
+ <p>Но не все растения опыляются насекомыми: некоторые используют для этого ветер.</p>
+ `,
+ задание: 'Нарисуй цветок и попробуй обозначить лепестки, тычинки и пестик. Можно использовать схему из учебника или энциклопедии.',
+ вопрос: 'Какую важную роль выполняет цветок?',
+ ответы: [
+ 'Участвует в размножении растения',
+ 'Всегда защищает корни от холода',
+ 'Поглощает воду из почвы'
+ ],
+ correct: 0,
+ reward: 'Страница «Цветочная мастерская»',
+ fact: 'Некоторые цветы опыляются не насекомыми, а ветром.'
+ },
 
-    {
-        title: 'Тайна семени',
-        subtitle: 'Начало новой жизни',
-        text: `
-            <p>В маленьком семени скрывается будущая жизнь растения.</p>
+ {
+ title: 'Тайна семени',
+ subtitle: 'Начало новой жизни',
+ text: `
+ <p>В маленьком семени скрыта будущая жизнь растения.</p>
 
-            <p>Внутри семени находится зародыш — зачаток будущего растения. Также семя содержит запас питательных веществ.</p>
+ <p>Внутри семени находится зародыш — зачаток будущего растения. Также семя содержит запас питательных веществ.</p>
 
-            <p>Когда условия подходят, семя может прорасти. Для этого многим растениям нужны вода, подходящая температура и кислород.</p>
+ <p>При подходящих условиях семя может прорасти. Для этого многим растениям нужны вода, подходящая температура и кислород.</p>
 
-            <p>Семена распространяются разными способами: ветром, водой, животными или благодаря самому растению.</p>
-        `,
-        task: 'Придумай и нарисуй путешествие одного семечка. Как оно может попасть на новое место? Нарисуй хотя бы два варианта.',
-        question: 'Что находится внутри семени?',
-        answers: [
-            'Готовый взрослый цветок',
-            'Зародыш будущего растения',
-            'Только воздух'
-        ],
-        correct: 1,
-        reward: 'Страница «Путешествие семени»',
-        fact: 'Семена одуванчика могут переноситься ветром на большие расстояния.'
-    },
+ <p>Семена распространяются разными способами: ветром, водой, животными или благодаря самому растению.</p>
+ `,
+ task: 'Придумай и нарисуй путешествие одного семечка. Как оно может попасть на новое место? Нарисуй хотя бы два варианта.',
+ question: 'Что находится внутри семени?',
+ answers: [
+ 'Готовый взрослый цветок',
+ 'Зародыш будущего растения',
+ 'Только воздух'
+ ],
+ correct: 1,
+ reward: 'Страница «Путешествие семени»',
+ fact: 'Семена одуванчика могут переноситься ветром на большие расстояния.'
+ },
 
-    {
-        title: 'Гербарная мастерская',
-        subtitle: 'Искусство наблюдения',
-        text: `
-            <p>Дариека открывает ящик с рисунками растений.</p>
+ {
+ title: 'Гербарная мастерская',
+ subtitle: 'Искусство наблюдения',
+ text: `
+ <p>Дариэка открывает ящик с рисунками растений.</p>
 
-            <p>«Раньше травницы собирали не только сведения, но и изображения растений. Так создавались ботанические атласы».</p>
+ <p>«Раньше травницы собирали не только сведения, но и изображения растений. Так создавались ботанические атласы».</p>
 
-            <p>Гербарий — это коллекция засушенных растений или их частей, сопровождаемая сведениями о находке.</p>
+ <p>Гербарий — это коллекция засушенных растений или их частей, сопровождаемая сведениями о находке.</p>
 
-            <p>В нашей академии можно вести безопасный бумажный гербарий: рисовать растения, использовать фотографии и записывать наблюдения.</p>
+ <p>В нашей академии можно вести безопасный бумажный гербарий: рисовать растения, использовать фотографии и записывать наблюдения.</p>
 
-            <p>Не нужно самостоятельно срывать незнакомые растения. Для учебной страницы достаточно рисунка или фотографии.</p>
-        `,
-        task: 'Создай свою первую ботаническую страницу. Добавь название растения, рисунок или фотографию, описание листьев и место, где растение обычно растёт.',
-        question: 'Что можно использовать для безопасной страницы гербария?',
-        answers: [
-            'Только неизвестные растения, сорванные в лесу',
-            'Рисунок, фотографию и собственные наблюдения',
-            'Пробу растения на вкус'
-        ],
-        correct: 1,
-        reward: 'Первая ботаническая страница',
-        fact: 'В музеях хранятся гербарии, которым сотни лет.'
-    },
+ <p>Не нужно самостоятельно срывать незнакомые растения. Для учебной страницы достаточно рисунка или фотографии.</p>
+ `,
+ задание: 'Создай свою первую ботаническую страницу. Добавь название растения, рисунок или фотографию, описание листьев и место, где обычно растет растение.',
+ вопрос: 'Что можно использовать для безопасной страницы гербария?',
+ ответы: [
+ 'Только неизвестные растения, собранные в лесу',
+ 'Рисунок, фотографию и собственные наблюдения',
+ 'Попробовать растение на вкус'
+ ],
+ correct: 1,
+ reward: 'Первая ботаническая страница',
+ fact: 'В музеях хранятся гербарии, которым сотни лет.'
+ },
 
-    {
-        title: 'Легенды зелёного леса',
-        subtitle: 'Реальные растения и вымышленные истории',
-        text: `
+ {
+ title: 'Легенды зеленого леса',
+ subtitle: 'Реальные растения и вымышленные истории',
+ text: `
             <p>На чердаке ты находишь книгу старых преданий.</p>
 
             <p>В сказках и легендах растения часто становились символами: дуб означал силу, лавр — победу, розмарин — память.</p>
