@@ -475,5 +475,4 @@ function updateGrimoireInterface() {
 
     if (gameState.grimoireStep >= total) {
         content.innerHTML = `
-            <div class="grimoire-page">
-                <h3>${escapeHTML(gameState.grimoireName)}</h3
+            <div class="grimoire-page
