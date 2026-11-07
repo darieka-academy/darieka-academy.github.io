@@ -6,7 +6,7 @@
     <title>Школа травниц Дариеки</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=chapter2">
 
     <style>
         /* Иллюстрации локаций на карте */
@@ -763,12 +763,97 @@
 
             </div>
 
+
+            <button class="btn btn-gold" onclick="openGrimoire()">
+                Открыть мой гримуар
+            </button>
+
+            <button class="btn btn-secondary" onclick="replayChapterOpening()">
+                Пересмотреть открытие главы
+            </button>
+
             <button class="btn btn-back" onclick="backToMap()">
                 На карту
             </button>
 
         </div>
 
+    </div>
+
+
+    <!-- АНИМАЦИЯ ОТКРЫТИЯ ГЛАВЫ II -->
+
+    <div id="screen-chapter-opening" class="screen chapter-opening-screen">
+        <div class="opening-scene">
+            <div class="opening-glow"></div>
+            <div class="opening-door-frame">
+                <div class="opening-door opening-door-left"></div>
+                <div class="opening-door opening-door-right"></div>
+                <div class="opening-door-light"></div>
+            </div>
+            <div class="opening-copy">
+                <p class="opening-eyebrow">Лесной архив приглашает</p>
+                <h1>Глава II</h1>
+                <h2>Чердак хранительницы</h2>
+                <p>За этой дверью ждут забытые знания и страницы твоего первого гримуара.</p>
+                <button id="chapter-enter-button" class="btn btn-gold" onclick="enterChapterTwo()" disabled>
+                    Дверь открывается...
+                </button>
+                <button class="sound-toggle" onclick="toggleChapterSound()" id="sound-toggle">
+                    Звук: включён
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ГРИМУАР УЧЕНИЦЫ -->
+
+    <div id="screen-grimoire" class="screen">
+        <div class="paper-card grimoire-cover">
+            <p class="chapter-kicker">Личный том исследовательницы</p>
+            <h1>Мой гримуар</h1>
+            <p class="text-center">Книга, которая будет расти вместе с твоими знаниями. Здесь сохраняются уроки, наблюдения и открытия.</p>
+            <div class="grimoire-progress">
+                <div class="grimoire-progress-track"><div id="grimoire-progress-fill"></div></div>
+                <span id="grimoire-progress-label">0 из 6 знаний открыто</span>
+            </div>
+        </div>
+
+        <div class="paper-card">
+            <h2>Содержание</h2>
+            <p>Выбирай страницу. Пройденные уроки можно перечитывать, а к новым возвращаться в удобное время.</p>
+            <div id="grimoire-lessons" class="lesson-list"></div>
+            <button class="btn btn-back" onclick="openAttic()">Вернуться на чердак</button>
+            <button class="btn btn-secondary" onclick="backToMap()">На карту академии</button>
+        </div>
+    </div>
+
+
+    <!-- СТРАНИЦА УРОКА ГРИМУАРА -->
+
+    <div id="screen-grimoire-lesson" class="screen">
+        <div class="paper-card">
+            <p class="chapter-kicker" id="lesson-kicker">Гримуар • Ботаника</p>
+            <h1 id="lesson-title">Страница гримуара</h1>
+            <div id="lesson-content" class="lesson-content"></div>
+            <div class="lesson-task">
+                <h3>Запись исследовательницы</h3>
+                <p id="lesson-task-prompt"></p>
+                <textarea id="lesson-notes" rows="5" placeholder="Запиши свои наблюдения или ответ здесь..."></textarea>
+                <p class="small-note">Запись сохранится на этом устройстве. Можно вернуться и дополнить её позже.</p>
+            </div>
+            <div class="lesson-quiz" id="lesson-quiz">
+                <h3>Проверка Дариеки</h3>
+                <p id="lesson-question"></p>
+                <div id="lesson-answers" class="lesson-answers"></div>
+                <div id="lesson-feedback" class="feedback-text" aria-live="polite"></div>
+            </div>
+            <button id="lesson-complete-button" class="btn btn-gold" onclick="completeGrimoireLesson()" disabled>
+                Завершить страницу и получить печать
+            </button>
+            <button class="btn btn-back" onclick="openGrimoire()">К содержанию гримуара</button>
+        </div>
     </div>
 
 
@@ -793,7 +878,7 @@
 </div>
 
 
-<script src="app.js"></script>
+<script src="app.js?v=chapter2"></script>
 
 </body>
 </html>
