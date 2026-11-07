@@ -1,4 +1,3 @@
-// 1. СОСТОЯНИЕ ИГРЫ
 let gameState = {
     name: localStorage.getItem('darieka_student_name') || '',
     hasPass: localStorage.getItem('darieka_has_pass') === 'true',
@@ -300,9 +299,7 @@ function findAtticCard() {
     const button = document.getElementById('btn-attic-find');
     if (result) result.classList.remove('hidden');
     if (button) button.style.display = 'none';
-}
-
-const grimoireLessons = [
+}const grimoireLessons = [
     {
         title: 'Пустая книга хранительницы', subtitle: 'Начало твоего гримуара',
         text: `<p>На старом чердаке ты находишь большую книгу в темно-зеленом переплете.</p><p>Ее страницы пожелтели от времени. На первой странице виден едва заметный отпечаток листа.</p><p><strong>Дариэка:</strong> «Каждая хранительница вела свою книгу. В неё записывали открытия, наблюдения, рисунки и истории. Теперь у тебя будет своя».</p><p>Гримуар — это не просто книга заклинаний. Это личная энциклопедия исследовательницы.</p>`,
@@ -402,9 +399,7 @@ function saveGrimoireNote(index, value) {
     const notes = getGrimoireNotes();
     notes[index] = value;
     localStorage.setItem('darieka_grimoire_notes', JSON.stringify(notes));
-}
-
-function createGrimoireInterface() {
+}function createGrimoireInterface() {
     const atticScreen = document.getElementById('screen-attic');
     if (!atticScreen) return;
     if (document.getElementById('grimoire-interface')) { updateGrimoireInterface(); return; }
@@ -460,231 +455,5 @@ function updateGrimoireInterface() {
     if (progressText) progressText.innerText = 'Страниц открыто: ' + completed + ' из ' + total;
 
     if (!gameState.grimoireStarted) {
-                         content.innerHTML = `
-            <div class="grimoire-page">
-                <h3>Старая книга</h3>
-                <p>На чердаке ты находишь книгу прежней хранительницы. Её страницы почти пусты.</p>
-                <p>Возможно, именно тебе предстоит наполнить её знаниями.</p>
-                <label for="grimoire-name">Название твоего гримуара:</label>
-                <input id="grimoire-name" class="grimoire-note" type="text" value="${escapeHTML(gameState.grimoireName)}" maxlength="60">
-                <button class="btn btn-gold" onclick="beginGrimoire()">Открыть первую страницу</button>
-            </div>
-        `;
-        return;
-    }
-
-    if (gameState.grimoireStep >= total) {
         content.innerHTML = `
-            <div class="grimoire-page">
-                <h3>${escapeHTML(gameState.grimoireName)}</h3>
-                <h2>Первый том завершён!</h2>
-                <p>Ты собрала первые страницы своего гримуара, изучила строение растений и создала собственные записи.</p>
-                <p><strong>Дариека:</strong> «Это прекрасное начало. Твоя книга будет пополняться новыми знаниями по мере исследования леса».</p>
-                <div class="grimoire-reward">
-                    <strong>Награда:</strong> Первый том знаний травницы.
-                </div>
-                <button class="btn" onclick="showGrimoireArchive()">Перечитать страницы</button>
-            </div>
-        `;
-        return;
-    }
-
-    showGrimoireLesson();
-}
-
-function beginGrimoire() {
-    const input = document.getElementById('grimoire-name');
-    if (input && input.value.trim()) {
-        gameState.grimoireName = input.value.trim();
-    }
-    gameState.grimoireStarted = true;
-    saveState();
-    updateGrimoireInterface();
-}
-
-function showGrimoireLesson() {
-    const content = document.getElementById('grimoire-content');
-    if (!content) return;
-
-    const pageIndex = gameState.grimoireStep;
-    const lesson = grimoireLessons[pageIndex];
-    if (!lesson) return;
-
-    const imageName = grimoirePageImages[pageIndex];
-    const notes = getGrimoireNotes();
-    const savedNote = notes[pageIndex] || '';
-
-    content.innerHTML = `
-        <div class="grimoire-page">
-            <p class="grimoire-page-counter">СТРАНИЦА ${pageIndex + 1} ИЗ ${grimoireLessons.length}</p>
-            <div class="grimoire-illustration-frame">
-                <img class="grimoire-illustration" src="${imageName}" alt="Иллюстрация" onerror="this.parentElement.style.display='none'">
-            </div>
-            <h3>${lesson.title}</h3>
-            <p><em>${lesson.subtitle}</em></p>
-            ${lesson.text}
-            <div class="grimoire-task">
-                <strong>Твоё исследование:</strong>
-                <p>${lesson.task}</p>
-                <textarea id="grimoire-student-note" class="grimoire-note" placeholder="Здесь можно записать свои наблюдения...">${escapeHTML(savedNote)}</textarea>
-                <p class="grimoire-small">Запись сохраняется автоматически и останется в твоём гримуаре.</p>
-            </div>
-            <div class="grimoire-question">
-                <strong>Проверка знаний от Дариеки</strong>
-                <p>${lesson.question}</p>
-                ${lesson.answers.map((answer, index) => `
-                    <button class="grimoire-answer" onclick="checkGrimoireAnswer(${index})">${answer}</button>
-                `).join('')}
-                <div id="grimoire-feedback"></div>
-            </div>
-        </div>
-    `;
-
-    const noteInput = document.getElementById('grimoire-student-note');
-    if (noteInput) {
-        noteInput.addEventListener('input', function() {
-            saveGrimoireNote(pageIndex, this.value);
-        });
-    }
-    window.scrollTo({ top: 0, behavior: 'instant' });
-}
-
-function checkGrimoireAnswer(choice) {
-    const lesson = grimoireLessons[gameState.grimoireStep];
-    const feedback = document.getElementById('grimoire-feedback');
-    if (!lesson || !feedback) return;
-
-    if (choice === lesson.correct) {
-        feedback.innerHTML = `
-            <p class="grimoire-success">Верно! Дариека одобрительно кивает.</p>
-            <div class="grimoire-reward">
-                <strong>Открытие:</strong> ${lesson.reward}
-                <p>${lesson.fact}</p>
-            </div>
-            <button class="btn btn-gold" onclick="completeGrimoireLesson()">Сохранить страницу</button>
-        `;
-    } else {
-        feedback.innerHTML = `
-            <p style="color:#9a4238;">Пока не совсем верно. Перечитай страницу и попробуй ещё раз. Опыт за ошибки не снимается.</p>
-        `;
-    }
-}
-
-function completeGrimoireLesson() {
-    const lesson = grimoireLessons[gameState.grimoireStep];
-    if (!lesson) return;
-
-    if (gameState.grimoirePages.includes(gameState.grimoireStep)) {
-        gameState.grimoireStep++;
-        saveState();
-        updateGrimoireInterface();
-        return;
-    }
-
-    const currentPage = gameState.grimoireStep;
-    const noteInput = document.getElementById('grimoire-student-note');
-    const note = noteInput ? noteInput.value.trim() : '';
-    saveGrimoireNote(currentPage, note);
-
-    gameState.grimoirePages.push(gameState.grimoireStep);
-    gameState.grimoireStep++;
-    gameState.exp += 10;
-    saveState();
-
-    showGrimoireSavedPage(lesson, note);
-}
-
-function showGrimoireSavedPage(lesson, note) {
-    const content = document.getElementById('grimoire-content');
-    if (!content) return;
-
-    content.innerHTML = `
-        <div class="grimoire-page">
-            <h2>Страница сохранена!</h2>
-            <p>Дариека бережно закрывает книгу. Новое знание теперь останется в твоём гримуаре.</p>
-            <div class="grimoire-reward">
-                <strong>${lesson.reward}</strong>
-                <p>${lesson.fact}</p>
-                <p><strong>Награда: +10 опыта</strong></p>
-            </div>
-            ${note ? `<div class="grimoire-task"><strong>Твоя запись:</strong><p>${escapeHTML(note)}</p></div>` : ''}
-            <button class="btn btn-gold" onclick="updateGrimoireInterface()">Следующая страница</button>
-            <button class="btn btn-back" onclick="showGrimoireArchive()">Мой гримуар</button>
-        </div>
-    `;
-}
-
-function showGrimoireArchive() {
-    const content = document.getElementById('grimoire-content');
-    if (!content) return;
-
-    const completed = gameState.grimoirePages.length;
-    let html = `<div class="grimoire-page"><h2>${escapeHTML(gameState.grimoireName)}</h2><p>Сохранённые страницы: ${completed}</p>`;
-
-    gameState.grimoirePages.forEach(index => {
-        const lesson = grimoireLessons[index];
-        if (!lesson) return;
-        const notes = getGrimoireNotes();
-        const savedNote = notes[index] || '';
-        const imageName = grimoirePageImages[index] || '';
-
-        html += `
-            <div class="grimoire-reward">
-                <div class="grimoire-illustration-frame"><img class="grimoire-illustration" src="${imageName}" alt="${lesson.title}" onerror="this.parentElement.style.display='none'"></div>
-                <strong>${lesson.title}</strong>
-                <p>${lesson.subtitle}</p>
-                <p>${lesson.reward}</p>
-                ${savedNote ? `<p><strong>Твоя запись:</strong><br>${escapeHTML(savedNote).replace(/\n/g, '<br>')}</p>` : ''}
-            </div>
-        `;
-    });
-
-    html += `<button class="btn btn-gold" onclick="updateGrimoireInterface()">Продолжить обучение</button></div>`;
-    content.innerHTML = html;
-}
-
-function escapeHTML(value) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-function openCollection() {
-    const grid = document.getElementById('collection-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    if (gameState.hasPass) {
-        grid.innerHTML += `<div class="collectible-card"><h3>Пропуск исследовательницы</h3><p>Твой первый артефакт академии.</p></div>`;
-    }
-    if (gameState.hasFern) {
-        grid.innerHTML += `<div class="collectible-card"><h3>Лист папоротника</h3><p>Первая ботаническая находка из оранжереи.</p></div>`;
-    }
-    if (gameState.hasKey) {
-        grid.innerHTML += `<div class="collectible-card"><h3>Старый ключ</h3><p>Артефакт, который помог открыть Библиотеку.</p></div>`;
-    }
-    if (gameState.hasLetter) {
-        grid.innerHTML += `<div class="collectible-card"><h3>Письмо из архива</h3><p>Старинное послание из библиотечного сундука.</p></div>`;
-    }
-    if (gameState.hasAtticCard) {
-        grid.innerHTML += `<div class="collectible-card"><h3>Медный колокольчик</h3><p>Первая находка на Чердаке хранительницы.</p></div>`;
-    }
-
-    if (grid.innerHTML === '') {
-        grid.innerHTML = `<p class="text-center">Корзинка пока пуста. Твои находки появятся здесь.</p>`;
-    }
-
-    switchScreen(null, 'screen-collection');
-}
-
-function openGrimoire() {
-    if (!gameState.hasPet || !gameState.atticOpened) {
-        alert('Сначала открой Чердак хранительницы.');
-        return;
-    }
-    switchScreen(null, 'screen-attic');
-    createGrimoireInterface();
-}
+            <div class
