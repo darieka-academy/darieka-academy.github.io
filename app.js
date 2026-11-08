@@ -240,7 +240,7 @@ function checkSecret() {
         if (!gameState.secretRewardClaimed) { gameState.exp += 10; gameState.secretRewardClaimed = true; saveState(); }
         switchScreen('screen-secret', 'screen-secret-reward');
     } else {
-        alert('Пока не сходится. Подсказка: 12 — это двенадцатая буква алфавита.');
+        alert('Пока не сходится. Подсказка: 13 — это тринадцатая буква алфавита.');
     }
 }
 
