@@ -6,6 +6,7 @@
     <title>Школа травниц Дариеки</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=chapter2">
+    <link rel="stylesheet" href="chapter2.css?v=ch2b">
     <style>
         /* Иллюстрации локаций на карте */
         .map-container { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; margin-bottom: 18px; }
@@ -82,6 +83,19 @@
 
     <!-- КАРТА АКАДЕМИИ -->
     <div id="screen-map" class="screen">
+      <div class="map-pager">
+        <div class="map-pager-bar">
+            <button type="button" id="mapPrev" class="map-arrow" aria-label="Предыдущая страница карты">&#8249;</button>
+            <div id="mapPagerTitle" class="map-pager-title">Академия</div>
+            <button type="button" id="mapNext" class="map-arrow" aria-label="Следующая страница карты">&#8250;</button>
+        </div>
+        <div id="mapDots" class="map-dots">
+            <button type="button" class="map-dot active" data-p="0" aria-label="Страница «Академия»"></button>
+            <button type="button" class="map-dot" data-p="1" aria-label="Страница «Учебная»"></button>
+            <button type="button" class="map-dot" data-p="2" aria-label="Страница «Приключения»"></button>
+        </div>
+        <div id="mapTrack" class="map-track">
+        <section class="map-slide" data-title="Академия">
         <div class="paper-card">
             <h1>Карта академии</h1>
             <p class="text-center" id="mapGreeting">Твой путь начинается здесь</p>
@@ -117,6 +131,15 @@
             <button id="btn-pets-map" class="btn btn-secondary" onclick="openPets()" style="display:none;">Мои питомцы</button>
             <button id="btn-diploma-map" class="btn btn-secondary" onclick="openDiploma()" style="display:none;">Мой диплом</button>
         </div>
+        </section>
+        <section class="map-slide" data-title="Учебная">
+            <div id="map-page-2" class="paper-card"></div>
+        </section>
+        <section class="map-slide" data-title="Приключения">
+            <div id="map-page-3" class="paper-card"></div>
+        </section>
+        </div>
+      </div>
     </div>
 
     <!-- ВСТРЕЧА С ДАРИЕКОЙ -->
@@ -291,7 +314,7 @@
 
     <!-- ГЛАВА II: ЧЕРДАК -->
     <div id="screen-attic" class="screen">
-        <div class="illustration-frame"><img src="attic.jfif" alt="Чердак хранительницы"></div>
+        <div class="illustration-frame"><img src="che.jfif" alt="Чердак хранительницы" onerror="this.onerror=null;this.src='attic.jfif'"></div>
         <div class="paper-card">
             <h2>Глава II. Чердак хранительницы</h2>
             <p>За узкой дверью лестница ведет на самую крышу академии. Здесь пахнет деревом, сухими травами и старыми книгами.</p>
@@ -312,6 +335,13 @@
     <!-- ГРИМУАР (Скрытый контейнер, управляется через JS) -->
     <div id="screen-grimoire" class="screen"></div>
 
+    <!-- ГЛАВА II: РАССЛЕДОВАНИЕ, РАЗДЕЛЫ КАРТЫ, ГЛАВА III (содержимое рисует chapter2.js) -->
+    <div id="screen-c2-hub" class="screen"></div>
+    <div id="screen-c2-step" class="screen"></div>
+    <div id="screen-c2-stations" class="screen"></div>
+    <div id="screen-c2-sec" class="screen"></div>
+    <div id="screen-c3-teaser" class="screen"></div>
+
     <!-- КОЛЛЕКЦИЯ -->
     <div id="screen-collection" class="screen">
         <div class="paper-card">
@@ -323,6 +353,7 @@
 
 </div>
 
-<script src="app.js?v=chapter2"></script>
+<script src="app.js?v=ch2b"></script>
+<script src="chapter2.js?v=ch2b"></script>
 </body>
 </html>

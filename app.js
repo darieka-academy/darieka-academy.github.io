@@ -88,7 +88,8 @@ function updateUI() {
         el.innerText = gameState.name;
     });
 
-    const itemsCount = (gameState.hasPass ? 1 : 0) + (gameState.hasFern ? 1 : 0) + (gameState.hasKey ? 1 : 0) + (gameState.hasLetter ? 1 : 0) + (gameState.hasAtticCard ? 1 : 0);
+    const itemsCount = (gameState.hasPass ? 1 : 0) + (gameState.hasFern ? 1 : 0) + (gameState.hasKey ? 1 : 0) + (gameState.hasLetter ? 1 : 0) + (gameState.hasAtticCard ? 1 : 0)
+        + (typeof ch2ItemCount === 'function' ? ch2ItemCount() : 0); // предметы расследования Главы II (chapter2.js)
     if (uiItems) uiItems.innerText = itemsCount;
 
     const expFill = document.getElementById('expFill');
@@ -144,6 +145,9 @@ function updateUI() {
         atticResult.classList.toggle('hidden', !gameState.hasAtticCard);
         atticButton.style.display = gameState.hasAtticCard ? 'none' : 'block';
     }
+
+    // Глава II (chapter2.js): блок на чердаке и страницы карты. Ничего не сохраняет, поэтому цикла нет.
+    if (typeof ch2UpdateUI === 'function') ch2UpdateUI();
 }
 
 function switchScreen(hideId, showId) {
@@ -279,6 +283,8 @@ function openCollection() {
         if (gameState.hasKey) items.push({ img: 'key.jfif', type: 'Артефакт • Необычный', title: 'Старый ключ', text: 'Тяжелый бронзовый ключ с биркой «Не для дверей».' });
         if (gameState.hasLetter) items.push({ img: 'letter.jfif', type: 'Секрет • Редкая', title: 'Письмо из архива', text: 'Пожелтевший лист с непонятными символами.' });
         if (gameState.hasAtticCard) items.push({ img: '', type: 'Артефакт • Необычный', title: 'Медный колокольчик', text: 'С выгравированным листом папоротника.' });
+        // Предметы расследования Главы II (chapter2.js) попадают в ту же коллекцию
+        if (typeof ch2CollectionItems === 'function') ch2CollectionItems().forEach(function (it) { items.push(it); });
 
         if (!items.length) {
             grid.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Пока в коллекции пусто. Находки появятся по мере твоих исследований.</p>';
