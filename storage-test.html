@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Тест сохранения данных — MAX</title>
+<title>Тест сохранения данных — MAX (версия 2)</title>
 <style>
     :root { --bg:#2b3325; --paper:#e8dcc4; --ink:#2c241b; --green:#3d4d36; --gold:#b89b5e; --red:#8c3a3a; --ok:#42643b; }
     * { box-sizing: border-box; }
@@ -25,17 +25,21 @@
     button:disabled { opacity:.5; cursor:default; }
     .state { display:inline-block; padding:2px 9px; border-radius:12px; font-size:13px; font-weight:bold; color:#fff; background:#766448; }
     .state.ok { background:var(--ok); } .state.miss { background:#8a6d1f; } .state.err { background:var(--red); } .state.na { background:#5a5a5a; }
-    .detail { margin-top:7px; font-size:13px; word-break:break-word; white-space:pre-wrap; }
+    .detail, pre.mono { margin:7px 0 0; font-size:13px; word-break:break-word; white-space:pre-wrap; }
+    pre.mono { font:12.5px/1.45 ui-monospace, Menlo, Consolas, monospace; }
     .verdict { font-weight:bold; }
-    ul#log { list-style:none; margin:0; padding:0; max-height:260px; overflow:auto; font:12.5px/1.45 ui-monospace, Menlo, Consolas, monospace; }
-    ul#log li { padding:3px 0; border-bottom:1px dotted #b8a87f; word-break:break-word; }
+    .label { font:700 22px ui-monospace, Menlo, Consolas, monospace; letter-spacing:1px; }
+    input[type=text] { width:100%; padding:10px; font-size:16px; border:1px solid #8c7a5d; border-radius:4px; background:#fff8e6; color:var(--ink); }
+    ul#log { list-style:none; margin:0; padding:0; max-height:300px; overflow:auto; font:12.5px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+    ul#log li { padding:3px 0; border-bottom:1px dotted #b8a87f; word-break:break-word; white-space:pre-wrap; }
     ol { margin:6px 0 0; padding-left:20px; font-size:13.5px; }
+    ol li { margin-bottom:4px; }
 </style>
 </head>
 <body>
 <main>
-    <h1>Тест сохранения данных</h1>
-    <p class="lead">Временная служебная страница. Она создаёт только два тестовых ключа и никак не связана с игровым прогрессом. Ключи <code>darieka_*</code> она не читает и не меняет.</p>
+    <h1>Тест сохранения данных (версия 2)</h1>
+    <p class="lead">Временная служебная страница. Она создаёт только два тестовых ключа и никак не связана с игровым прогрессом. Ключи <code>darieka_*</code> она не читает и не меняет. При открытии страница ничего не записывает и не удаляет.</p>
 
     <section class="card" aria-live="polite">
         <h2>1. Среда запуска</h2>
@@ -43,84 +47,116 @@
         <p id="envVerdict" class="note verdict"></p>
     </section>
 
-    <button type="button" id="btnWrite" class="gold">Записать тестовые данные</button>
-    <button type="button" id="btnCheck">Проверить сохранение</button>
+    <section class="card" aria-live="polite">
+        <h2>2. Автопроверка при запуске (только чтение)</h2>
+        <p class="note" style="margin-top:0">Выполняется сама через 0,3 / 2,5 / 6 секунд после открытия, если в этом запуске ещё ничего не записывали. Три попытки нужны, чтобы исключить «слишком раннее» чтение.</p>
+        <pre id="autoInfo" class="mono">ждём…</pre>
+    </section>
+
+    <button type="button" id="btnWrite" class="gold">Записать новое тестовое значение</button>
+    <button type="button" id="btnCheck">Проверить сохранение (только чтение)</button>
     <button type="button" id="btnRemove" class="danger">Удалить тестовые данные</button>
 
     <section class="card" aria-live="polite">
-        <h2>2. localStorage</h2>
+        <h2>Метка последней записи</h2>
+        <div id="labelBox" class="note" style="margin-top:0">В этом запуске записи ещё не было.</div>
+        <p id="waitMsg" class="note verdict"></p>
+        <label class="note" for="expectLabel">Метка, которую вы записали раньше (необязательно, для сравнения):</label>
+        <input type="text" id="expectLabel" maxlength="20" autocomplete="off" autocapitalize="off" placeholder="например, k3x9ab">
+        <p id="compareLine" class="note verdict"></p>
+    </section>
+
+    <section class="card" aria-live="polite">
+        <h2>3. Результат записи (setItem)</h2>
+        <pre id="writeInfo" class="mono">Запись ещё не выполнялась в этом запуске.</pre>
+    </section>
+
+    <section class="card" aria-live="polite">
+        <h2>4. localStorage</h2>
         <span id="lsState" class="state">ещё не проверялось</span>
         <div id="lsDetail" class="detail"></div>
     </section>
 
     <section class="card" aria-live="polite">
-        <h2>3. DeviceStorage (MAX Bridge)</h2>
+        <h2>5. DeviceStorage (MAX Bridge)</h2>
         <span id="dsState" class="state">ещё не проверялось</span>
         <div id="dsDetail" class="detail"></div>
     </section>
 
     <section class="card" aria-live="polite">
         <h2>Вывод по этому устройству</h2>
-        <p id="summary" class="note verdict">Нажмите «Проверить сохранение».</p>
+        <div id="checkTag" class="note" style="margin-top:0"></div>
+        <p id="summary" class="note verdict">Ждите автопроверку или нажмите «Проверить сохранение».</p>
     </section>
 
     <section class="card">
         <h2>Как провести тест</h2>
         <ol>
-            <li>Откройте страницу как Mini App внутри MAX и нажмите «Записать тестовые данные».</li>
-            <li>Нажмите «Проверить сохранение»: сразу после записи оба значения должны найтись.</li>
-            <li>Полностью закройте Mini App (и вернитесь в чат).</li>
-            <li>Откройте Mini App заново и нажмите «Проверить сохранение», <b>не</b> нажимая «Записать».</li>
-            <li>В конце нажмите «Удалить тестовые данные».</li>
+            <li>Нажмите «Записать новое тестовое значение». Запомните или сфотографируйте <b>метку</b>.</li>
+            <li>Дождитесь сообщения «Можно закрывать Mini App» (около 10 секунд) — запись должна успеть дойти до хранилища.</li>
+            <li><b>Вариант А.</b> Закройте Mini App обычным способом и откройте заново. <b>Вариант Б.</b> Полностью выгрузите MAX из памяти (смахните его в списке приложений) и откройте заново. Лучше проверить оба варианта отдельными записями.</li>
+            <li>После открытия <b>ничего не нажимайте</b> и подождите 7 секунд: автопроверка покажет результат. Для сравнения введите метку в поле выше.</li>
+            <li>Для нового теста снова нажмите «Записать новое тестовое значение» (метка будет другой). В конце нажмите «Удалить тестовые данные».</li>
         </ol>
     </section>
 
     <section class="card">
-        <h2>Журнал</h2>
+        <h2>Журнал (только этот запуск)</h2>
         <ul id="log"></ul>
     </section>
 </main>
 
-<!-- Скрипт MAX Bridge (по документации dev.max.ru). Флаги нужны, чтобы честно показать, загрузился ли он. -->
-<script>window.__bridgeLoaded = false; window.__bridgeFailed = false;</script>
+<!-- Порядок: сначала флаги, затем скрипт Bridge (синхронно, как в документации dev.max.ru), затем код страницы. -->
+<script>window.__bridgeLoaded = false; window.__bridgeFailed = false; window.__webAppBefore = !!window.WebApp;</script>
 <script src="https://st.max.ru/js/max-web-app.js" onload="window.__bridgeLoaded = true" onerror="window.__bridgeFailed = true"></script>
 
 <script>
 (function () {
     'use strict';
 
-    // Ровно два тестовых ключа. Другие ключи страница не читает, не пишет и не удаляет.
+    // Ровно два тестовых ключа, одни и те же во всех запусках. Другие ключи страница не трогает.
     var KEY_LS = 'maxtest_ls_probe_v1';
     var KEY_DS = 'maxtest_ds_probe_v1';
     var TIMEOUT_MS = 8000;
 
+    var launchAt = new Date();
+    var wroteThisLaunch = false;
+    var lastLabel = null;
+    var busy = false;
+    var waitTimers = [];
+
     function $(id) { return document.getElementById(id); }
     function setText(id, text) { $(id).textContent = text; }
+    function timeStr(d) { return d.toLocaleTimeString('ru-RU'); }
+    function stamp(iso) { try { return new Date(iso).toLocaleString('ru-RU'); } catch (e) { return String(iso); } }
 
-    function errText(e) {
-        if (e === undefined || e === null) return 'неизвестная ошибка';
-        var name = e && e.name ? e.name + ': ' : '';
-        var msg = '';
-        if (typeof e === 'string') msg = e;
-        else if (e && e.message) msg = e.message;
-        else { try { msg = JSON.stringify(e); } catch (x) { msg = String(e); } }
-        return (name + msg).slice(0, 300);
-    }
-
-    function short(v, n) {
+    // Безопасное «как есть»: ошибки превращаются в читаемый JSON со всеми своими полями.
+    function raw(x, n) {
         var s;
-        try { s = typeof v === 'string' ? v : JSON.stringify(v); } catch (e) { s = String(v); }
-        if (s === undefined) s = 'undefined';
+        try {
+            if (x instanceof Error) {
+                var o = { name: x.name, message: x.message };
+                Object.getOwnPropertyNames(x).forEach(function (k) { if (k !== 'stack' && k !== 'message' && k !== 'name') o[k] = x[k]; });
+                s = JSON.stringify(o);
+            } else if (typeof x === 'string') {
+                s = x;
+            } else {
+                s = JSON.stringify(x);
+            }
+        } catch (e) { s = String(x); }
+        if (s === undefined) s = String(x);
         return s.length > n ? s.slice(0, n) + '…' : s;
     }
-
-    function stamp(iso) {
-        try { return new Date(iso).toLocaleString('ru-RU'); } catch (e) { return String(iso); }
+    function describe(x) {
+        var t = (x === null) ? 'null' : typeof x;
+        if (x && typeof x === 'object' && x.constructor && x.constructor.name) t = x.constructor.name;
+        return '[' + t + '] ' + raw(x, 400);
     }
+    function short(v, n) { return raw(v, n); }
 
     function log(msg) {
         var li = document.createElement('li');
-        li.textContent = new Date().toLocaleTimeString('ru-RU') + '  ' + msg;
+        li.textContent = timeStr(new Date()) + '  ' + msg;
         var ul = $('log');
         ul.insertBefore(li, ul.firstChild);
     }
@@ -140,39 +176,42 @@
             var done = false;
             var timer = setTimeout(function () {
                 if (done) return; done = true;
-                reject(new Error(label + ': нет ответа за ' + (ms / 1000) + ' с'));
+                var e = new Error(label + ': нет ответа за ' + (ms / 1000) + ' с');
+                e.isTimeout = true;
+                reject(e);
             }, ms);
             promise.then(function (v) { if (done) return; done = true; clearTimeout(timer); resolve(v); },
                          function (e) { if (done) return; done = true; clearTimeout(timer); reject(e); });
         });
     }
 
-    // Единая обёртка вызовов DeviceStorage: всегда Promise, ошибки и зависание обрабатываются.
-    // Допустимы только setItem / getItem / removeItem. Метод clear здесь намеренно не используется.
+    // Единая обёртка DeviceStorage: результат всегда ожидается через await и никогда не «теряется».
+    // Возвращает { ok, res | err, ms, kind, returnedPromise }. Разрешены только setItem / getItem / removeItem.
     var ALLOWED = { setItem: 1, getItem: 1, removeItem: 1 };
-    function dsCall(method, args) {
-        if (!ALLOWED[method]) return Promise.reject(new Error('Метод ' + method + ' запрещён в этом тесте'));
+    async function dsCall(method, args) {
+        var t0 = performance.now();
+        function ms() { return Math.round(performance.now() - t0); }
+        if (!ALLOWED[method]) return { ok: false, err: new Error('Метод ' + method + ' запрещён в этом тесте'), ms: 0, kind: 'blocked' };
         var d = deviceStorage();
-        if (!d) return Promise.reject(new Error('DeviceStorage недоступен'));
-        if (typeof d[method] !== 'function') return Promise.reject(new Error('Метод DeviceStorage.' + method + ' не найден'));
+        if (!d) return { ok: false, err: new Error('DeviceStorage недоступен'), ms: 0, kind: 'na' };
+        if (typeof d[method] !== 'function') return { ok: false, err: new Error('Метод DeviceStorage.' + method + ' не найден'), ms: 0, kind: 'na' };
         var p;
-        try { p = d[method].apply(d, args); } catch (e) { return Promise.reject(e); }
-        return withTimeout(Promise.resolve(p), TIMEOUT_MS, 'DeviceStorage.' + method);
+        try {
+            p = d[method].apply(d, args);
+            var res = await withTimeout(Promise.resolve(p), TIMEOUT_MS, 'DeviceStorage.' + method);
+            return { ok: true, res: res, ms: ms(), returnedPromise: !!(p && typeof p.then === 'function') };
+        } catch (e) {
+            return { ok: false, err: e, ms: ms(), kind: (e && e.isTimeout) ? 'timeout' : 'reject' };
+        }
     }
 
     /* ---------- localStorage (только KEY_LS) ---------- */
 
-    function lsGet() {
-        try { return { ok: true, value: window.localStorage.getItem(KEY_LS) }; } catch (e) { return { ok: false, error: errText(e) }; }
-    }
-    function lsSet(value) {
-        try { window.localStorage.setItem(KEY_LS, value); return { ok: true }; } catch (e) { return { ok: false, error: errText(e) }; }
-    }
-    function lsRemove() {
-        try { window.localStorage.removeItem(KEY_LS); return { ok: true }; } catch (e) { return { ok: false, error: errText(e) }; }
-    }
+    function lsGet() { try { return { ok: true, value: window.localStorage.getItem(KEY_LS) }; } catch (e) { return { ok: false, error: describe(e) }; } }
+    function lsSet(value) { try { window.localStorage.setItem(KEY_LS, value); return { ok: true }; } catch (e) { return { ok: false, error: describe(e) }; } }
+    function lsRemove() { try { window.localStorage.removeItem(KEY_LS); return { ok: true }; } catch (e) { return { ok: false, error: describe(e) }; } }
 
-    /* ---------- Показ результатов ---------- */
+    /* ---------- Показ ---------- */
 
     function setCard(which, kind, label, detail) {
         var st = $(which + 'State');
@@ -180,20 +219,23 @@
         st.textContent = label;
         setText(which + 'Detail', detail || '');
     }
+    function show(which, r) { setCard(which, r.state, r.label, r.detail); }
 
-    function describeValue(raw) {
-        var info;
-        try {
-            var o = JSON.parse(raw);
-            if (o && o.page === 'storage-test') info = 'метка ' + o.id + ', записано ' + stamp(o.writtenAt);
-        } catch (e) { /* не наш формат */ }
-        return info || ('значение найдено, но в другом формате: ' + short(raw, 80));
+    function parseVal(rawv) {
+        try { var o = JSON.parse(rawv); if (o && o.page === 'storage-test') return o; } catch (e) { /* не наш формат */ }
+        return null;
+    }
+    function describeValue(rawv) {
+        var o = parseVal(rawv);
+        return o ? ('метка ' + o.id + ', записано ' + stamp(o.writtenAt) + ' (запуск от ' + stamp(o.launchAt) + ')')
+                 : ('значение найдено, но в другом формате: ' + short(rawv, 80));
     }
 
-    function row(k, v) {
+    function row(k, v, id) {
         var d = document.createElement('div'); d.className = 'row';
         var b = document.createElement('b'); b.textContent = k;
         var s = document.createElement('span'); s.textContent = v;
+        if (id) s.id = id;
         d.appendChild(b); d.appendChild(s);
         return d;
     }
@@ -206,14 +248,35 @@
         var lsOk = true;
         try { lsOk = !!window.localStorage; } catch (e) { lsOk = false; }
 
-        box.appendChild(row('Адрес страницы', location.origin));
+        var dsMethods = 'нет';
+        if (d) {
+            var names = [];
+            try { names = Object.keys(d); } catch (e) { /* ignore */ }
+            ['setItem', 'getItem', 'removeItem'].forEach(function (m) { if (typeof d[m] === 'function' && names.indexOf(m) === -1) names.push(m); });
+            dsMethods = names.join(', ') || 'не определены';
+        }
+        var wKeys = 'нет';
+        if (w) { try { wKeys = Object.keys(w).slice(0, 40).join(', ') || 'не определены'; } catch (e) { wKeys = 'не определены'; } }
+
+        var search = location.search ? 'есть (' + location.search.length + ' симв.)' : 'нет';
+        var hash = location.hash ? 'есть (' + location.hash.length + ' симв.)' : 'нет';
+
+        box.appendChild(row('Адрес страницы', location.origin + location.pathname));
+        box.appendChild(row('Параметры ?… / #… в адресе', search + ' / ' + hash));
+        box.appendChild(row('Страница открыта', launchAt.toLocaleString('ru-RU')));
         box.appendChild(row('Скрипт MAX Bridge', bridgeScript));
+        box.appendChild(row('WebApp был до скрипта Bridge', window.__webAppBefore ? 'да' : 'нет'));
         box.appendChild(row('window.WebApp', w ? 'найден' : 'не найден'));
+        box.appendChild(row('Поля WebApp (только имена)', wKeys));
         box.appendChild(row('WebApp.DeviceStorage', d ? 'найден' : 'не найден'));
+        box.appendChild(row('Методы DeviceStorage', dsMethods));
         box.appendChild(row('Тип клиента (platform)', prop('platform') || 'недоступно'));
         box.appendChild(row('Версия MAX (version)', prop('version') || 'недоступно'));
         box.appendChild(row('Устройство (deviceName)', prop('deviceName') || 'недоступно'));
+        box.appendChild(row('Контекст запуска (getLaunchContext)', 'проверяется…', 'envCtx'));
         box.appendChild(row('localStorage', lsOk ? 'доступен' : 'недоступен'));
+        box.appendChild(row('Хранилище браузера (оценка)', 'проверяется…', 'envQuota'));
+        box.appendChild(row('Браузер', (navigator.userAgent || '').slice(0, 110)));
 
         var v;
         if (!w) {
@@ -223,132 +286,255 @@
         } else if (prop('platform') === 'web') {
             v = 'Клиент сообщает платформу «web». По документации MAX хранилища Bridge в веб-версии не поддерживаются, поэтому DeviceStorage может не сработать.';
         } else {
-            v = 'WebApp и DeviceStorage найдены. Проведите тест записи и проверки.';
+            v = 'WebApp и DeviceStorage найдены. Выполните тест записи и проверки.';
         }
         setText('envVerdict', v);
+        fillAsyncEnv();
     }
 
-    /* ---------- Операции ---------- */
-
-    var busy = false;
-    function lock(on) {
-        busy = on;
-        ['btnWrite', 'btnCheck', 'btnRemove'].forEach(function (id) { $(id).disabled = on; });
+    function fillAsyncEnv() {
+        var w = webApp();
+        if (w && typeof w.getLaunchContext === 'function') {
+            try {
+                Promise.resolve(w.getLaunchContext()).then(function (c) { setText('envCtx', raw(c, 120)); },
+                    function (e) { setText('envCtx', 'ошибка: ' + describe(e)); });
+            } catch (e) { setText('envCtx', 'ошибка: ' + describe(e)); }
+        } else {
+            setText('envCtx', 'недоступно (функции нет в этой версии)');
+        }
+        try {
+            if (navigator.storage && navigator.storage.estimate) {
+                navigator.storage.estimate().then(function (est) {
+                    var mb = function (b) { return Math.round((b || 0) / 1048576) + ' МБ'; };
+                    var txt = 'занято ' + mb(est.usage) + ' из ' + mb(est.quota);
+                    if (navigator.storage.persisted) {
+                        navigator.storage.persisted().then(function (p) { setText('envQuota', txt + '; persisted: ' + (p ? 'да' : 'нет')); },
+                            function () { setText('envQuota', txt); });
+                    } else { setText('envQuota', txt); }
+                }, function (e) { setText('envQuota', 'ошибка: ' + describe(e)); });
+            } else { setText('envQuota', 'недоступно'); }
+        } catch (e) { setText('envQuota', 'недоступно'); }
     }
+
+    /* ---------- Чтение (без записи) ---------- */
 
     function readLS() {
         var r = lsGet();
-        if (!r.ok) return { state: 'err', label: 'ошибка', detail: 'Не удалось прочитать localStorage: ' + r.error };
-        if (typeof r.value === 'string' && r.value !== '') return { state: 'ok', label: 'значение найдено', detail: describeValue(r.value), raw: r.value };
-        return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_LS + ' пуст.' };
+        if (!r.ok) return { state: 'err', label: 'ошибка', detail: 'Не удалось прочитать localStorage: ' + r.error, brief: 'ошибка чтения' };
+        if (typeof r.value === 'string' && r.value !== '') {
+            var o = parseVal(r.value);
+            return { state: 'ok', label: 'значение найдено', detail: describeValue(r.value), id: o ? o.id : null, brief: 'найдено' + (o ? ' (метка ' + o.id + ')' : '') };
+        }
+        return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_LS + ' пуст.', brief: 'не найдено' };
     }
 
-    function readDS() {
-        if (!webApp()) return Promise.resolve({ state: 'na', label: 'проверка невозможна', detail: 'Bridge недоступен: window.WebApp не найден.' });
-        if (!deviceStorage()) return Promise.resolve({ state: 'na', label: 'проверка невозможна', detail: 'DeviceStorage в этом клиенте не найден (только для этого устройства и версии).' });
-        return dsCall('getItem', [KEY_DS]).then(function (res) {
-            var v = (res && typeof res === 'object') ? res.value : res;
-            var answer = 'Ответ DeviceStorage: ' + short(res, 160);
-            if (typeof v === 'string' && v !== '') return { state: 'ok', label: 'значение найдено', detail: describeValue(v) + '\n' + answer, raw: v };
-            return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_DS + ' пуст.\n' + answer };
-        }, function (e) {
-            return { state: 'err', label: 'ошибка', detail: 'Ошибка DeviceStorage.getItem: ' + errText(e) };
-        });
+    async function readDS() {
+        if (!webApp()) return { state: 'na', label: 'проверка невозможна', detail: 'Bridge недоступен: window.WebApp не найден.', brief: 'проверка невозможна (нет Bridge)' };
+        if (!deviceStorage()) return { state: 'na', label: 'проверка невозможна', detail: 'DeviceStorage в этом клиенте не найден (только для этого устройства и версии).', brief: 'проверка невозможна (нет DeviceStorage)' };
+        var r = await dsCall('getItem', [KEY_DS]);
+        if (!r.ok) {
+            var d = describe(r.err);
+            if (r.err && r.err.isTimeout) return { state: 'err', label: 'нет ответа', detail: d, brief: 'нет ответа MAX' };
+            if (/not_found/i.test(d)) {
+                return { state: 'miss', label: 'MAX: ключ не найден', notFound: true,
+                    detail: 'MAX ответил, что такого ключа нет. Это штатный ответ, а не сбой метода.\nОтвет MAX: ' + d + '\nВремя ответа: ' + r.ms + ' мс',
+                    brief: 'MAX: ключ не найден ' + raw(r.err && (r.err.message || r.err.code || r.err), 80) };
+            }
+            return { state: 'err', label: 'ошибка', detail: 'Ошибка DeviceStorage.getItem: ' + d + '\nВремя: ' + r.ms + ' мс', brief: 'ошибка: ' + raw(r.err, 100) };
+        }
+        var rr = raw(r.res, 300);
+        var v = (r.res && typeof r.res === 'object') ? r.res.value : r.res;
+        var answer = 'Ответ MAX: ' + rr + '\nВремя ответа: ' + r.ms + ' мс';
+        if (typeof v === 'string' && v !== '') {
+            var o = parseVal(v);
+            return { state: 'ok', label: 'значение найдено', detail: describeValue(v) + '\n' + answer, id: o ? o.id : null, brief: 'найдено' + (o ? ' (метка ' + o.id + ')' : '') };
+        }
+        if (/not_found/i.test(rr)) return { state: 'miss', label: 'MAX: ключ не найден', notFound: true, detail: 'MAX вернул ответ «не найден».\n' + answer, brief: 'MAX: ключ не найден' };
+        return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_DS + ' пуст.\n' + answer, brief: 'не найдено (пустой ответ)' };
     }
-
-    function show(which, r) { setCard(which, r.state, r.label, r.detail); }
 
     function summarize(ls, ds) {
         var t;
+        var from = wroteThisLaunch ? 'записаны в ЭТОМ запуске (перезапуск ещё не проверялся)' : 'записаны в ПРЕДЫДУЩЕМ запуске';
+        var lsF = ls.state === 'ok', dsF = ds.state === 'ok';
         if (ls.state === 'err' || ds.state === 'err') {
             t = 'Есть ошибки при обращении к хранилищу (см. тексты выше). Результат неполный.';
         } else if (ds.state === 'na') {
-            t = ls.state === 'ok'
-                ? 'localStorage: значение найдено. DeviceStorage проверить невозможно (нет Bridge или DeviceStorage).'
-                : 'localStorage: значение не найдено. DeviceStorage проверить невозможно.';
-        } else if (ls.state === 'ok' && ds.state === 'ok') {
-            t = 'Оба хранилища сохранили значение.';
-        } else if (ls.state !== 'ok' && ds.state === 'ok') {
-            t = 'DeviceStorage сохранил значение, а localStorage — нет. Если до этого вы закрывали Mini App, localStorage здесь не переживает перезапуск.';
-        } else if (ls.state === 'ok' && ds.state !== 'ok') {
-            t = 'localStorage сохранил значение, а DeviceStorage — нет.';
+            t = lsF ? 'localStorage: значение найдено. DeviceStorage проверить невозможно (нет Bridge или DeviceStorage).'
+                    : 'localStorage: значение не найдено. DeviceStorage проверить невозможно.';
+        } else if (lsF && dsF) {
+            t = wroteThisLaunch ? 'Оба значения найдены, но ' + from + '.' : 'Оба значения пережили перезапуск.';
+        } else if (!lsF && dsF) {
+            t = wroteThisLaunch ? 'DeviceStorage вернул значение, а localStorage — нет (' + from + ').'
+                                : 'DeviceStorage пережил перезапуск, а localStorage — нет.';
+        } else if (lsF && !dsF) {
+            t = wroteThisLaunch ? 'localStorage вернул значение, а DeviceStorage — нет (' + from + ').'
+                                : 'localStorage пережил перезапуск, а DeviceStorage — нет.';
+        } else if (wroteThisLaunch) {
+            t = 'В этом запуске значения не найдены сразу после записи: проверьте блок «Результат записи» и ошибки.';
         } else {
-            t = 'Ни одно значение не найдено. Если вы ещё не нажимали «Записать» или уже удаляли данные, это ожидаемо.';
+            t = 'Ни одно значение не найдено. Если запись была в прошлом запуске и данные не удалялись, значит, после перезапуска оба хранилища оказались пустыми (см. возможные причины в отчёте).';
         }
         setText('summary', t + ' Вывод относится только к этому устройству и этой версии MAX.');
     }
 
-    function doCheck() {
+    function compareExpected(ls, ds) {
+        var exp = ($('expectLabel').value || '').trim();
+        if (!exp) { setText('compareLine', ''); return; }
+        function one(name, r) { return name + ': ' + (r.id ? (r.id === exp ? 'метка совпала' : 'метка ДРУГАЯ (' + r.id + ')') : 'значения нет'); }
+        setText('compareLine', 'Сравнение с «' + exp + '» — ' + one('localStorage', ls) + '; ' + one('DeviceStorage', ds));
+    }
+
+    async function doCheck(tag) {
+        setText('checkTag', 'Проверка: ' + tag + ' · ' + timeStr(new Date()) + ' · записей в этом запуске: ' + (wroteThisLaunch ? 'да' : 'нет'));
         var ls = readLS();
         show('ls', ls);
         setCard('ds', '', 'проверяется…', '');
-        return readDS().then(function (ds) {
-            show('ds', ds);
-            summarize(ls, ds);
-            log('Проверка: localStorage — ' + ls.label + '; DeviceStorage — ' + ds.label);
+        var ds = await readDS();
+        show('ds', ds);
+        summarize(ls, ds);
+        compareExpected(ls, ds);
+        log('Проверка (' + tag + '): localStorage — ' + ls.brief + '; DeviceStorage — ' + ds.brief);
+        return { ls: ls, ds: ds };
+    }
+
+    /* ---------- Кнопки ---------- */
+
+    function lock(on) {
+        busy = on;
+        ['btnWrite', 'btnCheck', 'btnRemove'].forEach(function (id) { $(id).disabled = on; });
+    }
+    function clearWait() {
+        waitTimers.forEach(function (t) { clearTimeout(t); clearInterval(t); });
+        waitTimers = [];
+        setText('waitMsg', '');
+    }
+
+    function startWait() {
+        var n = 10;
+        setText('waitMsg', 'Подождите ' + n + ' с перед закрытием Mini App…');
+        waitTimers.push(setInterval(function () {
+            n--;
+            if (n <= 0) { clearWait(); setText('waitMsg', 'Можно закрывать Mini App. Метка записи: ' + lastLabel); }
+            else setText('waitMsg', 'Подождите ' + n + ' с перед закрытием Mini App…');
+        }, 1000));
+        waitTimers.push(setTimeout(function () { if (!busy) doCheck('через 3 с после записи, только чтение'); }, 3000));
+    }
+
+    async function onCheck() {
+        if (busy) return;
+        lock(true); clearWait(); renderEnv();
+        try {
+            log('Чтение без записи. Записей в этом запуске: ' + (wroteThisLaunch ? 'были' : 'нет') + '.');
+            await doCheck('ручная проверка, только чтение');
+        } catch (e) { log('Неожиданная ошибка проверки: ' + describe(e)); }
+        lock(false);
+    }
+
+    async function onWrite() {
+        if (busy) return;
+        lock(true); clearWait(); renderEnv();
+        var info = [];
+        try {
+            var label = Math.random().toString(36).slice(2, 8);
+            var now = new Date();
+            var payload = JSON.stringify({ page: 'storage-test', v: 2, id: label, writtenAt: now.toISOString(), launchAt: launchAt.toISOString() });
+
+            // Что лежало в хранилищах ДО записи (только чтение)
+            var bl = readLS(), bd = await readDS();
+            info.push('До записи: localStorage — ' + bl.brief + '; DeviceStorage — ' + bd.brief);
+
+            var t0 = performance.now();
+            var w = lsSet(payload);
+            info.push('localStorage.setItem: ' + (w.ok ? 'выполнено за ' + Math.round(performance.now() - t0) + ' мс' : 'ОШИБКА — ' + w.error));
+
+            if (!webApp() || !deviceStorage()) {
+                info.push('DeviceStorage.setItem: запись невозможна (' + (!webApp() ? 'нет window.WebApp' : 'нет DeviceStorage') + ')');
+            } else {
+                var r = await dsCall('setItem', [KEY_DS, payload]);
+                if (r.ok) {
+                    var okStatus = !!(r.res && r.res.status === 'updated');
+                    info.push('DeviceStorage.setItem: результат получен через await, успех за ' + r.ms + ' мс');
+                    info.push('   вернул Promise: ' + (r.returnedPromise ? 'да' : 'нет'));
+                    info.push('   ответ MAX: ' + raw(r.res, 300));
+                    info.push('   ' + (okStatus ? 'совпадает с ожидаемым {"status":"updated"}' : 'ОТЛИЧАЕТСЯ от ожидаемого {"status":"updated"}'));
+                } else {
+                    info.push('DeviceStorage.setItem: ОШИБКА за ' + r.ms + ' мс — ' + describe(r.err));
+                }
+            }
+            wroteThisLaunch = true;
+            lastLabel = label;
+            setText('writeInfo', info.join('\n'));
+            setText('labelBox', 'Метка записи: ' + label + ' · ' + timeStr(now) + '. Запомните или сфотографируйте её.');
+            $('labelBox').className = 'label';
+            info.forEach(function (line) { log(line); });
+            await doCheck('сразу после записи');
+            startWait();
+        } catch (e) {
+            log('Неожиданная ошибка записи: ' + describe(e));
+            setText('writeInfo', info.join('\n') + '\nНеожиданная ошибка: ' + describe(e));
+        }
+        lock(false);
+    }
+
+    async function onRemove() {
+        if (busy) return;
+        lock(true); clearWait(); renderEnv();
+        try {
+            var r = lsRemove();
+            log('localStorage.removeItem(' + KEY_LS + '): ' + (r.ok ? 'выполнено' : 'ОШИБКА — ' + r.error));
+            if (!webApp() || !deviceStorage()) {
+                log('DeviceStorage: удалять нечего или невозможно (нет Bridge/DeviceStorage)');
+            } else {
+                var d = await dsCall('removeItem', [KEY_DS]);
+                log('DeviceStorage.removeItem(' + KEY_DS + '): ' + (d.ok ? 'выполнено, ответ ' + raw(d.res, 100) : 'ОШИБКА — ' + describe(d.err)));
+            }
+            await doCheck('после удаления, только чтение');
+        } catch (e) { log('Неожиданная ошибка удаления: ' + describe(e)); }
+        lock(false);
+    }
+
+    /* ---------- Автопроверка при запуске: только чтение, три попытки ---------- */
+
+    function scheduleAutoCheck() {
+        var delays = [300, 2500, 6000];
+        var lines = [];
+        delays.forEach(function (ms, i) {
+            setTimeout(async function () {
+                if (busy || wroteThisLaunch) {
+                    lines.push('+' + (ms / 1000) + ' с: пропущено (вы уже начали запись в этом запуске)');
+                    setText('autoInfo', lines.join('\n'));
+                    return;
+                }
+                try {
+                    var ls = readLS();
+                    var ds = await readDS();
+                    lines.push('+' + (ms / 1000) + ' с: localStorage — ' + ls.brief + '; DeviceStorage — ' + ds.brief);
+                    setText('autoInfo', lines.join('\n'));
+                    if (i === delays.length - 1 && !busy && !wroteThisLaunch) {
+                        setText('checkTag', 'Автопроверка при запуске · ' + timeStr(new Date()) + ' · записей в этом запуске: нет');
+                        show('ls', ls); show('ds', ds); summarize(ls, ds); compareExpected(ls, ds);
+                        log('Автопроверка: localStorage — ' + ls.brief + '; DeviceStorage — ' + ds.brief);
+                    }
+                } catch (e) {
+                    lines.push('+' + (ms / 1000) + ' с: неожиданная ошибка — ' + describe(e));
+                    setText('autoInfo', lines.join('\n'));
+                }
+            }, ms);
         });
-    }
-
-    function onCheck() {
-        if (busy) return;
-        lock(true);
-        renderEnv();
-        doCheck().then(null, function (e) { log('Неожиданная ошибка проверки: ' + errText(e)); }).then(function () { lock(false); });
-    }
-
-    function onWrite() {
-        if (busy) return;
-        lock(true);
-        renderEnv();
-        var payload = JSON.stringify({ page: 'storage-test', id: Math.random().toString(36).slice(2, 10), writtenAt: new Date().toISOString() });
-
-        var w = lsSet(payload);
-        log('localStorage.setItem: ' + (w.ok ? 'выполнено' : 'ОШИБКА — ' + w.error));
-
-        var step;
-        if (!webApp() || !deviceStorage()) {
-            log('DeviceStorage: запись невозможна (' + (!webApp() ? 'нет window.WebApp' : 'нет DeviceStorage') + ')');
-            step = Promise.resolve();
-        } else {
-            step = dsCall('setItem', [KEY_DS, payload]).then(function (res) {
-                log('DeviceStorage.setItem: выполнено, ответ ' + short(res, 100));
-            }, function (e) {
-                log('DeviceStorage.setItem: ОШИБКА — ' + errText(e));
-            });
-        }
-        step.then(function () {
-            log('Читаю обратно в этой же сессии…');
-            return doCheck();
-        }).then(null, function (e) { log('Неожиданная ошибка записи: ' + errText(e)); }).then(function () { lock(false); });
-    }
-
-    function onRemove() {
-        if (busy) return;
-        lock(true);
-        renderEnv();
-        var r = lsRemove();
-        log('localStorage.removeItem(' + KEY_LS + '): ' + (r.ok ? 'выполнено' : 'ОШИБКА — ' + r.error));
-        var step;
-        if (!webApp() || !deviceStorage()) {
-            log('DeviceStorage: удалять нечего или невозможно (нет Bridge/DeviceStorage)');
-            step = Promise.resolve();
-        } else {
-            step = dsCall('removeItem', [KEY_DS]).then(function (res) {
-                log('DeviceStorage.removeItem(' + KEY_DS + '): выполнено, ответ ' + short(res, 100));
-            }, function (e) {
-                log('DeviceStorage.removeItem: ОШИБКА — ' + errText(e));
-            });
-        }
-        step.then(doCheck).then(null, function (e) { log('Неожиданная ошибка удаления: ' + errText(e)); }).then(function () { lock(false); });
     }
 
     $('btnWrite').addEventListener('click', onWrite);
     $('btnCheck').addEventListener('click', onCheck);
     $('btnRemove').addEventListener('click', onRemove);
+    $('expectLabel').addEventListener('input', function () { /* сравнение обновится при следующей проверке */ });
 
     renderEnv();
-    // Скрипт Bridge мог догрузиться уже после первого показа среды — обновим по событию load.
-    window.addEventListener('load', function () { renderEnv(); log('Страница загружена. Тестовых ключей: ' + KEY_LS + ' и ' + KEY_DS); });
+    window.addEventListener('load', function () {
+        renderEnv();
+        log('Страница загружена. Тестовые ключи: ' + KEY_LS + ' и ' + KEY_DS + '. Автоматических записей и удалений при запуске нет.');
+        scheduleAutoCheck();
+    });
 })();
 </script>
 </body>
