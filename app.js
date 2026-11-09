@@ -166,7 +166,12 @@ function backToMap() {
     window.scrollTo(0, 0);
 }
 
-window.addEventListener('load', function () {
+var gameStarted = false;
+
+function startGame() {
+    if (gameStarted) return;
+    gameStarted = true;
+
     // Старые сохранения: если питомец уже есть, а бонус главы I не выдан — выдать один раз.
     if (gameState.hasPet && !gameState.chapter1BonusClaimed) {
         gameState.chapter1BonusClaimed = true;
@@ -175,12 +180,23 @@ window.addEventListener('load', function () {
     }
     updateUI();
 
+    // Стартовый экран выбирается сразу после разбора страницы, не дожидаясь загрузки всех картинок
+    // (раньше это было по событию load, и пока грузились иллюстрации, показывалась форма имени).
     if (gameState.name && gameState.hasPass) {
         switchScreen('screen-gates', 'screen-map');
     } else if (gameState.name) {
         switchScreen('screen-gates', 'screen-card');
     }
-});
+}
+
+// setTimeout(0) — чтобы chapter2.js успел выполнить свой init() (он подписан на тот же DOMContentLoaded).
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(startGame, 0); });
+} else {
+    setTimeout(startGame, 0);
+}
+// Страховка: если по какой-то причине выше не сработало.
+window.addEventListener('load', startGame);
 
 /* ---------- Глава I ---------- */
 
@@ -240,7 +256,7 @@ function checkSecret() {
         if (!gameState.secretRewardClaimed) { gameState.exp += 10; gameState.secretRewardClaimed = true; saveState(); }
         switchScreen('screen-secret', 'screen-secret-reward');
     } else {
-        alert('Пока не сходится. Подсказка: 13 — это тринадцатая буква алфавита.');
+        alert('Пока не сходится. Подсказка: 12 — это двенадцатая буква алфавита.');
     }
 }
 
