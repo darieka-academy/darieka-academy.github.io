@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Тест сохранения данных — MAX</title>
+<style>
+    :root { --bg:#2b3325; --paper:#e8dcc4; --ink:#2c241b; --green:#3d4d36; --gold:#b89b5e; --red:#8c3a3a; --ok:#42643b; }
+    * { box-sizing: border-box; }
+    body { margin:0; padding:14px; background:var(--bg); color:#f4ebd9; font:15px/1.5 Georgia, 'Times New Roman', serif; }
+    main { max-width:520px; margin:0 auto; }
+    h1 { font-size:21px; margin:4px 0 6px; color:var(--gold); }
+    h2 { font-size:16px; margin:0 0 8px; color:#8c6d2f; }
+    .lead { margin:0 0 12px; font-size:13.5px; color:#d9ccb0; }
+    .card { background:var(--paper); color:var(--ink); border:1px solid #8c7a5d; border-radius:6px; padding:12px 14px; margin:12px 0; }
+    .row { display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px dotted #b8a87f; font-size:14px; }
+    .row:last-child { border-bottom:0; }
+    .row b { flex:0 0 auto; }
+    .row span { text-align:right; word-break:break-word; }
+    .note { font-size:13px; margin:8px 0 0; }
+    button { display:block; width:100%; min-height:48px; margin:9px 0 0; padding:11px; border:0; border-radius:4px; background:var(--green); color:#f4ebd9; font:700 17px Georgia, serif; cursor:pointer; touch-action:manipulation; }
+    button.gold { background:var(--gold); color:var(--ink); }
+    button.danger { background:#766448; }
+    button:disabled { opacity:.5; cursor:default; }
+    .state { display:inline-block; padding:2px 9px; border-radius:12px; font-size:13px; font-weight:bold; color:#fff; background:#766448; }
+    .state.ok { background:var(--ok); } .state.miss { background:#8a6d1f; } .state.err { background:var(--red); } .state.na { background:#5a5a5a; }
+    .detail { margin-top:7px; font-size:13px; word-break:break-word; white-space:pre-wrap; }
+    .verdict { font-weight:bold; }
+    ul#log { list-style:none; margin:0; padding:0; max-height:260px; overflow:auto; font:12.5px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+    ul#log li { padding:3px 0; border-bottom:1px dotted #b8a87f; word-break:break-word; }
+    ol { margin:6px 0 0; padding-left:20px; font-size:13.5px; }
+</style>
+</head>
+<body>
+<main>
+    <h1>Тест сохранения данных</h1>
+    <p class="lead">Временная служебная страница. Она создаёт только два тестовых ключа и никак не связана с игровым прогрессом. Ключи <code>darieka_*</code> она не читает и не меняет.</p>
+
+    <section class="card" aria-live="polite">
+        <h2>1. Среда запуска</h2>
+        <div id="env"></div>
+        <p id="envVerdict" class="note verdict"></p>
+    </section>
+
+    <button type="button" id="btnWrite" class="gold">Записать тестовые данные</button>
+    <button type="button" id="btnCheck">Проверить сохранение</button>
+    <button type="button" id="btnRemove" class="danger">Удалить тестовые данные</button>
+
+    <section class="card" aria-live="polite">
+        <h2>2. localStorage</h2>
+        <span id="lsState" class="state">ещё не проверялось</span>
+        <div id="lsDetail" class="detail"></div>
+    </section>
+
+    <section class="card" aria-live="polite">
+        <h2>3. DeviceStorage (MAX Bridge)</h2>
+        <span id="dsState" class="state">ещё не проверялось</span>
+        <div id="dsDetail" class="detail"></div>
+    </section>
+
+    <section class="card" aria-live="polite">
+        <h2>Вывод по этому устройству</h2>
+        <p id="summary" class="note verdict">Нажмите «Проверить сохранение».</p>
+    </section>
+
+    <section class="card">
+        <h2>Как провести тест</h2>
+        <ol>
+            <li>Откройте страницу как Mini App внутри MAX и нажмите «Записать тестовые данные».</li>
+            <li>Нажмите «Проверить сохранение»: сразу после записи оба значения должны найтись.</li>
+            <li>Полностью закройте Mini App (и вернитесь в чат).</li>
+            <li>Откройте Mini App заново и нажмите «Проверить сохранение», <b>не</b> нажимая «Записать».</li>
+            <li>В конце нажмите «Удалить тестовые данные».</li>
+        </ol>
+    </section>
+
+    <section class="card">
+        <h2>Журнал</h2>
+        <ul id="log"></ul>
+    </section>
+</main>
+
+<!-- Скрипт MAX Bridge (по документации dev.max.ru). Флаги нужны, чтобы честно показать, загрузился ли он. -->
+<script>window.__bridgeLoaded = false; window.__bridgeFailed = false;</script>
+<script src="https://st.max.ru/js/max-web-app.js" onload="window.__bridgeLoaded = true" onerror="window.__bridgeFailed = true"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    // Ровно два тестовых ключа. Другие ключи страница не читает, не пишет и не удаляет.
+    var KEY_LS = 'maxtest_ls_probe_v1';
+    var KEY_DS = 'maxtest_ds_probe_v1';
+    var TIMEOUT_MS = 8000;
+
+    function $(id) { return document.getElementById(id); }
+    function setText(id, text) { $(id).textContent = text; }
+
+    function errText(e) {
+        if (e === undefined || e === null) return 'неизвестная ошибка';
+        var name = e && e.name ? e.name + ': ' : '';
+        var msg = '';
+        if (typeof e === 'string') msg = e;
+        else if (e && e.message) msg = e.message;
+        else { try { msg = JSON.stringify(e); } catch (x) { msg = String(e); } }
+        return (name + msg).slice(0, 300);
+    }
+
+    function short(v, n) {
+        var s;
+        try { s = typeof v === 'string' ? v : JSON.stringify(v); } catch (e) { s = String(v); }
+        if (s === undefined) s = 'undefined';
+        return s.length > n ? s.slice(0, n) + '…' : s;
+    }
+
+    function stamp(iso) {
+        try { return new Date(iso).toLocaleString('ru-RU'); } catch (e) { return String(iso); }
+    }
+
+    function log(msg) {
+        var li = document.createElement('li');
+        li.textContent = new Date().toLocaleTimeString('ru-RU') + '  ' + msg;
+        var ul = $('log');
+        ul.insertBefore(li, ul.firstChild);
+    }
+
+    /* ---------- Bridge ---------- */
+
+    function webApp() { try { return window.WebApp || null; } catch (e) { return null; } }
+    function deviceStorage() {
+        try { var w = webApp(); return (w && w.DeviceStorage) ? w.DeviceStorage : null; } catch (e) { return null; }
+    }
+    function prop(name) {
+        try { var w = webApp(); var v = w ? w[name] : undefined; return (v === undefined || v === null || v === '') ? null : String(v); } catch (e) { return null; }
+    }
+
+    function withTimeout(promise, ms, label) {
+        return new Promise(function (resolve, reject) {
+            var done = false;
+            var timer = setTimeout(function () {
+                if (done) return; done = true;
+                reject(new Error(label + ': нет ответа за ' + (ms / 1000) + ' с'));
+            }, ms);
+            promise.then(function (v) { if (done) return; done = true; clearTimeout(timer); resolve(v); },
+                         function (e) { if (done) return; done = true; clearTimeout(timer); reject(e); });
+        });
+    }
+
+    // Единая обёртка вызовов DeviceStorage: всегда Promise, ошибки и зависание обрабатываются.
+    // Допустимы только setItem / getItem / removeItem. Метод clear здесь намеренно не используется.
+    var ALLOWED = { setItem: 1, getItem: 1, removeItem: 1 };
+    function dsCall(method, args) {
+        if (!ALLOWED[method]) return Promise.reject(new Error('Метод ' + method + ' запрещён в этом тесте'));
+        var d = deviceStorage();
+        if (!d) return Promise.reject(new Error('DeviceStorage недоступен'));
+        if (typeof d[method] !== 'function') return Promise.reject(new Error('Метод DeviceStorage.' + method + ' не найден'));
+        var p;
+        try { p = d[method].apply(d, args); } catch (e) { return Promise.reject(e); }
+        return withTimeout(Promise.resolve(p), TIMEOUT_MS, 'DeviceStorage.' + method);
+    }
+
+    /* ---------- localStorage (только KEY_LS) ---------- */
+
+    function lsGet() {
+        try { return { ok: true, value: window.localStorage.getItem(KEY_LS) }; } catch (e) { return { ok: false, error: errText(e) }; }
+    }
+    function lsSet(value) {
+        try { window.localStorage.setItem(KEY_LS, value); return { ok: true }; } catch (e) { return { ok: false, error: errText(e) }; }
+    }
+    function lsRemove() {
+        try { window.localStorage.removeItem(KEY_LS); return { ok: true }; } catch (e) { return { ok: false, error: errText(e) }; }
+    }
+
+    /* ---------- Показ результатов ---------- */
+
+    function setCard(which, kind, label, detail) {
+        var st = $(which + 'State');
+        st.className = 'state' + (kind ? ' ' + kind : '');
+        st.textContent = label;
+        setText(which + 'Detail', detail || '');
+    }
+
+    function describeValue(raw) {
+        var info;
+        try {
+            var o = JSON.parse(raw);
+            if (o && o.page === 'storage-test') info = 'метка ' + o.id + ', записано ' + stamp(o.writtenAt);
+        } catch (e) { /* не наш формат */ }
+        return info || ('значение найдено, но в другом формате: ' + short(raw, 80));
+    }
+
+    function row(k, v) {
+        var d = document.createElement('div'); d.className = 'row';
+        var b = document.createElement('b'); b.textContent = k;
+        var s = document.createElement('span'); s.textContent = v;
+        d.appendChild(b); d.appendChild(s);
+        return d;
+    }
+
+    function renderEnv() {
+        var box = $('env');
+        box.textContent = '';
+        var w = webApp(), d = deviceStorage();
+        var bridgeScript = window.__bridgeLoaded ? 'загружен' : (window.__bridgeFailed ? 'не загрузился' : 'неизвестно');
+        var lsOk = true;
+        try { lsOk = !!window.localStorage; } catch (e) { lsOk = false; }
+
+        box.appendChild(row('Адрес страницы', location.origin));
+        box.appendChild(row('Скрипт MAX Bridge', bridgeScript));
+        box.appendChild(row('window.WebApp', w ? 'найден' : 'не найден'));
+        box.appendChild(row('WebApp.DeviceStorage', d ? 'найден' : 'не найден'));
+        box.appendChild(row('Тип клиента (platform)', prop('platform') || 'недоступно'));
+        box.appendChild(row('Версия MAX (version)', prop('version') || 'недоступно'));
+        box.appendChild(row('Устройство (deviceName)', prop('deviceName') || 'недоступно'));
+        box.appendChild(row('localStorage', lsOk ? 'доступен' : 'недоступен'));
+
+        var v;
+        if (!w) {
+            v = 'Bridge недоступен: проверка DeviceStorage на этой странице невозможна. Откройте страницу как Mini App внутри MAX. Проверка localStorage при этом работает.';
+        } else if (!d) {
+            v = 'Объект WebApp найден, но DeviceStorage в нём не обнаружен. Это относится только к этому устройству и версии MAX и не доказывает, что он не поддерживается на других устройствах.';
+        } else if (prop('platform') === 'web') {
+            v = 'Клиент сообщает платформу «web». По документации MAX хранилища Bridge в веб-версии не поддерживаются, поэтому DeviceStorage может не сработать.';
+        } else {
+            v = 'WebApp и DeviceStorage найдены. Проведите тест записи и проверки.';
+        }
+        setText('envVerdict', v);
+    }
+
+    /* ---------- Операции ---------- */
+
+    var busy = false;
+    function lock(on) {
+        busy = on;
+        ['btnWrite', 'btnCheck', 'btnRemove'].forEach(function (id) { $(id).disabled = on; });
+    }
+
+    function readLS() {
+        var r = lsGet();
+        if (!r.ok) return { state: 'err', label: 'ошибка', detail: 'Не удалось прочитать localStorage: ' + r.error };
+        if (typeof r.value === 'string' && r.value !== '') return { state: 'ok', label: 'значение найдено', detail: describeValue(r.value), raw: r.value };
+        return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_LS + ' пуст.' };
+    }
+
+    function readDS() {
+        if (!webApp()) return Promise.resolve({ state: 'na', label: 'проверка невозможна', detail: 'Bridge недоступен: window.WebApp не найден.' });
+        if (!deviceStorage()) return Promise.resolve({ state: 'na', label: 'проверка невозможна', detail: 'DeviceStorage в этом клиенте не найден (только для этого устройства и версии).' });
+        return dsCall('getItem', [KEY_DS]).then(function (res) {
+            var v = (res && typeof res === 'object') ? res.value : res;
+            var answer = 'Ответ DeviceStorage: ' + short(res, 160);
+            if (typeof v === 'string' && v !== '') return { state: 'ok', label: 'значение найдено', detail: describeValue(v) + '\n' + answer, raw: v };
+            return { state: 'miss', label: 'значение не найдено', detail: 'Ключ ' + KEY_DS + ' пуст.\n' + answer };
+        }, function (e) {
+            return { state: 'err', label: 'ошибка', detail: 'Ошибка DeviceStorage.getItem: ' + errText(e) };
+        });
+    }
+
+    function show(which, r) { setCard(which, r.state, r.label, r.detail); }
+
+    function summarize(ls, ds) {
+        var t;
+        if (ls.state === 'err' || ds.state === 'err') {
+            t = 'Есть ошибки при обращении к хранилищу (см. тексты выше). Результат неполный.';
+        } else if (ds.state === 'na') {
+            t = ls.state === 'ok'
+                ? 'localStorage: значение найдено. DeviceStorage проверить невозможно (нет Bridge или DeviceStorage).'
+                : 'localStorage: значение не найдено. DeviceStorage проверить невозможно.';
+        } else if (ls.state === 'ok' && ds.state === 'ok') {
+            t = 'Оба хранилища сохранили значение.';
+        } else if (ls.state !== 'ok' && ds.state === 'ok') {
+            t = 'DeviceStorage сохранил значение, а localStorage — нет. Если до этого вы закрывали Mini App, localStorage здесь не переживает перезапуск.';
+        } else if (ls.state === 'ok' && ds.state !== 'ok') {
+            t = 'localStorage сохранил значение, а DeviceStorage — нет.';
+        } else {
+            t = 'Ни одно значение не найдено. Если вы ещё не нажимали «Записать» или уже удаляли данные, это ожидаемо.';
+        }
+        setText('summary', t + ' Вывод относится только к этому устройству и этой версии MAX.');
+    }
+
+    function doCheck() {
+        var ls = readLS();
+        show('ls', ls);
+        setCard('ds', '', 'проверяется…', '');
+        return readDS().then(function (ds) {
+            show('ds', ds);
+            summarize(ls, ds);
+            log('Проверка: localStorage — ' + ls.label + '; DeviceStorage — ' + ds.label);
+        });
+    }
+
+    function onCheck() {
+        if (busy) return;
+        lock(true);
+        renderEnv();
+        doCheck().then(null, function (e) { log('Неожиданная ошибка проверки: ' + errText(e)); }).then(function () { lock(false); });
+    }
+
+    function onWrite() {
+        if (busy) return;
+        lock(true);
+        renderEnv();
+        var payload = JSON.stringify({ page: 'storage-test', id: Math.random().toString(36).slice(2, 10), writtenAt: new Date().toISOString() });
+
+        var w = lsSet(payload);
+        log('localStorage.setItem: ' + (w.ok ? 'выполнено' : 'ОШИБКА — ' + w.error));
+
+        var step;
+        if (!webApp() || !deviceStorage()) {
+            log('DeviceStorage: запись невозможна (' + (!webApp() ? 'нет window.WebApp' : 'нет DeviceStorage') + ')');
+            step = Promise.resolve();
+        } else {
+            step = dsCall('setItem', [KEY_DS, payload]).then(function (res) {
+                log('DeviceStorage.setItem: выполнено, ответ ' + short(res, 100));
+            }, function (e) {
+                log('DeviceStorage.setItem: ОШИБКА — ' + errText(e));
+            });
+        }
+        step.then(function () {
+            log('Читаю обратно в этой же сессии…');
+            return doCheck();
+        }).then(null, function (e) { log('Неожиданная ошибка записи: ' + errText(e)); }).then(function () { lock(false); });
+    }
+
+    function onRemove() {
+        if (busy) return;
+        lock(true);
+        renderEnv();
+        var r = lsRemove();
+        log('localStorage.removeItem(' + KEY_LS + '): ' + (r.ok ? 'выполнено' : 'ОШИБКА — ' + r.error));
+        var step;
+        if (!webApp() || !deviceStorage()) {
+            log('DeviceStorage: удалять нечего или невозможно (нет Bridge/DeviceStorage)');
+            step = Promise.resolve();
+        } else {
+            step = dsCall('removeItem', [KEY_DS]).then(function (res) {
+                log('DeviceStorage.removeItem(' + KEY_DS + '): выполнено, ответ ' + short(res, 100));
+            }, function (e) {
+                log('DeviceStorage.removeItem: ОШИБКА — ' + errText(e));
+            });
+        }
+        step.then(doCheck).then(null, function (e) { log('Неожиданная ошибка удаления: ' + errText(e)); }).then(function () { lock(false); });
+    }
+
+    $('btnWrite').addEventListener('click', onWrite);
+    $('btnCheck').addEventListener('click', onCheck);
+    $('btnRemove').addEventListener('click', onRemove);
+
+    renderEnv();
+    // Скрипт Bridge мог догрузиться уже после первого показа среды — обновим по событию load.
+    window.addEventListener('load', function () { renderEnv(); log('Страница загружена. Тестовых ключей: ' + KEY_LS + ' и ' + KEY_DS); });
+})();
+</script>
+</body>
+</html>
