@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ru">
 <head>
@@ -8,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Literata:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <header class="topbar" id="topbar" hidden>
@@ -96,7 +97,7 @@
               </button>
 
               <button class="home-tile" onclick="openSection(1)">
-                <img src="potions-cover.jfif" alt="Зимняя мастерская зелий">
+                <img src="6f352e57de0011f1a5c2c2c1e6453527_3.jfif" alt="Зимняя мастерская зелий">
                 <span>
                   <b>Раздел II</b>
                   <small>Искусство зелий и чар</small>
@@ -105,6 +106,15 @@
               </button>
             </div>
 
+            <button class="home-tile story-tile" onclick="openChapter2()">
+              <img src="glava2.jfif" alt="Чердак хранительницы — сюжетная глава II">
+              <span>
+                <b>Глава II</b>
+                <small>Чердак хранительницы: первые страницы гримуара</small>
+                <em>Сюжетное приключение</em>
+              </span>
+            </button>
+
             <div class="story-note">
               <b>Письмо Дариеки</b>
               <p id="homeLetter">«Зима — хорошее время для учёбы. Пока лес отдыхает под снегом, мы будем собирать знания у тёплого очага».</p>
@@ -112,13 +122,23 @@
           </div>
 
           <div class="map-page" id="mapPage1" role="tabpanel" aria-labelledby="mapTab1">
-            <p class="map-page-title">Мои книги · спутник</p>
-            <div class="home-grid">
-              <button class="home-tile" onclick="openGrimoire()">
-                <img src="gr.jfif" alt="Гримуар">
+            <p class="map-page-title">Мои книги · личные знания и открытия</p>
+            <div class="home-grid book-grid">
+              <button class="home-tile" onclick="openTravnik()">
+                <img src="travnik.jfif" alt="Личный Травник">
                 <span>
-                  <b>Личный гримуар</b>
-                  <small>Твои знания и открытия</small>
+                  <b>Травник</b>
+                  <small>Растения, наблюдения и гербарий</small>
+                  <em id="travnikProgress">Твои ботанические записи</em>
+                </span>
+              </button>
+
+              <button class="home-tile" onclick="openGrimoire()">
+                <img src="grimoar.jfif" alt="Личный Гримуар">
+                <span>
+                  <b>Гримуар</b>
+                  <small>Зелья, заклинания и заговоры</small>
+                  <em id="grimoireProgress">Твои магические знания</em>
                 </span>
               </button>
 
@@ -161,6 +181,24 @@
       </div>
     </section>
 
+    <section class="screen" id="screen-chapter2">
+      <div class="paper chapter-paper">
+        <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
+        <p class="eyebrow">Сюжетная глава II · Наследие хранительницы</p>
+        <h1>Чердак хранительницы: первые страницы гримуара</h1>
+        <img src="glava2.jfif" class="wide-art chapter-art" alt="Чердак хранительницы">
+        <div class="chapter-text">
+          <p>За потайной дверцей старого дома скрывается чердак, куда давно никто не поднимался. Здесь пахнет сухими травами, древесиной и старым пергаментом. Вдоль стен стоят сундуки, коробки и книги прежней хранительницы.</p>
+          <p>Дариека останавливается у тяжёлого сундука и осторожно касается его крышки.</p>
+          <blockquote>«Когда-то здесь собирали знания те, кто умел слушать лес и замечать малейшие перемены. Не всё из оставленного нам наследия уже разгадано. Возможно, именно тебе удастся прочесть первые страницы».</blockquote>
+          <p>На столе лежит старый Гримуар. Его страницы пока почти пусты. Постепенно ты будешь наполнять собственные книги знаниями, наблюдениями и открытиями.</p>
+          <p class="quiet">Это самостоятельная сюжетная глава Академии. Она не является Разделом II учебной программы «Искусство зелий и чар».</p>
+        </div>
+        <button class="primary" onclick="openTravnik()">Открыть Травник</button>
+        <button class="secondary" onclick="openGrimoire()">Открыть Гримуар</button>
+      </div>
+    </section>
+
     <section class="screen" id="screen-section">
       <div class="paper">
         <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
@@ -180,6 +218,14 @@
         <img id="lessonImage" class="wide-art" alt="Иллюстрация урока">
         <div id="lessonBody" class="lesson-body"></div>
         <div class="darieka-note" id="lessonNote"></div>
+        <div class="practice-card" id="practiceCard">
+          <p class="eyebrow">Необязательная практика</p>
+          <h2 id="practiceTitle">Маленькое задание для книги</h2>
+          <p id="practicePrompt"></p>
+          <textarea id="practiceText" rows="4" placeholder="Если захочешь, оставь здесь свою запись..."></textarea>
+          <button class="secondary" onclick="savePractice()">Сохранить запись в книгу</button>
+          <p class="quiet">Практика по желанию: её можно пропустить. Она не влияет на прохождение квеста и получение награды.</p>
+        </div>
         <button class="primary" onclick="startQuest()">Перейти к квесту</button>
       </div>
     </section>
@@ -199,9 +245,9 @@
 
     <section class="screen" id="screen-reward">
       <div class="paper reward-paper">
-        <p class="eyebrow">Запись в гримуаре</p>
+        <p class="eyebrow" id="rewardKicker">Новая запись в личной книге</p>
         <h1>Знание найдено!</h1>
-        <img src="badge.jfif" class="badge-art" alt="Наградной знак Академии">
+        <div id="rewardSeal" class="reward-seal" aria-label="Тематическая печать урока"><span>✧</span></div>
         <h2 id="rewardTitle"></h2>
         <p id="rewardText"></p>
         <div class="reward-ribbon" id="rewardNumber">Знак № 1</div>
@@ -209,16 +255,31 @@
       </div>
     </section>
 
+    <section class="screen" id="screen-travnik">
+      <div class="paper book-paper">
+        <button class="text-button" onclick="showScreen('home'); goMapPage(1)">← К моим книгам</button>
+        <p class="eyebrow">Личная книга ученицы · Раздел I</p>
+        <h1>Травник</h1>
+        <img src="travnik.jfif" class="book-cover" alt="Обложка личного Травника">
+        <p>Здесь собираются знания о настоящих растениях, их строении, местах обитания, наблюдения и страницы учебного гербария.</p>
+        <div id="travnikContent" class="book-content"></div>
+        <label class="field-label" for="travnikNotes">Мои ботанические заметки</label>
+        <textarea id="travnikNotes" rows="6" placeholder="Записывай наблюдения, описания растений и идеи для гербария..."></textarea>
+        <button class="primary" onclick="saveTravnikNotes()">Сохранить в Травник</button>
+      </div>
+    </section>
+
     <section class="screen" id="screen-grimoire">
-      <div class="paper">
-        <button class="text-button" onclick="showScreen('home')">← На карту</button>
-        <p class="eyebrow">Личные записи ученицы</p>
-        <h1>Гримуар травницы</h1>
-        <p>Здесь хранятся пройденные уроки, награды и твои заметки.</p>
-        <div id="grimoireContent"></div>
-        <label class="field-label" for="studentNotes">Мои заметки</label>
-        <textarea id="studentNotes" rows="5" placeholder="Запиши сюда свои наблюдения и мысли..."></textarea>
-        <button class="primary" onclick="saveNotes()">Сохранить записи</button>
+      <div class="paper book-paper">
+        <button class="text-button" onclick="showScreen('home'); goMapPage(1)">← К моим книгам</button>
+        <p class="eyebrow">Личная книга ученицы · Раздел II</p>
+        <h1>Гримуар</h1>
+        <img src="grimoar.jfif" class="book-cover" alt="Обложка личного Гримуара">
+        <p>Здесь хранятся игровые рецепты, заклинания, заговоры, магические символы и твои записи о сказочном ремесле.</p>
+        <div id="grimoireContent" class="book-content"></div>
+        <label class="field-label" for="grimoireNotes">Мои записи в Гримуаре</label>
+        <textarea id="grimoireNotes" rows="6" placeholder="Записывай свои рецепты, формулы и мысли..."></textarea>
+        <button class="primary" onclick="saveGrimoireNotes()">Сохранить в Гримуар</button>
       </div>
     </section>
 
@@ -280,6 +341,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <footer>Школа травниц Дариеки <span>✧</span> Знания растут в своём темпе</footer>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
