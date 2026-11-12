@@ -1,3 +1,4 @@
+
 :root {
   --forest: #26352b;
   --forest2: #34483a;
@@ -1036,4 +1037,223 @@ body.modal-open {
   .toast {
     transition: none;
   }
+}
+
+/* =========================================================
+   Личные книги, сюжетная глава и необязательная практика
+   ========================================================= */
+
+.story-tile {
+  width: 100%;
+  margin: 4px 0 18px;
+}
+
+.story-tile img {
+  object-position: center;
+}
+
+.book-grid .home-tile {
+  min-height: 112px;
+}
+
+.book-paper {
+  min-height: 70vh;
+}
+
+.book-cover {
+  display: block;
+  width: min(100%, 560px);
+  max-height: 280px;
+  object-fit: contain;
+  margin: 18px auto 24px;
+  border: 1px solid #c3ae82;
+  border-radius: 4px;
+  background: #e8deca;
+  box-shadow: 0 8px 20px #30291f22;
+}
+
+.book-content {
+  margin: 22px 0;
+  padding: 16px;
+  border: 1px solid #c6b58f;
+  background: #f8f2e7;
+}
+
+.book-practice {
+  margin: 8px 0 2px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--gold);
+  background: #eee5d4;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.practice-card {
+  margin: 24px 0 10px;
+  padding: 18px;
+  border: 1px dashed #b99a60;
+  border-radius: 5px;
+  background: #f7f0e3;
+}
+
+.practice-card h2 {
+  margin: 4px 0 8px;
+  font-size: 26px;
+}
+
+.practice-card textarea {
+  margin-top: 8px;
+}
+
+.practice-card .quiet {
+  margin-bottom: 0;
+}
+
+.chapter-paper {
+  background: linear-gradient(145deg, #f4eddf, #e6dcc8);
+}
+
+.chapter-art {
+  max-height: 460px;
+  object-fit: cover;
+}
+
+.chapter-text {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.chapter-text blockquote {
+  margin: 22px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--gold);
+  background: #e7dcc7;
+  color: #51432d;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  line-height: 1.45;
+}
+
+.reward-seal {
+  width: 158px;
+  height: 158px;
+  margin: 24px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 50%;
+  border: 5px double #a68a55;
+  background: radial-gradient(circle, #f8edcf 0 42%, #d9c49a 43% 58%, #f0e4c7 59% 100%);
+  color: #5a482b;
+  box-shadow: 0 5px 18px #30291f33, inset 0 0 0 5px #f6ecd5;
+}
+
+.reward-seal span {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.reward-seal small {
+  font: 700 10px 'Literata', serif;
+  letter-spacing: 1.5px;
+}
+
+.reward-seal.seal-0-0 {
+  border-color: #6e875d;
+  background: radial-gradient(circle, #f8f1d8 0 42%, #b7c5a3 43% 58%, #edf0df 59%);
+}
+
+.reward-seal.seal-0-1 {
+  border-color: #8d7650;
+  background: radial-gradient(circle, #fff2d5 0 42%, #cbb88e 43% 58%, #f2e8d2 59%);
+}
+
+.reward-seal.seal-0-2 {
+  border-color: #66828a;
+  background: radial-gradient(circle, #f4f2df 0 42%, #b9cdd0 43% 58%, #e8efeb 59%);
+}
+
+.reward-seal.seal-0-3 {
+  border-color: #94734d;
+  background: radial-gradient(circle, #fff3d8 0 42%, #d7bd91 43% 58%, #f5ead5 59%);
+}
+
+.reward-seal.seal-0-4 {
+  border-color: #647d58;
+  background: radial-gradient(circle, #f5f1d9 0 42%, #b7c7a5 43% 58%, #e9efdf 59%);
+}
+
+.reward-seal.seal-1-0 {
+  border-color: #9b7242;
+  background: radial-gradient(circle, #fff0d4 0 42%, #d7b27a 43% 58%, #f4e3c5 59%);
+}
+
+.reward-seal.seal-1-1 {
+  border-color: #8b5947;
+  background: radial-gradient(circle, #fff0df 0 42%, #d8ad98 43% 58%, #f2e3d8 59%);
+}
+
+.reward-seal.seal-1-2 {
+  border-color: #6d6b91;
+  background: radial-gradient(circle, #f3efff 0 42%, #b8b3d4 43% 58%, #e8e5f2 59%);
+}
+
+.reward-seal.seal-1-3 {
+  border-color: #92764d;
+  background: radial-gradient(circle, #fff2dc 0 42%, #d6c08d 43% 58%, #f1e8d4 59%);
+}
+
+.reward-seal.seal-1-4 {
+  border-color: #785b38;
+  background: radial-gradient(circle, #fff0d2 0 42%, #c6a56c 43% 58%, #eee0c0 59%);
+}
+
+@media (max-width: 680px) {
+  .story-tile {
+    align-items: flex-start;
+  }
+
+  .chapter-text blockquote {
+    font-size: 19px;
+  }
+
+  .book-cover {
+    max-height: 220px;
+  }
+
+  .practice-card {
+    padding: 14px;
+  }
+}
+
+.book-stamp {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px double #9a8355;
+  border-radius: 50%;
+  background: #eee3c9;
+  color: #627653;
+  font-style: normal;
+  font-size: 20px;
+}
+
+.stamp-1-0,
+.stamp-1-4 {
+  color: #9a6b38;
+  border-color: #9a6b38;
+}
+
+.stamp-1-2 {
+  color: #77749c;
+  border-color: #77749c;
+}
+
+.stamp-0-2 {
+  color: #66828a;
+  border-color: #66828a;
 }
