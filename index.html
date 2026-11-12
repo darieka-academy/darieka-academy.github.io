@@ -8,14 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Literata:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <header class="topbar" id="topbar" hidden>
-    <div>
-      <strong id="studentNameTop">Ученица</strong>
-      <small id="rankTop">Начинающая травница</small>
-    </div>
+    <button class="top-profile" onclick="openProfile()" aria-label="Мой профиль: изменить имя">
+      <span>
+        <strong id="studentNameTop">Ученица</strong>
+        <small id="rankTop">Начинающая травница</small>
+      </span>
+      <span class="top-edit" aria-hidden="true">✎</span>
+    </button>
     <div class="top-stats">
       <span>✧ <b id="expTop">0</b> опыта</span>
       <button class="small-button" onclick="openGrimoire()">Гримуар</button>
@@ -68,45 +71,92 @@
         <p>В окнах горит тёплый свет. Снег укрыл тропинки, а в старой избе уже ждёт Дариека.</p>
         <div class="home-familiar" id="homeFamiliar"></div>
 
-        <div class="home-grid">
-          <button class="home-tile" onclick="openSection(0)">
-            <img src="bazik8.jfif" alt="Травяная мастерская">
-            <span>
-              <b>Раздел I</b>
-              <small>Основы травологии</small>
-              <em id="sectionOneProgress">0 из 5 квестов</em>
-            </span>
-          </button>
-
-          <button class="home-tile" onclick="openSection(1)">
-            <img src="potions-cover.jfif" alt="Зимняя мастерская зелий">
-            <span>
-              <b>Раздел II</b>
-              <small>Искусство зелий и чар</small>
-              <em id="sectionTwoProgress">Ещё закрыт</em>
-            </span>
-          </button>
-
-          <button class="home-tile" onclick="openGrimoire()">
-            <img src="gr.jfif" alt="Гримуар">
-            <span>
-              <b>Личный гримуар</b>
-              <small>Твои знания и открытия</small>
-            </span>
-          </button>
-
-          <button class="home-tile" onclick="openFamiliar()">
-            <img id="familiarTileImage" src="f1.jfif" alt="Фамильяр">
-            <span>
-              <b>Мой фамильяр</b>
-              <small id="familiarTileName">Верный спутник</small>
-            </span>
-          </button>
+        <div class="map-nav">
+          <button class="map-arrow" id="mapPrev" onclick="mapStep(-1)" aria-label="Предыдущая страница карты">‹</button>
+          <div class="map-tabs" role="tablist" aria-label="Страницы карты">
+            <button class="map-tab" id="mapTab0" role="tab" aria-controls="mapPage0" aria-selected="true" onclick="goMapPage(0)">Академия</button>
+            <button class="map-tab" id="mapTab1" role="tab" aria-controls="mapPage1" aria-selected="false" onclick="goMapPage(1)">Мои книги</button>
+            <button class="map-tab" id="mapTab2" role="tab" aria-controls="mapPage2" aria-selected="false" onclick="goMapPage(2)">Ученица</button>
+          </div>
+          <button class="map-arrow" id="mapNext" onclick="mapStep(1)" aria-label="Следующая страница карты">›</button>
         </div>
+        <p class="map-hint" id="mapHint">‹ Листай карту пальцем или стрелками — страниц три ›</p>
 
-        <div class="story-note">
-          <b>Письмо Дариеки</b>
-          <p id="homeLetter">«Зима — хорошее время для учёбы. Пока лес отдыхает под снегом, мы будем собирать знания у тёплого очага».</p>
+        <div class="map-pager" id="mapPager" tabindex="0" aria-label="Карта Академии: три страницы, листай влево и вправо">
+          <div class="map-page" id="mapPage0" role="tabpanel" aria-labelledby="mapTab0">
+            <p class="map-page-title">Академия · уроки и разделы</p>
+            <div class="home-grid">
+              <button class="home-tile" onclick="openSection(0)">
+                <img src="bazik8.jfif" alt="Травяная мастерская">
+                <span>
+                  <b>Раздел I</b>
+                  <small>Основы травологии</small>
+                  <em id="sectionOneProgress">0 из 5 квестов</em>
+                </span>
+              </button>
+
+              <button class="home-tile" onclick="openSection(1)">
+                <img src="potions-cover.jfif" alt="Зимняя мастерская зелий">
+                <span>
+                  <b>Раздел II</b>
+                  <small>Искусство зелий и чар</small>
+                  <em id="sectionTwoProgress">Ещё закрыт</em>
+                </span>
+              </button>
+            </div>
+
+            <div class="story-note">
+              <b>Письмо Дариеки</b>
+              <p id="homeLetter">«Зима — хорошее время для учёбы. Пока лес отдыхает под снегом, мы будем собирать знания у тёплого очага».</p>
+            </div>
+          </div>
+
+          <div class="map-page" id="mapPage1" role="tabpanel" aria-labelledby="mapTab1">
+            <p class="map-page-title">Мои книги · спутник</p>
+            <div class="home-grid">
+              <button class="home-tile" onclick="openGrimoire()">
+                <img src="gr.jfif" alt="Гримуар">
+                <span>
+                  <b>Личный гримуар</b>
+                  <small>Твои знания и открытия</small>
+                </span>
+              </button>
+
+              <button class="home-tile" onclick="openFamiliar()">
+                <img id="familiarTileImage" src="f1.jfif" alt="Фамильяр">
+                <span>
+                  <b>Мой фамильяр</b>
+                  <small id="familiarTileName">Верный спутник</small>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="map-page" id="mapPage2" role="tabpanel" aria-labelledby="mapTab2">
+            <p class="map-page-title">Ученица · профиль и настройки</p>
+            <div class="profile-card">
+              <div class="profile-head">
+                <div id="profileThumb"></div>
+                <div>
+                  <b id="profileName"></b>
+                  <small id="profileRank"></small>
+                  <small id="profileStats"></small>
+                  <small id="profileFamiliarLine"></small>
+                </div>
+              </div>
+
+              <div class="profile-actions">
+                <button class="secondary" onclick="openRenameStudent()">✎ Изменить своё имя</button>
+                <button class="secondary" id="renameFamiliarBtn" onclick="openRenameFamiliar()">✎ Изменить имя фамильяра</button>
+              </div>
+
+              <div class="profile-danger">
+                <b>Начать сначала</b>
+                <p class="quiet">Если захочешь пройти обучение заново, можно сбросить прогресс. Перед этим Дариека обязательно попросит подтверждение.</p>
+                <button class="danger" onclick="openResetConfirm()">Начать обучение сначала</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -180,6 +230,17 @@
         <div id="profileFamiliarArt"></div>
         <p id="profileFamiliarDescription"></p>
         <p class="quiet">Фамильяр остаётся с тобой на всём пути. Его не нужно кормить по расписанию, и он никогда не исчезнет из-за пропусков занятий.</p>
+        <button class="secondary" onclick="openRenameFamiliar()">✎ Изменить имя фамильяра</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-reset-done">
+      <div class="paper reward-paper">
+        <p class="eyebrow">Новый путь</p>
+        <h1>Всё начинается заново</h1>
+        <p id="resetDoneText"></p>
+        <button class="primary" onclick="openLesson(0, 0)">К первому уроку</button>
+        <button class="secondary" onclick="showScreen('home')">На карту</button>
       </div>
     </section>
 
@@ -196,7 +257,29 @@
     </section>
   </main>
 
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <p id="modalText"></p>
+      <div id="modalField" hidden>
+        <label class="field-label" for="modalInput" id="modalLabel"></label>
+        <input id="modalInput" autocomplete="off">
+      </div>
+      <label class="check-row" id="modalCheckRow" hidden>
+        <input type="checkbox" id="modalCheck">
+        <span id="modalCheckText"></span>
+      </label>
+      <p class="modal-error" id="modalError" role="alert"></p>
+      <div class="modal-actions">
+        <button class="secondary" id="modalCancel" onclick="closeModal()">Отмена</button>
+        <button class="primary" id="modalOk" onclick="submitModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <footer>Школа травниц Дариеки <span>✧</span> Знания растут в своём темпе</footer>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

@@ -218,18 +218,150 @@ const COURSES = [
   }
 ];
 
-const LEGACY_NAME = localStorage.getItem('darieka_student_name') || '';
 
-const DEFAULT_STATE = {
-  name: LEGACY_NAME,
-  familiarId: '',
-  familiarName: '',
-  exp: 0,
-  completed: { 0: [], 1: [] },
-  notes: '',
-  activeSection: 0,
-  firstVisit: true
-};
+/* =========================================================
+   Хранилище, состояние и миграция
+   ---------------------------------------------------------
+   Сохранение хранится одним JSON в ключе darieka_reimagined_v2.
+   Прежний ключ darieka_reimagined_v1 и старые ключи
+   (darieka_student_name, darieka_exp) НЕ изменяются и НЕ удаляются:
+   при первом запуске из них собирается v2.
+   ========================================================= */
+
+const STORE_V2 = 'darieka_reimagined_v2';
+const STORE_V1 = 'darieka_reimagined_v1';
+const STORE_BACKUP = 'darieka_reimagined_v2_backup';
+const STORE_CORRUPT = 'darieka_reimagined_v2_corrupt';
+const SAVE_VERSION = 2;
+const NAME_MAX = 24;
+const FAMILIAR_NAME_MAX = 20;
+const MAP_PAGES = 3;
+const LESSONS_PER_SECTION = 5;
+
+const memoryStore = {};
+let storageWarned = false;
+
+function lsGet(key) {
+  try {
+    const value = localStorage.getItem(key);
+    if (value !== null) return value;
+  } catch (e) {}
+  return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+}
+
+function lsSet(key, value) {
+  memoryStore[key] = value;
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    if (!storageWarned) {
+      storageWarned = true;
+      setTimeout(function () {
+        alert('Не удалось сохранить прогресс на этом устройстве. Игра продолжит работать, но после закрытия данные могут пропасть.');
+      }, 0);
+    }
+    return false;
+  }
+}
+
+function parseJsonObject(raw) {
+  if (raw === null || raw === undefined || raw === '') return null;
+  try {
+    const value = JSON.parse(raw);
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function esc(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Чистка пользовательского ввода: без управляющих символов, лишних пробелов, ограничение длины.
+function cleanInput(value, max) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
+// Подстановка имён в тексты Дариеки: {name} и {familiar}.
+function fill(text) {
+  return String(text)
+    .replace(/\{name\}/g, state.name || 'ученица')
+    .replace(/\{familiar\}/g, state.familiarName || 'твой фамильяр');
+}
+
+function toLessonList(value) {
+  const out = [];
+  if (Array.isArray(value)) {
+    value.forEach(function (item) {
+      const n = Number(item);
+      if (Number.isInteger(n) && n >= 0 && n < LESSONS_PER_SECTION && out.indexOf(n) === -1) out.push(n);
+    });
+  }
+  return out.sort(function (a, b) { return a - b; });
+}
+
+// Приводит любые прочитанные данные к корректному виду. Незнакомые поля сохраняются (для следующих версий).
+function normalizeState(raw) {
+  const s = raw && typeof raw === 'object' ? raw : {};
+  const knownFamiliars = ASSETS.familiars.map(function (f) { return f.id; });
+  const completed = s.completed && typeof s.completed === 'object' ? s.completed : {};
+  const out = Object.assign({}, s);
+
+  out.version = SAVE_VERSION;
+  out.name = cleanInput(s.name, 40);
+  out.familiarId = knownFamiliars.indexOf(s.familiarId) !== -1 ? s.familiarId : '';
+  out.familiarName = cleanInput(s.familiarName, 40);
+  out.exp = Math.max(0, parseInt(s.exp, 10) || 0);
+  out.completed = { 0: toLessonList(completed[0]), 1: toLessonList(completed[1]) };
+  out.notes = typeof s.notes === 'string' ? s.notes : '';
+  out.activeSection = s.activeSection === 1 ? 1 : 0;
+  out.firstVisit = s.firstVisit === false ? false : true;
+
+  const ui = s.ui && typeof s.ui === 'object' ? s.ui : {};
+  out.ui = {
+    mapPage: [0, 1, 2].indexOf(ui.mapPage) !== -1 ? ui.mapPage : 0,
+    mapSwiped: !!ui.mapSwiped
+  };
+  return out;
+}
+
+function loadState() {
+  const rawV2 = lsGet(STORE_V2);
+  const v2 = parseJsonObject(rawV2);
+  if (v2) return normalizeState(v2);
+
+  // v2 есть, но повреждён: сохраняем его как есть (для восстановления) и пробуем взять данные из v1.
+  if (rawV2 !== null && rawV2 !== '' && lsGet(STORE_CORRUPT) === null) lsSet(STORE_CORRUPT, rawV2);
+
+  const legacyName = lsGet('darieka_student_name') || '';
+  const v1 = parseJsonObject(lsGet(STORE_V1));
+  let base;
+
+  if (v1) {
+    base = Object.assign({}, v1);
+    if (!base.name) base.name = legacyName;
+  } else {
+    base = {
+      name: legacyName,
+      exp: parseInt(lsGet('darieka_exp') || '0', 10) || 0
+    };
+  }
+
+  const migrated = normalizeState(base);
+  lsSet(STORE_V2, JSON.stringify(migrated));
+  return migrated;
+}
 
 let state = loadState();
 let currentSection = 0;
@@ -237,24 +369,10 @@ let currentLesson = 0;
 let answered = false;
 let selectedFamiliar = '';
 
-function loadState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('darieka_reimagined_v1') || 'null');
-    if (saved) {
-      return {
-        ...DEFAULT_STATE,
-        ...saved,
-        completed: { 0: [], 1: [], ...(saved.completed || {}) }
-      };
-    }
-  } catch (e) {}
-
-  const legacyExp = parseInt(localStorage.getItem('darieka_exp') || '0', 10) || 0;
-  return { ...DEFAULT_STATE, exp: legacyExp };
-}
-
 function persist() {
-  localStorage.setItem('darieka_reimagined_v1', JSON.stringify(state));
+  state.version = SAVE_VERSION;
+  state.updatedAt = new Date().toISOString();
+  lsSet(STORE_V2, JSON.stringify(state));
   updateHeader();
 }
 
@@ -266,6 +384,15 @@ function showScreen(name) {
   const screen = document.getElementById('screen-' + name);
   if (screen) screen.classList.add('active');
 
+  if (name === 'home') {
+    renderHome();
+    restoreMapPage();
+  } else if (name === 'intro') {
+    renderIntro();
+  } else if (name === 'familiar-profile') {
+    renderFamiliarProfile();
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -276,16 +403,40 @@ function updateHeader() {
   document.getElementById('studentNameTop').textContent = state.name || 'Ученица';
   document.getElementById('expTop').textContent = state.exp;
 
-  document.getElementById('rankTop').textContent =
-    state.completed[1].length === 5
-      ? 'Мастерица зелий и чар'
-      : state.completed[0].length === 5
-        ? 'Юная травница'
-        : 'Ученица Академии';
+  document.getElementById('rankTop').textContent = rankTitle();
+}
+
+function rankTitle() {
+  return state.completed[1].length === 5
+    ? 'Мастерица зелий и чар'
+    : state.completed[0].length === 5
+      ? 'Юная травница'
+      : 'Ученица Академии';
+}
+
+function currentFamiliar() {
+  return ASSETS.familiars.find(f => f.id === state.familiarId) || null;
+}
+
+function toast(message) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+}
+
+// Обновляет все места, где показываются имена.
+function refreshNames() {
+  updateHeader();
+  renderHome();
+  renderFamiliarProfile();
+  renderIntro();
 }
 
 function beginJourney() {
-  const name = document.getElementById('studentName').value.trim();
+  const name = cleanInput(document.getElementById('studentName').value, NAME_MAX);
 
   if (!name) {
     alert('Сначала впиши своё имя.');
@@ -304,9 +455,9 @@ function renderFamiliarChoices() {
   grid.innerHTML = ASSETS.familiars.map(f => `
     <button class="familiar-choice ${selectedFamiliar === f.id ? 'selected' : ''}"
       onclick="selectFamiliar('${f.id}')">
-      <img src="${f.image}" alt="${f.name}">
-      <b>${f.name}</b>
-      <small>${f.description}</small>
+      <img src="${f.image}" alt="${esc(f.name)}">
+      <b>${esc(f.name)}</b>
+      <small>${esc(f.description)}</small>
     </button>
   `).join('');
 }
@@ -323,14 +474,17 @@ function confirmFamiliar() {
 
   state.familiarId = familiar.id;
   state.familiarName =
-    document.getElementById('familiarName').value.trim() || familiar.name;
+    cleanInput(document.getElementById('familiarName').value, FAMILIAR_NAME_MAX) || familiar.name;
 
   persist();
+  showScreen('intro');
+}
+
+function renderIntro() {
+  if (!state.name || !state.familiarName) return;
 
   document.getElementById('introText').textContent =
     `${state.name}, твой фамильяр ${state.familiarName} уже рядом. Вместе вы будете исследовать Академию, учиться и открывать её тайны. Сегодня за окнами снег, а в оранжерее ждут первые уроки.`;
-
-  showScreen('intro');
 }
 
 function familiarMarkup(familiar, compact = false) {
@@ -348,18 +502,18 @@ function familiarMarkup(familiar, compact = false) {
 
   return `
     <img class="familiar-picture ${compact ? 'compact' : ''}"
-      src="${familiar.image}" alt="${familiar.name}">
+      src="${familiar.image}" alt="${esc(familiar.name)}">
   `;
 }
 
 function renderHome() {
-  const familiar = ASSETS.familiars.find(f => f.id === state.familiarId);
+  const familiar = currentFamiliar();
 
   document.getElementById('homeGreeting').textContent =
     `Академия ждёт тебя, ${state.name}`;
 
   document.getElementById('homeFamiliar').innerHTML = familiar
-    ? `${familiarMarkup(familiar, true)}<span><b>${state.familiarName}</b><small>Твой фамильяр и спутник</small></span>`
+    ? `${familiarMarkup(familiar, true)}<span><b>${esc(state.familiarName)}</b><small>Твой фамильяр и спутник</small></span>`
     : '';
 
   document.getElementById('familiarTileImage').src =
@@ -380,6 +534,27 @@ function renderHome() {
     state.completed[0].length === 5
       ? '«Ты доказала, что умеешь наблюдать и беречь. Теперь я могу открыть тебе тайны котла, чар и заговорённого слова».'
       : '«Зима — хорошее время для учёбы. Пока лес отдыхает под снегом, мы будем собирать знания у тёплого очага».';
+
+  renderProfileCard(familiar);
+}
+
+function renderProfileCard(familiar) {
+  const done = state.completed[0].length + state.completed[1].length;
+
+  document.getElementById('profileName').textContent = state.name;
+  document.getElementById('profileRank').textContent = rankTitle();
+  document.getElementById('profileStats').textContent =
+    `Пройдено уроков: ${done} из 10 · Опыт: ${state.exp}`;
+  document.getElementById('profileFamiliarLine').textContent = familiar
+    ? `Фамильяр: ${state.familiarName}`
+    : 'Фамильяр ещё не выбран';
+
+  const thumb = document.getElementById('profileThumb');
+  thumb.innerHTML = familiar
+    ? `<img class="familiar-picture compact" src="${familiar.image}" alt="${esc(familiar.name)}">`
+    : '';
+
+  document.getElementById('renameFamiliarBtn').hidden = !familiar;
 }
 
 function openSection(index) {
@@ -572,21 +747,400 @@ function saveNotes() {
 }
 
 function openFamiliar() {
-  const familiar = ASSETS.familiars.find(f => f.id === state.familiarId);
+  if (!currentFamiliar()) return;
+  showScreen('familiar-profile');
+}
+
+function renderFamiliarProfile() {
+  const familiar = currentFamiliar();
   if (!familiar) return;
 
   document.getElementById('profileFamiliarName').textContent = state.familiarName;
   document.getElementById('profileFamiliarArt').innerHTML = familiarMarkup(familiar);
   document.getElementById('profileFamiliarDescription').textContent = familiar.description;
+}
 
-  showScreen('familiar-profile');
+/* =========================================================
+   Окна (смена имён, подтверждение сброса)
+   ========================================================= */
+
+let modalConfig = null;
+let modalReturnFocus = null;
+
+function openModal(config) {
+  const modal = document.getElementById('modal');
+  modalConfig = config;
+  modalReturnFocus = document.activeElement;
+
+  document.getElementById('modalTitle').textContent = config.title;
+  document.getElementById('modalText').textContent = config.text || '';
+
+  const field = document.getElementById('modalField');
+  const input = document.getElementById('modalInput');
+  field.hidden = !config.label;
+  if (config.label) {
+    document.getElementById('modalLabel').textContent = config.label;
+    input.maxLength = config.max || 24;
+    input.value = config.value || '';
+  }
+
+  const checkRow = document.getElementById('modalCheckRow');
+  const check = document.getElementById('modalCheck');
+  checkRow.hidden = !config.checkText;
+  check.checked = false;
+  if (config.checkText) document.getElementById('modalCheckText').textContent = config.checkText;
+
+  const ok = document.getElementById('modalOk');
+  ok.textContent = config.okText || 'Сохранить';
+  ok.classList.toggle('is-danger', !!config.danger);
+  ok.disabled = !!config.checkText;
+
+  document.getElementById('modalError').textContent = '';
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+
+  if (config.label) {
+    input.focus();
+    input.select();
+  } else {
+    document.getElementById('modalCancel').focus();
+  }
+}
+
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (!modal || modal.hidden) return;
+  modal.hidden = true;
+  modalConfig = null;
+  document.body.classList.remove('modal-open');
+  if (modalReturnFocus && typeof modalReturnFocus.focus === 'function') {
+    try { modalReturnFocus.focus(); } catch (e) {}
+  }
+}
+
+function submitModal() {
+  if (!modalConfig) return;
+  const ok = document.getElementById('modalOk');
+  if (ok.disabled) return;
+
+  const result = modalConfig.onSubmit(document.getElementById('modalInput').value);
+  if (typeof result === 'string') {
+    document.getElementById('modalError').textContent = result;
+    return;
+  }
+  closeModal();
+}
+
+function initModal() {
+  const modal = document.getElementById('modal');
+
+  document.getElementById('modalCheck').addEventListener('change', function (e) {
+    document.getElementById('modalOk').disabled = !e.target.checked;
+  });
+
+  document.getElementById('modalInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitModal();
+    }
+  });
+
+  // Esc закрывает окно, где бы ни находился фокус.
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !modal.hidden) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+
+  modal.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab') {
+      const focusable = Array.from(modal.querySelectorAll('input, button'))
+        .filter(el => !el.disabled && el.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+}
+
+function openRenameStudent() {
+  openModal({
+    title: 'Изменить имя',
+    text: 'Так Дариека будет обращаться к тебе. Прогресс останется прежним.',
+    label: 'Твоё имя',
+    value: state.name,
+    max: NAME_MAX,
+    okText: 'Сохранить имя',
+    onSubmit: function (value) {
+      const name = cleanInput(value, NAME_MAX);
+      if (!name) return 'Впиши имя — хотя бы одну букву.';
+      state.name = name;
+      persist();
+      refreshNames();
+      toast('Имя сохранено');
+      return true;
+    }
+  });
+}
+
+function openRenameFamiliar() {
+  if (!currentFamiliar()) return;
+
+  openModal({
+    title: 'Имя фамильяра',
+    text: 'Фамильяр останется прежним, изменится только имя.',
+    label: 'Новое имя фамильяра',
+    value: state.familiarName,
+    max: FAMILIAR_NAME_MAX,
+    okText: 'Сохранить имя',
+    onSubmit: function (value) {
+      const name = cleanInput(value, FAMILIAR_NAME_MAX);
+      if (!name) return 'Придумай имя — хотя бы одну букву.';
+      state.familiarName = name;
+      persist();
+      refreshNames();
+      toast('Имя фамильяра сохранено');
+      return true;
+    }
+  });
+}
+
+/* =========================================================
+   Начать сначала
+   ========================================================= */
+
+function openResetConfirm() {
+  openModal({
+    title: 'Начать сначала?',
+    text: 'Будут стёрты пройденные уроки и квесты, опыт, полученные награды и записи в гримуаре. Твоё имя и фамильяр останутся. Отменить это действие после подтверждения нельзя.',
+    checkText: 'Я понимаю, что прогресс обучения будет сброшен.',
+    okText: 'Да, начать сначала',
+    danger: true,
+    onSubmit: function () {
+      performReset();
+      return true;
+    }
+  });
+}
+
+function performReset() {
+  // Копия прежнего прогресса хранится на случай ошибки (ученица её не видит).
+  lsSet(STORE_BACKUP, JSON.stringify(state));
+
+  const fresh = normalizeState({
+    name: state.name,
+    familiarId: state.familiarId,
+    familiarName: state.familiarName,
+    exp: 0,
+    completed: { 0: [], 1: [] },
+    notes: '',
+    firstVisit: true,
+    ui: { mapPage: 0, mapSwiped: state.ui.mapSwiped }
+  });
+
+  state = fresh;
+  currentSection = 0;
+  currentLesson = 0;
+  answered = false;
+  persist();
+
+  document.getElementById('resetDoneText').textContent =
+    `${state.name}, ${state.familiarName} уже ждёт у порога. Ничего не потеряно, кроме спешки: начнём с первого урока и пойдём в твоём темпе.`;
+
+  showScreen('reset-done');
+}
+
+/* =========================================================
+   Карта из трёх страниц
+   ========================================================= */
+
+let mapPage = 0;
+let suppressMapClickUntil = 0;
+let autoScrollUntil = 0;
+let settleTimer = 0;
+
+function getPager() {
+  return document.getElementById('mapPager');
+}
+
+function syncMapUI() {
+  for (let i = 0; i < MAP_PAGES; i++) {
+    const tab = document.getElementById('mapTab' + i);
+    if (!tab) continue;
+    tab.setAttribute('aria-selected', i === mapPage ? 'true' : 'false');
+    tab.tabIndex = i === mapPage ? 0 : -1;
+  }
+
+  const prev = document.getElementById('mapPrev');
+  const next = document.getElementById('mapNext');
+  if (prev) prev.disabled = mapPage === 0;
+  if (next) next.disabled = mapPage === MAP_PAGES - 1;
+
+  const hint = document.getElementById('mapHint');
+  if (hint) hint.hidden = !!state.ui.mapSwiped;
+}
+
+function setMapPage(index, smooth) {
+  const pager = getPager();
+  if (!pager) return;
+
+  mapPage = Math.max(0, Math.min(MAP_PAGES - 1, index));
+  if (smooth) autoScrollUntil = Date.now() + 700;
+  if (pager.clientWidth > 0) {
+    pager.scrollTo({ left: mapPage * pager.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+  }
+  syncMapUI();
+}
+
+function rememberMapPage() {
+  if (state.ui.mapPage !== mapPage) {
+    state.ui.mapPage = mapPage;
+    persist();
+  }
+}
+
+function markMapSwiped() {
+  if (!state.ui.mapSwiped) {
+    state.ui.mapSwiped = true;
+    persist();
+    syncMapUI();
+  }
+}
+
+function goMapPage(index) {
+  setMapPage(index, true);
+  rememberMapPage();
+  markMapSwiped();
+}
+
+function mapStep(delta) {
+  goMapPage(mapPage + delta);
+}
+
+function restoreMapPage() {
+  mapPage = [0, 1, 2].indexOf(state.ui.mapPage) !== -1 ? state.ui.mapPage : 0;
+  setMapPage(mapPage, false);
+}
+
+function onMapScroll() {
+  const pager = getPager();
+  if (!pager || !pager.clientWidth) return;
+
+  // Пока идёт плавная прокрутка, запущенная кнопкой, промежуточные положения игнорируем.
+  if (Date.now() < autoScrollUntil) {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(onMapScroll, autoScrollUntil - Date.now() + 40);
+    return;
+  }
+
+  const index = Math.max(0, Math.min(MAP_PAGES - 1, Math.round(pager.scrollLeft / pager.clientWidth)));
+  if (index !== mapPage) {
+    mapPage = index;
+    syncMapUI();
+    rememberMapPage();
+    markMapSwiped();
+  }
+}
+
+function initMapPager() {
+  const pager = getPager();
+  if (!pager) return;
+
+  let frame = 0;
+  pager.addEventListener('scroll', function () {
+    if (frame) return;
+    frame = requestAnimationFrame(function () {
+      frame = 0;
+      onMapScroll();
+    });
+  }, { passive: true });
+
+  // Перетаскивание мышью на компьютере. Пальцем карта листается обычной прокруткой.
+  let drag = null;
+
+  pager.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, left: pager.scrollLeft, page: mapPage, moved: false, id: e.pointerId };
+  });
+
+  pager.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+
+    if (!drag.moved && Math.abs(dx) > 6) {
+      drag.moved = true;
+      pager.classList.add('dragging');
+      try { pager.setPointerCapture(drag.id); } catch (err) {}
+    }
+    if (drag.moved) pager.scrollLeft = drag.left - dx;
+  });
+
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const wasDrag = drag;
+    drag = null;
+    if (!wasDrag.moved) return;
+
+    pager.classList.remove('dragging');
+    try { pager.releasePointerCapture(wasDrag.id); } catch (err) {}
+    suppressMapClickUntil = Date.now() + 120;
+
+    const dx = e.clientX - wasDrag.x;
+    const threshold = pager.clientWidth * 0.12;
+    let target = wasDrag.page;
+    if (dx < -threshold) target = wasDrag.page + 1;
+    else if (dx > threshold) target = wasDrag.page - 1;
+    goMapPage(target);
+  }
+
+  pager.addEventListener('pointerup', endDrag);
+  pager.addEventListener('pointercancel', endDrag);
+
+  // Нажатие сразу после перетаскивания не должно открывать локацию.
+  pager.addEventListener('click', function (e) {
+    if (Date.now() < suppressMapClickUntil) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  pager.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const home = document.getElementById('screen-home');
+    const modal = document.getElementById('modal');
+    if (!home || !home.classList.contains('active') || (modal && !modal.hidden)) return;
+    const tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    e.preventDefault();
+    mapStep(e.key === 'ArrowLeft' ? -1 : 1);
+  });
+
+  window.addEventListener('resize', function () {
+    setMapPage(mapPage, false);
+  });
+}
+
+function openProfile() {
+  state.ui.mapPage = 2;
+  showScreen('home');
 }
 
 (function init() {
   updateHeader();
+  initMapPager();
+  initModal();
 
   if (state.name && state.familiarId) {
-    renderHome();
     showScreen('home');
   } else if (state.name) {
     document.getElementById('studentName').value = state.name;
