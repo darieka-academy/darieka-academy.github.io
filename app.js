@@ -1,8 +1,9 @@
+
 'use strict';
 
 const ASSETS = {
   section1: 'bazik9.jfif',
-  section2: 'potions-cover.jfif',
+  section2: '6f352e57de0011f1a5c2c2c1e6453527_3.jfif',
   familiars: [
     {
       id: 'cat',
@@ -166,7 +167,7 @@ const COURSES = [
       {
         title: 'Азбука заклинаний',
         subtitle: 'Первые чары',
-        image: 'b19c0dedde0311f1bd14969b547feeaa_2.jfif',
+        image: 'b19c0dedde0311f1bd14969b547feea_2.jfif',
         questImage: 'e94c8048de0611f1af93b632ab106e2a_4.jfif',
         body: '<p>Заклинание в мире Дариеки — это короткая вымышленная формула, которая помогает героине направить намерение на определённое действие. У формулы есть название, смысл и образный знак.</p><p>Заклинания Академии могут зажечь огонёк в фонаре, подсветить страницу или помочь найти потерянную вещь в сказочном сюжете. Они не обещают реального воздействия на мир.</p><p>У каждой формулы есть границы: магия не должна причинять вред, принуждать другого или нарушать его волю.</p>',
         note: 'Дариека: «Сильное заклинание начинается с ясной мысли и доброго намерения».',
@@ -218,7 +219,6 @@ const COURSES = [
   }
 ];
 
-
 /* =========================================================
    Хранилище, состояние и миграция
    ---------------------------------------------------------
@@ -236,6 +236,7 @@ const SAVE_VERSION = 2;
 const NAME_MAX = 24;
 const FAMILIAR_NAME_MAX = 20;
 const MAP_PAGES = 3;
+const CHAPTER_TWO_IMAGE = 'glava2.jfif';
 const LESSONS_PER_SECTION = 5;
 
 const memoryStore = {};
@@ -325,6 +326,11 @@ function normalizeState(raw) {
   out.exp = Math.max(0, parseInt(s.exp, 10) || 0);
   out.completed = { 0: toLessonList(completed[0]), 1: toLessonList(completed[1]) };
   out.notes = typeof s.notes === 'string' ? s.notes : '';
+  out.travnikNotes = typeof s.travnikNotes === 'string' ? s.travnikNotes : '';
+  out.grimoireNotes = typeof s.grimoireNotes === 'string' ? s.grimoireNotes : out.notes;
+  out.practice = s.practice && typeof s.practice === 'object' ? s.practice : { 0: {}, 1: {} };
+  out.practice[0] = out.practice[0] && typeof out.practice[0] === 'object' ? out.practice[0] : {};
+  out.practice[1] = out.practice[1] && typeof out.practice[1] === 'object' ? out.practice[1] : {};
   out.activeSection = s.activeSection === 1 ? 1 : 0;
   out.firstVisit = s.firstVisit === false ? false : true;
 
@@ -435,6 +441,31 @@ function refreshNames() {
   renderIntro();
 }
 
+function bookForSection(section) {
+  return section === 0 ? 'travnik' : 'grimoire';
+}
+
+function practicePromptFor(section, lessonIndex) {
+  const prompts = section === 0 ? [
+    'Запиши три признака, по которым можно внимательно наблюдать незнакомое растение, не трогая его.',
+    'Нарисуй или опиши корень, стебель и лист любого знакомого растения.',
+    'Выбери место обитания растения и запиши, какие условия там важны.',
+    'Создай карточку наблюдения: название или описание, место, дата и заметные признаки.',
+    'Запиши три правила бережного поведения во время прогулки по зимнему лесу.'
+  ] : [
+    'Придумай название вымышленного зелья и опиши его сказочное назначение. Не используй реальные ингредиенты или инструкции.',
+    'Запиши, почему в сказочной мастерской важны порядок, подписи и аккуратное хранение.',
+    'Придумай добрую формулу для сказочного света или поиска потерянной вещи.',
+    'Сочини короткое пожелание спокойствия или смелости в ритмичной форме.',
+    'Запиши три правила безопасного и доброго волшебного ремесла Академии.'
+  ];
+  return prompts[lessonIndex] || 'Оставь здесь свои мысли по теме урока.';
+}
+
+function openChapter2() {
+  showScreen('chapter2');
+}
+
 function beginJourney() {
   const name = cleanInput(document.getElementById('studentName').value, NAME_MAX);
 
@@ -530,6 +561,11 @@ function renderHome() {
       ? `${state.completed[1].length} из 5 квестов`
       : 'Откроется после первого раздела';
 
+  const travnikProgress = document.getElementById('travnikProgress');
+  const grimoireProgress = document.getElementById('grimoireProgress');
+  if (travnikProgress) travnikProgress.textContent = `${state.completed[0].length} записей об уроках · Травология`;
+  if (grimoireProgress) grimoireProgress.textContent = `${state.completed[1].length} записей об уроках · Магия`;
+
   document.getElementById('homeLetter').textContent =
     state.completed[0].length === 5
       ? '«Ты доказала, что умеешь наблюдать и беречь. Теперь я могу открыть тебе тайны котла, чар и заговорённого слова».'
@@ -608,7 +644,11 @@ function openLesson(section, index) {
   document.getElementById('lessonTitle').textContent = lesson.title;
   document.getElementById('lessonImage').src = lesson.image;
   document.getElementById('lessonBody').innerHTML = lesson.body;
-  document.getElementById('lessonNote').textContent = lesson.note;
+  document.getElementById('lessonNote').textContent = fill(lesson.note);
+  document.getElementById('practiceTitle').textContent = currentSection === 0 ? 'Запись в Травник' : 'Запись в Гримуар';
+  document.getElementById('practicePrompt').textContent = practicePromptFor(section, index);
+  const savedPractice = state.practice[currentSection][String(currentLesson)] || '';
+  document.getElementById('practiceText').value = savedPractice;
 
   showScreen('lesson');
 }
@@ -634,9 +674,11 @@ function startQuest() {
   document.getElementById('questFeedback').textContent = '';
   document.getElementById('questContinue').hidden = true;
 
+  document.querySelectorAll('.retry').forEach(el => el.remove());
+
   document.getElementById('questChoices').innerHTML = lesson.answers.map((answer, i) => `
     <button class="choice" onclick="answerQuest(${i})">
-      ${String.fromCharCode(1040 + i)}. ${answer}
+      ${String.fromCharCode(1040 + i)}. ${esc(answer)}
     </button>
   `).join('');
 
@@ -692,14 +734,14 @@ function completeQuest() {
   const lesson = COURSES[currentSection].lessons[currentLesson];
 
   document.getElementById('rewardTitle').textContent = lesson.reward;
-
-  document.getElementById('rewardText').textContent =
-    currentSection === 0
-      ? 'Ты сохранила новое знание в гримуаре. Каждый бережный шаг приближает тебя к мастерству.'
-      : 'Ты освоила ещё одну часть сказочного ремесла Академии. Знание записано в гримуар.';
-
-  document.getElementById('rewardNumber').textContent =
-    `Знак № ${currentLesson + 1}`;
+  document.getElementById('rewardKicker').textContent = currentSection === 0 ? 'Новая запись в Травнике' : 'Новая запись в Гримуаре';
+  document.getElementById('rewardText').textContent = currentSection === 0
+    ? 'Ты сохранила новое ботаническое знание в Травнике. Твои наблюдения становятся частью личного гербария.'
+    : 'Ты открыла новую страницу сказочного ремесла. Знание и печать урока сохранены в твоём Гримуаре.';
+  const seal = document.getElementById('rewardSeal');
+  seal.className = `reward-seal seal-${currentSection}-${currentLesson}`;
+  seal.innerHTML = `<span>✧</span><small>${currentSection === 0 ? 'ТРАВНИК' : 'ГРИМУАР'} · ${currentLesson + 1}</small>`;
+  document.getElementById('rewardNumber').textContent = `Печать № ${currentSection * LESSONS_PER_SECTION + currentLesson + 1}`;
 
   showScreen('reward');
 }
@@ -716,34 +758,50 @@ function continueAfterReward() {
   }
 }
 
+function renderBookEntries(sectionIndex, targetId) {
+  const container = document.getElementById(targetId);
+  if (!container) return;
+  const course = COURSES[sectionIndex];
+  container.innerHTML = `<div class="grimoire-section"><h2>${course.title}</h2>${course.lessons.map((lesson, i) => {
+    const done = state.completed[sectionIndex].includes(i);
+    const practice = state.practice[sectionIndex][String(i)] || '';
+    return `<article class="grimoire-entry ${done ? 'earned' : ''}">
+      <span>${done ? `<i class="book-stamp stamp-${sectionIndex}-${i}">✧</i>` : '○'}</span><div><b>${esc(lesson.title)}</b>
+      <small>${done ? `Урок пройден · Печать: ${esc(lesson.reward)}` : 'Страница пока ждёт своего часа'}</small>
+      ${practice ? `<p class="book-practice"><b>Практическая запись:</b> ${esc(practice)}</p>` : ''}</div></article>`;
+  }).join('')}</div>`;
+}
+
+function openTravnik() {
+  renderBookEntries(0, 'travnikContent');
+  document.getElementById('travnikNotes').value = state.travnikNotes || '';
+  showScreen('travnik');
+}
+
 function openGrimoire() {
-  const container = document.getElementById('grimoireContent');
-
-  container.innerHTML = COURSES.map((course, sectionIndex) => `
-    <div class="grimoire-section">
-      <h2>${course.title}</h2>
-      ${course.lessons.map((lesson, i) => `
-        <div class="grimoire-entry ${state.completed[sectionIndex].includes(i) ? 'earned' : ''}">
-          <span>${state.completed[sectionIndex].includes(i) ? '✧' : '○'}</span>
-          <div>
-            <b>${lesson.title}</b>
-            <small>${state.completed[sectionIndex].includes(i)
-              ? 'Квест пройден · ' + lesson.reward
-              : 'Пока не открыто'}</small>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-
-  document.getElementById('studentNotes').value = state.notes || '';
+  renderBookEntries(1, 'grimoireContent');
+  document.getElementById('grimoireNotes').value = state.grimoireNotes || '';
   showScreen('grimoire');
 }
 
-function saveNotes() {
-  state.notes = document.getElementById('studentNotes').value;
+function saveTravnikNotes() {
+  state.travnikNotes = document.getElementById('travnikNotes').value;
   persist();
-  alert('Записи сохранены в гримуаре.');
+  toast('Записи сохранены в Травнике');
+}
+
+function saveGrimoireNotes() {
+  state.grimoireNotes = document.getElementById('grimoireNotes').value;
+  state.notes = state.grimoireNotes; // совместимость со старой версией сохранения
+  persist();
+  toast('Записи сохранены в Гримуаре');
+}
+
+function savePractice() {
+  const value = document.getElementById('practiceText').value.trim();
+  state.practice[currentSection][String(currentLesson)] = value;
+  persist();
+  toast(value ? `Запись сохранена в ${bookForSection(currentSection) === 'travnik' ? 'Травник' : 'Гримуар'}` : 'Практическая запись очищена');
 }
 
 function openFamiliar() {
@@ -942,6 +1000,9 @@ function performReset() {
     exp: 0,
     completed: { 0: [], 1: [] },
     notes: '',
+    travnikNotes: '',
+    grimoireNotes: '',
+    practice: { 0: {}, 1: {} },
     firstVisit: true,
     ui: { mapPage: 0, mapSwiped: state.ui.mapSwiped }
   });
