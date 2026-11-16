@@ -1,10 +1,10 @@
-
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#26352b">
+  <meta name="description" content="Сказочная Академия Дариеки: травология, старинные предания и ремёсла леса.">
   <title>Школа травниц Дариеки</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,27 +13,40 @@
 </head>
 <body>
   <header class="topbar" id="topbar" hidden>
-    <button class="top-profile" onclick="openProfile()" aria-label="Мой профиль: изменить имя">
-      <span>
-        <strong id="studentNameTop">Ученица</strong>
-        <small id="rankTop">Начинающая травница</small>
-      </span>
+    <button class="top-profile" onclick="openProfile()" aria-label="Открыть профиль ученицы">
+      <span><strong id="studentNameTop">Ученица</strong><small id="rankTop">Ученица Академии</small></span>
       <span class="top-edit" aria-hidden="true">✎</span>
     </button>
     <div class="top-stats">
-      <span>✧ <b id="expTop">0</b> опыта</span>
-      <button class="small-button" onclick="openGrimoire()">Гримуар</button>
+      <span class="exp-counter">✧ <b id="expTop">0</b> опыта</span>
+      <button class="small-button" onclick="openBook('grimoire')">Гримуар</button>
+      <button class="small-button" onclick="openBook('travnik')">Травник</button>
       <button class="small-button" onclick="showScreen('home')">Карта</button>
     </div>
   </header>
 
   <main class="app-shell">
-    <section class="screen active" id="screen-welcome">
+    <section class="screen active" id="screen-preview">
+      <div class="preview-scene">
+        <video id="academyPreviewVideo" class="preview-video" autoplay muted playsinline loop poster="bazik.jfif">
+          <source src="academy-preview.mp4" type="video/mp4">
+        </video>
+        <div class="preview-shade"></div>
+        <div class="preview-copy">
+          <p class="eyebrow">За старыми воротами начинается история</p>
+          <h1>Школа травниц<br>Дариеки</h1>
+          <p>Здесь знания хранятся в книгах, лес полон тайн, а у каждой ученицы есть собственный путь.</p>
+          <button class="primary large" onclick="enterGame()">Играть</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-welcome">
       <div class="hero gate-hero">
         <div class="hero-copy">
-          <p class="eyebrow">Зимняя сказка начинается</p>
-          <h1>Школа травниц<br>Дариеки</h1>
-          <p>За заснеженными воротами старой Академии хранятся знания о растениях, древних ремёслах и тихой магии.</p>
+          <p class="eyebrow">Пролог · Приглашение в Академию</p>
+          <h1>Добро пожаловать<br>в старую Академию</h1>
+          <p>За заснеженными воротами Дариека хранит знания о растениях, старых обычаях и тайнах зачарованного леса.</p>
           <label class="field-label" for="studentName">Как тебя зовут?</label>
           <input id="studentName" maxlength="24" placeholder="Твоё имя" autocomplete="given-name">
           <button class="primary" onclick="beginJourney()">Постучать в ворота</button>
@@ -43,23 +56,24 @@
 
     <section class="screen" id="screen-familiar">
       <div class="paper">
-        <p class="eyebrow">Первый шаг ученицы</p>
+        <p class="eyebrow">Пролог · Верный спутник</p>
         <h1>Выбери фамильяра</h1>
-        <p>У каждой травницы есть верный спутник. Он будет рядом с самого начала пути — в уроках, открытиях и приключениях.</p>
+        <p>Он будет рядом с самого начала: сопровождать тебя в путешествиях, ждать у книг и замечать то, что легко пропустить.</p>
         <div id="familiarGrid" class="familiar-grid"></div>
-        <label class="field-label" for="familiarName">Имя твоего фамильяра</label>
-        <input id="familiarName" maxlength="20" placeholder="Придумай ему имя">
+        <label class="field-label" for="familiarName">Как ты назовёшь своего фамильяра?</label>
+        <input id="familiarName" maxlength="20" placeholder="Имя фамильяра">
         <button class="primary" id="chooseFamiliarButton" onclick="confirmFamiliar()" disabled>Позвать спутника</button>
       </div>
     </section>
 
     <section class="screen" id="screen-intro">
       <div class="hero intro-hero">
-        <div class="paper">
+        <div class="paper intro-paper">
           <p class="eyebrow">Письмо от Дариеки</p>
-          <h1>Добро пожаловать в Академию</h1>
+          <h1>Твой путь начинается</h1>
           <p id="introText"></p>
-          <p><b>Дариека:</b> «Здесь не торопят и не сравнивают. Каждая ученица идёт своим шагом. Начнём с самого важного — научимся внимательно видеть мир растений».</p>
+          <blockquote>«Здесь не торопят и не сравнивают. Каждая ученица идёт своим шагом. Смотри внимательно, задавай вопросы и береги всё живое».</blockquote>
+          <p class="signature">Твоя наставница, Дариека</p>
           <button class="primary" onclick="showScreen('home')">Войти в Академию</button>
         </div>
       </div>
@@ -67,141 +81,79 @@
 
     <section class="screen" id="screen-home">
       <div class="paper home-paper">
-        <p class="eyebrow">Академия Дариеки · Зимний семестр</p>
-        <h1 id="homeGreeting">Твоя карта Академии</h1>
-        <p>В окнах горит тёплый свет. Снег укрыл тропинки, а в старой избе уже ждёт Дариека.</p>
+        <p class="eyebrow">Зачарованный лес Дариеки</p>
+        <h1 id="homeGreeting">Карта Академии</h1>
+        <p>Листай карту и выбирай, куда отправиться. Новые главы открываются по мере прохождения, но уже пройденные уроки всегда можно перечитать.</p>
         <div class="home-familiar" id="homeFamiliar"></div>
 
         <div class="map-nav">
           <button class="map-arrow" id="mapPrev" onclick="mapStep(-1)" aria-label="Предыдущая страница карты">‹</button>
           <div class="map-tabs" role="tablist" aria-label="Страницы карты">
-            <button class="map-tab" id="mapTab0" role="tab" aria-controls="mapPage0" aria-selected="true" onclick="goMapPage(0)">Академия</button>
+            <button class="map-tab" id="mapTab0" role="tab" aria-controls="mapPage0" aria-selected="true" onclick="goMapPage(0)">Главы</button>
             <button class="map-tab" id="mapTab1" role="tab" aria-controls="mapPage1" aria-selected="false" onclick="goMapPage(1)">Мои книги</button>
             <button class="map-tab" id="mapTab2" role="tab" aria-controls="mapPage2" aria-selected="false" onclick="goMapPage(2)">Ученица</button>
           </div>
           <button class="map-arrow" id="mapNext" onclick="mapStep(1)" aria-label="Следующая страница карты">›</button>
         </div>
-        <p class="map-hint" id="mapHint">‹ Листай карту пальцем или стрелками — страниц три ›</p>
+        <p class="map-hint" id="mapHint">‹ Листай карту пальцем или стрелками ›</p>
 
-        <div class="map-pager" id="mapPager" tabindex="0" aria-label="Карта Академии: три страницы, листай влево и вправо">
+        <div class="map-pager" id="mapPager" tabindex="0" aria-label="Карта Академии: три страницы">
           <div class="map-page" id="mapPage0" role="tabpanel" aria-labelledby="mapTab0">
-            <p class="map-page-title">Академия · уроки и разделы</p>
-            <div class="home-grid">
-              <button class="home-tile" onclick="openSection(0)">
-                <img src="bazik8.jfif" alt="Травяная мастерская">
-                <span>
-                  <b>Раздел I</b>
-                  <small>Основы травологии</small>
-                  <em id="sectionOneProgress">0 из 5 квестов</em>
-                </span>
-              </button>
-
-              <button class="home-tile" onclick="openSection(1)">
-                <img src="6f352e57de0011f1a5c2c2c1e6453527_3.jfif" alt="Зимняя мастерская зелий">
-                <span>
-                  <b>Раздел II</b>
-                  <small>Искусство зелий и чар</small>
-                  <em id="sectionTwoProgress">Ещё закрыт</em>
-                </span>
-              </button>
-            </div>
-
-            <button class="home-tile story-tile" onclick="openChapter2()">
-              <img src="glava2.jfif" alt="Чердак хранительницы — сюжетная глава II">
-              <span>
-                <b>Глава II</b>
-                <small>Чердак хранительницы: первые страницы гримуара</small>
-                <em>Сюжетное приключение</em>
-              </span>
-            </button>
-
-            <div class="story-note">
-              <b>Письмо Дариеки</b>
-              <p id="homeLetter">«Зима — хорошее время для учёбы. Пока лес отдыхает под снегом, мы будем собирать знания у тёплого очага».</p>
-            </div>
+            <p class="map-page-title">Дорога ученицы · главы Академии</p>
+            <div id="chapterCards" class="chapter-grid"></div>
+            <div class="story-note"><b>Письмо Дариеки</b><p id="homeLetter">«Не нужно спешить. У каждого знания своё время, а у каждой тропинки — своя история».</p></div>
           </div>
-
           <div class="map-page" id="mapPage1" role="tabpanel" aria-labelledby="mapTab1">
-            <p class="map-page-title">Мои книги · личные знания и открытия</p>
-            <div class="home-grid book-grid">
-              <button class="home-tile" onclick="openTravnik()">
-                <img src="travnik.jfif" alt="Личный Травник">
-                <span>
-                  <b>Травник</b>
-                  <small>Растения, наблюдения и гербарий</small>
-                  <em id="travnikProgress">Твои ботанические записи</em>
-                </span>
+            <p class="map-page-title">Личные книги и награды</p>
+            <div class="home-grid">
+              <button class="home-tile" onclick="openBook('travnik')">
+                <img src="travnik.jfif" alt="Травник">
+                <span><b>Травник</b><small>Растения, наблюдения и гербарий</small><em id="travnikCount">Пока пуст</em></span>
               </button>
-
-              <button class="home-tile" onclick="openGrimoire()">
-                <img src="grimoar.jfif" alt="Личный Гримуар">
-                <span>
-                  <b>Гримуар</b>
-                  <small>Зелья, заклинания и заговоры</small>
-                  <em id="grimoireProgress">Твои магические знания</em>
-                </span>
+              <button class="home-tile" onclick="openBook('grimoire')">
+                <img src="grimoar.jfif" alt="Гримуар">
+                <span><b>Гримуар</b><small>Зелья, обряды, знаки и предания</small><em id="grimoireCount">Пока пуст</em></span>
               </button>
-
+              <button class="home-tile" onclick="openSeals()">
+                <img src="pch1.jfif" alt="Печати Академии">
+                <span><b>Коллекция печатей</b><small>Знаки пройденных испытаний</small><em id="sealCount">0 из 10</em></span>
+              </button>
               <button class="home-tile" onclick="openFamiliar()">
                 <img id="familiarTileImage" src="f1.jfif" alt="Фамильяр">
-                <span>
-                  <b>Мой фамильяр</b>
-                  <small id="familiarTileName">Верный спутник</small>
-                </span>
+                <span><b>Мой фамильяр</b><small id="familiarTileName">Верный спутник</small></span>
               </button>
             </div>
           </div>
-
           <div class="map-page" id="mapPage2" role="tabpanel" aria-labelledby="mapTab2">
-            <p class="map-page-title">Ученица · профиль и настройки</p>
+            <p class="map-page-title">Профиль ученицы</p>
             <div class="profile-card">
-              <div class="profile-head">
-                <div id="profileThumb"></div>
-                <div>
-                  <b id="profileName"></b>
-                  <small id="profileRank"></small>
-                  <small id="profileStats"></small>
-                  <small id="profileFamiliarLine"></small>
-                </div>
-              </div>
-
+              <div class="profile-head"><div id="profileThumb"></div><div><b id="profileName"></b><small id="profileRank"></small><small id="profileStats"></small><small id="profileFamiliarLine"></small></div></div>
               <div class="profile-actions">
                 <button class="secondary" onclick="openRenameStudent()">✎ Изменить своё имя</button>
                 <button class="secondary" id="renameFamiliarBtn" onclick="openRenameFamiliar()">✎ Изменить имя фамильяра</button>
               </div>
-
-              <div class="profile-danger">
-                <b>Начать сначала</b>
-                <p class="quiet">Если захочешь пройти обучение заново, можно сбросить прогресс. Перед этим Дариека обязательно попросит подтверждение.</p>
-                <button class="danger" onclick="openResetConfirm()">Начать обучение сначала</button>
-              </div>
+              <div class="profile-danger"><b>Начать сначала</b><p class="quiet">Имя и фамильяр сохранятся. Прогресс, записи и награды будут сброшены только после твоего подтверждения.</p><button class="danger" onclick="openResetConfirm()">Начать обучение сначала</button></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="screen" id="screen-chapter2">
-      <div class="paper chapter-paper">
+    <section class="screen" id="screen-chapter">
+      <div class="paper">
         <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
-        <p class="eyebrow">Сюжетная глава II · Наследие хранительницы</p>
-        <h1>Чердак хранительницы: первые страницы гримуара</h1>
-        <img src="glava2.jfif" class="wide-art chapter-art" alt="Чердак хранительницы">
-        <div class="chapter-text">
-          <p>За потайной дверцей старого дома скрывается чердак, куда давно никто не поднимался. Здесь пахнет сухими травами, древесиной и старым пергаментом. Вдоль стен стоят сундуки, коробки и книги прежней хранительницы.</p>
-          <p>Дариека останавливается у тяжёлого сундука и осторожно касается его крышки.</p>
-          <blockquote>«Когда-то здесь собирали знания те, кто умел слушать лес и замечать малейшие перемены. Не всё из оставленного нам наследия уже разгадано. Возможно, именно тебе удастся прочесть первые страницы».</blockquote>
-          <p>На столе лежит старый Гримуар. Его страницы пока почти пусты. Постепенно ты будешь наполнять собственные книги знаниями, наблюдениями и открытиями.</p>
-          <p class="quiet">Это самостоятельная сюжетная глава Академии. Она не является Разделом II учебной программы «Искусство зелий и чар».</p>
-        </div>
-        <button class="primary" onclick="openTravnik()">Открыть Травник</button>
-        <button class="secondary" onclick="openGrimoire()">Открыть Гримуар</button>
+        <p class="eyebrow" id="chapterKicker"></p>
+        <h1 id="chapterTitle"></h1>
+        <p id="chapterDescription"></p>
+        <img id="chapterCover" class="wide-art" alt="Иллюстрация главы">
+        <div id="chapterSections" class="chapter-sections"></div>
+        <div id="chapterLessonList" class="lesson-list"></div>
       </div>
     </section>
 
     <section class="screen" id="screen-section">
       <div class="paper">
-        <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
+        <button class="text-button" onclick="backToChapter()">← К главе</button>
         <p class="eyebrow" id="sectionKicker"></p>
         <h1 id="sectionTitle"></h1>
         <p id="sectionDescription"></p>
@@ -212,74 +164,65 @@
 
     <section class="screen" id="screen-lesson">
       <div class="paper">
-        <button class="text-button" onclick="backToSection()">← К урокам раздела</button>
+        <button class="text-button" onclick="backToLessonList()">← К урокам</button>
         <p class="eyebrow" id="lessonKicker"></p>
         <h1 id="lessonTitle"></h1>
         <img id="lessonImage" class="wide-art" alt="Иллюстрация урока">
         <div id="lessonBody" class="lesson-body"></div>
         <div class="darieka-note" id="lessonNote"></div>
-        <div class="practice-card" id="practiceCard">
-          <p class="eyebrow">Необязательная практика</p>
-          <h2 id="practiceTitle">Маленькое задание для книги</h2>
-          <p id="practicePrompt"></p>
-          <textarea id="practiceText" rows="4" placeholder="Если захочешь, оставь здесь свою запись..."></textarea>
-          <button class="secondary" onclick="savePractice()">Сохранить запись в книгу</button>
-          <p class="quiet">Практика по желанию: её можно пропустить. Она не влияет на прохождение квеста и получение награды.</p>
-        </div>
-        <button class="primary" onclick="startQuest()">Перейти к квесту</button>
+        <div class="practice-panel" id="practicePanel"></div>
+        <button class="primary" onclick="startCheck()">Проверь полученные знания</button>
       </div>
     </section>
 
-    <section class="screen" id="screen-quest">
+    <section class="screen" id="screen-check">
       <div class="paper">
         <button class="text-button" onclick="backToLesson()">← Вернуться к уроку</button>
         <p class="eyebrow">Испытание ученицы</p>
-        <h1 id="questTitle"></h1>
-        <img id="questImage" class="wide-art" alt="Сцена квеста">
-        <p id="questIntro"></p>
-        <div id="questChoices" class="choice-list"></div>
-        <p id="questFeedback" class="feedback" aria-live="polite"></p>
-        <button class="primary" id="questContinue" onclick="completeQuest()" hidden>Завершить квест</button>
+        <h1 id="checkTitle"></h1>
+        <img id="checkImage" class="wide-art" alt="Иллюстрация испытания">
+        <p id="checkPrompt"></p>
+        <div id="checkArea" class="check-area"></div>
+        <p id="checkFeedback" class="feedback" aria-live="polite"></p>
+        <button class="primary" id="checkSubmit" onclick="submitCheck()">Ответить</button>
+        <button class="secondary" id="checkRetry" onclick="startCheck()" hidden>Попробовать ещё раз</button>
       </div>
     </section>
 
     <section class="screen" id="screen-reward">
       <div class="paper reward-paper">
-        <p class="eyebrow" id="rewardKicker">Новая запись в личной книге</p>
-        <h1>Знание найдено!</h1>
-        <div id="rewardSeal" class="reward-seal" aria-label="Тематическая печать урока"><span>✧</span></div>
+        <p class="eyebrow" id="rewardKicker">Новое знание</p>
+        <h1 id="rewardHeading">Запись сохранена!</h1>
+        <img id="rewardSeal" class="badge-art" src="pch1.jfif" alt="Печать Академии">
         <h2 id="rewardTitle"></h2>
         <p id="rewardText"></p>
-        <div class="reward-ribbon" id="rewardNumber">Знак № 1</div>
+        <div class="reward-ribbon" id="rewardNumber"></div>
+        <div class="reward-book-note" id="rewardBookNote"></div>
         <button class="primary" onclick="continueAfterReward()">Продолжить путь</button>
       </div>
     </section>
 
-    <section class="screen" id="screen-travnik">
+    <section class="screen" id="screen-book">
       <div class="paper book-paper">
-        <button class="text-button" onclick="showScreen('home'); goMapPage(1)">← К моим книгам</button>
-        <p class="eyebrow">Личная книга ученицы · Раздел I</p>
-        <h1>Травник</h1>
-        <img src="travnik.jfif" class="book-cover" alt="Обложка личного Травника">
-        <p>Здесь собираются знания о настоящих растениях, их строении, местах обитания, наблюдения и страницы учебного гербария.</p>
-        <div id="travnikContent" class="book-content"></div>
-        <label class="field-label" for="travnikNotes">Мои ботанические заметки</label>
-        <textarea id="travnikNotes" rows="6" placeholder="Записывай наблюдения, описания растений и идеи для гербария..."></textarea>
-        <button class="primary" onclick="saveTravnikNotes()">Сохранить в Травник</button>
+        <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
+        <p class="eyebrow" id="bookKicker">Личная книга ученицы</p>
+        <h1 id="bookTitle"></h1>
+        <p id="bookDescription"></p>
+        <img id="bookCover" class="book-cover" alt="Обложка книги">
+        <div id="bookEntries" class="book-entries"></div>
+        <label class="field-label" for="studentNotes">Личные заметки</label>
+        <textarea id="studentNotes" rows="5" placeholder="Запиши сюда свои наблюдения, вопросы и мысли..."></textarea>
+        <button class="primary" onclick="saveNotes()">Сохранить заметки</button>
       </div>
     </section>
 
-    <section class="screen" id="screen-grimoire">
-      <div class="paper book-paper">
-        <button class="text-button" onclick="showScreen('home'); goMapPage(1)">← К моим книгам</button>
-        <p class="eyebrow">Личная книга ученицы · Раздел II</p>
-        <h1>Гримуар</h1>
-        <img src="grimoar.jfif" class="book-cover" alt="Обложка личного Гримуара">
-        <p>Здесь хранятся игровые рецепты, заклинания, заговоры, магические символы и твои записи о сказочном ремесле.</p>
-        <div id="grimoireContent" class="book-content"></div>
-        <label class="field-label" for="grimoireNotes">Мои записи в Гримуаре</label>
-        <textarea id="grimoireNotes" rows="6" placeholder="Записывай свои рецепты, формулы и мысли..."></textarea>
-        <button class="primary" onclick="saveGrimoireNotes()">Сохранить в Гримуар</button>
+    <section class="screen" id="screen-seals">
+      <div class="paper">
+        <button class="text-button" onclick="showScreen('home')">← На карту Академии</button>
+        <p class="eyebrow">Коллекция ученицы</p>
+        <h1>Печати Академии</h1>
+        <p>Каждая печать отмечает пройденное испытание. Полученные знаки остаются с тобой.</p>
+        <div id="sealCollection" class="seal-grid"></div>
       </div>
     </section>
 
@@ -300,20 +243,7 @@
         <p class="eyebrow">Новый путь</p>
         <h1>Всё начинается заново</h1>
         <p id="resetDoneText"></p>
-        <button class="primary" onclick="openLesson(0, 0)">К первому уроку</button>
-        <button class="secondary" onclick="showScreen('home')">На карту</button>
-      </div>
-    </section>
-
-    <section class="screen" id="screen-finale">
-      <div class="paper reward-paper">
-        <p class="eyebrow">Первый большой рубеж</p>
-        <h1>Юная травница Академии Дариеки</h1>
-        <img src="badge.jfif" class="badge-art" alt="Знак Академии">
-        <p>Ты научилась замечать растения, понимать их строение, узнавать места обитания и бережно наблюдать за природой. Дариека вручает тебе первую почётную запись в летописи Академии.</p>
-        <h2>Первый раздел завершён!</h2>
-        <button class="primary" onclick="openSection(1)">Открыть искусство зелий и чар</button>
-        <button class="secondary" onclick="showScreen('home')">Вернуться на карту</button>
+        <button class="primary" onclick="showScreen('home')">Вернуться на карту</button>
       </div>
     </section>
   </main>
@@ -321,25 +251,14 @@
   <div class="modal" id="modal" hidden>
     <div class="modal-backdrop" onclick="closeModal()"></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h2 id="modalTitle"></h2>
-      <p id="modalText"></p>
-      <div id="modalField" hidden>
-        <label class="field-label" for="modalInput" id="modalLabel"></label>
-        <input id="modalInput" autocomplete="off">
-      </div>
-      <label class="check-row" id="modalCheckRow" hidden>
-        <input type="checkbox" id="modalCheck">
-        <span id="modalCheckText"></span>
-      </label>
+      <h2 id="modalTitle"></h2><p id="modalText"></p>
+      <div id="modalField" hidden><label class="field-label" for="modalInput" id="modalLabel"></label><input id="modalInput" autocomplete="off"></div>
+      <label class="check-row" id="modalCheckRow" hidden><input type="checkbox" id="modalCheck"><span id="modalCheckText"></span></label>
       <p class="modal-error" id="modalError" role="alert"></p>
-      <div class="modal-actions">
-        <button class="secondary" id="modalCancel" onclick="closeModal()">Отмена</button>
-        <button class="primary" id="modalOk" onclick="submitModal()">Сохранить</button>
-      </div>
+      <div class="modal-actions"><button class="secondary" id="modalCancel" onclick="closeModal()">Отмена</button><button class="primary" id="modalOk" onclick="submitModal()">Сохранить</button></div>
     </div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
   <footer>Школа травниц Дариеки <span>✧</span> Знания растут в своём темпе</footer>
   <script src="app.js?v=5"></script>
 </body>
