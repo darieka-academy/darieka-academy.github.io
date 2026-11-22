@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Literata:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <header class="topbar" id="topbar" hidden>
@@ -168,10 +168,11 @@
         <p class="eyebrow" id="lessonKicker"></p>
         <h1 id="lessonTitle"></h1>
         <img id="lessonImage" class="wide-art" alt="Иллюстрация урока">
+        <div id="familiarHint" class="familiar-hint" hidden aria-live="polite"></div>
         <div id="lessonBody" class="lesson-body"></div>
         <div class="darieka-note" id="lessonNote"></div>
         <div class="practice-panel" id="practicePanel"></div>
-        <button class="primary" onclick="startCheck()">Проверь полученные знания</button>
+        <button class="primary" id="lessonNextButton" onclick="nextLessonStep()">Проверь полученные знания</button>
       </div>
     </section>
 
@@ -260,6 +261,6 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <footer>Школа травниц Дариеки <span>✧</span> Знания растут в своём темпе</footer>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

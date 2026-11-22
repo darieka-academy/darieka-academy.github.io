@@ -288,3 +288,52 @@ footer span { margin: 0 7px; color: var(--gold-light); }
   width: auto;
   margin: 4px 0 0;
 }
+
+
+/* Многостраничные уроки и подсказки фамильяра */
+.familiar-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 24px;
+  padding: 12px 15px;
+  border: 1px solid #b99a60;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #e9dfc9, #f8f1e4);
+  box-shadow: 0 4px 12px #30291f12;
+}
+.familiar-hint[hidden] { display: none !important; }
+.familiar-hint img {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  border: 2px solid #b99a60;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.familiar-hint-copy { min-width: 0; }
+.familiar-hint-copy b {
+  display: block;
+  margin-bottom: 4px;
+  color: #526044;
+  font: 700 17px 'Cormorant Garamond', Georgia, serif;
+}
+.familiar-hint-copy p {
+  margin: 0;
+  color: #514735;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.lesson-step-indicator {
+  margin: 0 0 12px;
+  color: #887044;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.lesson-body h2, .lesson-body h3 {
+  margin: 24px 0 10px;
+  color: #3b4937;
+}
+.lesson-body ul { padding-left: 22px; line-height: 1.75; }
+.lesson-body li { margin: 6px 0; }
